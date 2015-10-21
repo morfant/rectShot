@@ -81,6 +81,14 @@ void testApp::update(){
 		grayImage.threshold(threshold);
 		contourFinder.findContours(grayImage, kMIN_BLOBAREA, (OPENCV_WIDTH*OPENCV_HEIGHT)/3, kBLOBNUM, true);
         
+        //clear containers
+        blobsVec.clear();
+        
+        // get vector<ofxCvBlob>
+        blobsVec = contourFinder.blobs;
+        cvBlobNum = blobsVec.size();
+        
+        
         // cam -> colorImg
 //        colorImg.setFromPixels(vidGrabber.getPixels(), OPENCV_WIDTH,OPENCV_HEIGHT);
 //        colorImg.setFromPixels(movie.getPixels(), OPENCV_WIDTH,OPENCV_HEIGHT);
@@ -98,56 +106,6 @@ void testApp::update(){
 //		grayDiff.threshold(threshold);
 //
 //		contourFinder.findContours(grayDiff, kMIN_BLOBAREA, (OPENCV_WIDTH*OPENCV_HEIGHT)/3, kBLOBNUM, true);	// find holes
-        
-        //clear containers
-        blobsVec.clear();
-        blobsPts.clear();
-        blobsPtsDiv.clear();
-        rBlobsPtsDiv.clear();
-        blobCenterPos.clear();
-        
-        // get vector<ofxCvBlob>
-        blobsVec = contourFinder.blobs;
-        
-        
-        //blobsVec[0].pts = all points of 1st blob.
-        
-        if(blobsVec.size() != 0){
-            blobsPts = blobsVec[0].pts;
-            cvBlobPos = blobsVec[0].centroid;
-        }
-        
-        for (int i = 0; i < blobsPts.size(); i++){
-            cout << "blobsPts[" << i << "] : " << blobsPts[i] << endl;
-        }
-
-        
-        if(blobsPts.size() > 0){
-            divNum = blobsPts.size()/kMAX_VERTICES;
-            
-            // Make blobsPtsDiv
-            b2Vec2 temp = b2Vec2(0, 0);
-            temp.x = blobsPts[0].x;
-            temp.y = blobsPts[0].y;
-            
-            blobsPtsDiv.push_back(temp);
-        
-            for (int i = 1; i < (kMAX_VERTICES - 1); i++) {
-                b2Vec2 temp = b2Vec2(0, 0);
-                temp.x = blobsPts[divNum * i].x;
-                temp.y = blobsPts[divNum * i].y;
-                blobsPtsDiv.push_back(temp);
-            }
-        
-            temp.x = blobsPts[blobsPts.size() - 1].x;
-            temp.y = blobsPts[blobsPts.size() - 1].y;
-
-            blobsPtsDiv.push_back(temp);
-            
-            if(pBodies.size() != 0) resetPolygonBody();
-            if(pBodies.size() == 0) makeBodyAtCvPosition();
-            
-        }
 	}
 }
 
@@ -222,12 +180,7 @@ void testApp::draw(){
 
     
     // Draw body at cv pos
-    ofColor(0, 255, 0);
-    ofFill();
-    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
-    }
-    
+    drawPolygonBodies();
     
     
     // Right bottom rect.
@@ -240,16 +193,97 @@ void testApp::draw(){
     
 }
 
+void testApp::drawPolygonBodies(){
+    
+    ofColor(0, 255, 0);
+    ofFill();
+    
+    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+    }
+    
+}
+
+void testApp::makePolygonBody(int blobNum){
+    
+    if (blobNum != 0){ // blobNum 0 means "Nothing selected".
+        //clear containers
+        blobsVec.clear();
+        blobsPts.clear();
+        blobsPtsDiv.clear();
+        rBlobsPtsDiv.clear();
+        blobCenterPos.clear();
+        
+        // get vector<ofxCvBlob>
+        blobsVec = contourFinder.blobs;
+        
+        cvBlobNum = blobsVec.size();
+        //blobsVec[0].pts = all points of 1st blob.
+        
+        if(cvBlobNum != 0){
+            blobsPts = blobsVec[blobNum - 1].pts;
+            cvBlobPos = blobsVec[blobNum - 1].centroid;
+        }
+        
+        //        for (int i = 0; i < blobsPts.size(); i++){
+        //            cout << "blobsPts[" << i << "] : " << blobsPts[i] << endl;
+        //        }
+        
+        
+        if(blobsPts.size() > 0){
+            
+            // divNum = sampling interval
+            if (blobsPts.size() > kMAX_VERTICES){
+                divNum = blobsPts.size()/kMAX_VERTICES;
+            }else{
+                divNum = 1;
+            }
+            
+            // Make blobsPtsDiv
+            b2Vec2 temp = b2Vec2(0, 0);
+            temp.x = blobsPts[0].x;
+            temp.y = blobsPts[0].y;
+            
+            // Add first point of blob polygon shape.
+            blobsPtsDiv.push_back(temp);
+            
+            for (int i = 1; i < (kMAX_VERTICES - 1); i++) {
+                b2Vec2 temp = b2Vec2(0, 0);
+                temp.x = blobsPts[divNum * i].x;
+                temp.y = blobsPts[divNum * i].y;
+                blobsPtsDiv.push_back(temp);
+            }
+            
+            // Add end point of blob polygon shape
+            temp.x = blobsPts[blobsPts.size() - 1].x;
+            temp.y = blobsPts[blobsPts.size() - 1].y;
+            blobsPtsDiv.push_back(temp);
+            
+            
+            // Reset Box2d polygon bodies
+//            if(pBodies.size() != 0) resetPolygonBody();
+            
+            // Make new Box2d polygon bodies
+//            if(pBodies.size() == 0)
+            makeBodyAtCvPosition();
+            
+        }
+    }
+    
+    
+}
+
+
 void testApp::makeBodyAtCvPosition(){
 
     for (vector<b2Vec2>::iterator ir = blobsPtsDiv.end(); ir != blobsPtsDiv.begin(); ir--) {
         rBlobsPtsDiv.push_back(*(ir));
     }
     
-    cout << "b[0] / r[7] " << blobsPtsDiv[0].x << " / " << rBlobsPtsDiv[7].x << endl;
+//    cout << "b[0] / r[7] " << blobsPtsDiv[0].x << " / " << rBlobsPtsDiv[7].x << endl;
     
     
-    if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){
+    if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
         PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y);
         pBodies.push_back(aPbody);
     }
@@ -268,6 +302,7 @@ void testApp::resetPolygonBody(){
     
 }
 
+// I don't know how it is works.
 float testApp::getArea(b2Vec2* vertices, int maxVCount){
 
     int i,j;
@@ -281,6 +316,24 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
     
     area /= 2;
     return(area < 0 ? -area : area);
+    
+}
+
+
+int testApp::selBlob(ofRectangle blobRect, float mx, float my){
+    
+//    for (int i = 0; i < nBlobRect; i++){
+//        
+//        if (blobRect.inside(mx, my)){
+//            
+//        }
+//    
+//    }
+    
+    
+    
+    
+    
     
 }
 
@@ -334,12 +387,24 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
     
+    for (int i = 0; i < cvBlobNum; i++){
+        if (blobsVec[i].boundingRect.inside(x, y)){
+            selBlobRect = i + 1;
+            printf("Selected blob rect number: %d\n", selBlobRect);
+            makePolygonBody(selBlobRect);
+        }
+    }
+    
+    selBlobRect = 0;
+    
+    printf("Num of pbodies: %lu\n", pBodies.size());
 
 
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
+    selBlobRect = 0;
 
 }
 

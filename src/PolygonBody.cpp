@@ -143,16 +143,17 @@ PolygonBody::renderAtBodyPosition()
     b2Vec2 pos = mBody->GetPosition();
     
     ofSetColor(0, 200, 255);
-    ofPushMatrix();
+//    ofPushMatrix();
 //    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
     ofBeginShape();
 
     for (int i = 0; i < maxVertexCount; i++) {
         ofVertex(_toPixelX(mPts[i].x), _toPixelY(mPts[i].y));
+//        ofVertex(mPts[i].x, mPts[i].y);
     }
     
     ofEndShape();
-    ofPopMatrix();
+//    ofPopMatrix();
 }
 
 

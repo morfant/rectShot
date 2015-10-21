@@ -47,7 +47,12 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
 
+        //cv
+    int selBlob(ofRectangle blobRect, float x, float y);
+    
         //Box2d
+        void makePolygonBody(int blobNum);
+        void drawPolygonBodies();
         void resetPolygonBody();
         void makeBodyAtCvPosition();
         float getArea(b2Vec2* vertices, int maxVCount);
@@ -86,7 +91,9 @@ class testApp : public ofBaseApp{
         
         // container
     ofPoint cvBlobPos;
-    
+    ofRectangle cvBlobRect;
+    int cvBlobNum;
+    int selBlobRect;
         vector<Ball*>           balls;
         vector<PolygonBody*>    pBodies;
         vector<ofxCvBlob>       blobsVec;
