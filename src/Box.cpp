@@ -23,7 +23,8 @@ Box::Box(b2World* aWorld, float x, float y)
 //    posY = ofGetHeight()/2;
     
 	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_staticBody;
+//	myBodyDef.type = b2_staticBody;
+	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -35,7 +36,7 @@ Box::Box(b2World* aWorld, float x, float y)
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myPolygonShape;
-	myFixtureDef.density = 1.f;
+	myFixtureDef.density = 20.f;
     myFixtureDef.restitution = 0.5f;
     mBody->CreateFixture(&myFixtureDef);
 

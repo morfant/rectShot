@@ -23,7 +23,7 @@ enum {
     OPENCV_WIDTH = 720,
     OPENCV_HEIGHT = 480,
     kBLOBNUM = 1,
-    kMAX_VERTICES = 10,
+    kMAX_VERTICES = 100,
     kMIN_BLOBAREA = 10000
 };
 
@@ -64,6 +64,7 @@ class testApp : public ofBaseApp{
         //video
         ofVideoPlayer 		movie;
         bool                frameByframe;
+        bool                moviePlay;
     
     
         //blob
@@ -88,13 +89,17 @@ class testApp : public ofBaseApp{
         
         // Wall
         Wall                    *left, *right, *floor, *ceil;
-        
+    
+        // Box
+        Box*                    aBox;
+    
         // container
     ofPoint cvBlobPos;
     ofRectangle cvBlobRect;
     int cvBlobNum;
     int selBlobRect;
         vector<Ball*>           balls;
+        vector<Box*>            boxes;
         vector<PolygonBody*>    pBodies;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;
@@ -104,6 +109,8 @@ class testApp : public ofBaseApp{
         vector<b2Vec2>          rBlobsPtsDiv;
         
         float                   divNum;
+    
+    float                   aforce;
 
 
 };

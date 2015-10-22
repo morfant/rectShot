@@ -39,16 +39,16 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
-	b2PolygonShape myPolygonShape;
-    myPolygonShape.Set(mPts, maxVertexCount);
+//	b2PolygonShape myPolygonShape;
+//    myPolygonShape.Set(mPts, maxVertexCount);
 
-//    b2ChainShape chain;
+    b2ChainShape chain;
 //    chain.CreateChain(mPts, 8);
-//    chain.CreateLoop(mPts, maxVertexCount);
+    chain.CreateLoop(mPts, maxVertexCount);
 	   
 	b2FixtureDef myFixtureDef;
-	myFixtureDef.shape = &myPolygonShape;
-//	myFixtureDef.shape = &chain;
+//	myFixtureDef.shape = &myPolygonShape;
+	myFixtureDef.shape = &chain;
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);
@@ -83,13 +83,13 @@ PolygonBody::getArea(b2Vec2* vertices, int maxVCount)
 float
 PolygonBody::getX()
 {
-    return posX;
+    return _toPixelX(mBody->GetPosition().x);
 }
 
 float
 PolygonBody::getY()
 {
-    return posY;
+    return _toPixelY(mBody->GetPosition().y);
 }
 
 
@@ -145,9 +145,10 @@ PolygonBody::setVertices(b2Vec2* vertices)
 void
 PolygonBody::renderAtBodyPosition()
 {
+
     b2Vec2 pos = mBody->GetPosition();
     float32 angle = mBody->GetAngle();
-    printf("pbody angle: %f\n", angle);
+//    printf("pbody angle: %f\n", angle);
     
 //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
 //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));

@@ -6,6 +6,8 @@ void testApp::setup(){
     ofSetWindowPosition(950, 0);
     
 	frameByframe = false;
+    moviePlay = false;
+    
     
 	// Uncomment this to show movies with alpha channels
 	// fingerMovie.setPixelFormat(OF_PIXELS_RGBA);
@@ -24,7 +26,7 @@ void testApp::setup(){
 	grayDiff.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
 
 	bLearnBakground = true;
-	threshold = 100;
+	threshold = 115;
     
 
     
@@ -36,17 +38,34 @@ void testApp::setup(){
     // World
     aWorld = new World();
     iWorld = aWorld -> getWorld();
-    
-    // Wall
+
+    /*
+    // Wall - edge body
     left = new Wall(iWorld, b2Vec2(0, 0), b2Vec2(0, ofGetHeight()), ofGetHeight());
     right = new Wall(iWorld, b2Vec2(ofGetWidth(), 0), b2Vec2(ofGetWidth(), ofGetHeight()), ofGetHeight());
     floor = new Wall(iWorld, b2Vec2(0, ofGetHeight()), b2Vec2(ofGetWidth(), ofGetHeight()), ofGetWidth());
     ceil = new Wall(iWorld, b2Vec2(0, 0), b2Vec2(ofGetWidth(), 0), ofGetWidth());
-        
+    */
+    
+
+    // Wall - box
+    int thickness = 40;
+//    left = new Wall(iWorld, 0, ofGetHeight()/2, thickness, ofGetHeight());
+//    right = new Wall(iWorld, ofGetWidth(), ofGetHeight()/2, thickness, ofGetHeight());
+    floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight(), ofGetWidth(), thickness);
+//    ceil = new Wall(iWorld, ofGetWidth()/2, 0, ofGetWidth(), thickness);
+    
+    
     // vector init
     blobsPts.clear();
     blobsPtsDiv.clear();
-        
+    
+    // make balls
+    for (int i = 0; i < 60; i++){
+        Ball * aBall = new Ball(iWorld, ofGetWidth()/2.0f + i, ofGetHeight()/2.0f - i);
+        balls.push_back(aBall);
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -174,23 +193,32 @@ void testApp::draw(){
     // Draw Box2D walls
     ofColor(255, 250, 0);
     ofNoFill();
-    left->renderAtBodyPosition();
-    right->renderAtBodyPosition();
+//    left->renderAtBodyPosition();
+//    right->renderAtBodyPosition();
     floor->renderAtBodyPosition();
-    ceil->renderAtBodyPosition();
+//    ceil->renderAtBodyPosition();
 
     
     // Draw body at cv pos
     drawPolygonBodies();
     
     
-    // Right bottom rect.
-//    ofPushMatrix();
-//    ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
-//    ofScale(360.f / OPENCV_WIDTH, 280.f / OPENCV_HEIGHT);
-//    movie.draw(0, 0);
-//    ofPopMatrix();
+    if (moviePlay){
+        // Right bottom rect.
+        ofPushMatrix();
+        ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
+        ofScale(360.f / OPENCV_WIDTH, 280.f / OPENCV_HEIGHT);
+        movie.draw(0, 0);
+        ofPopMatrix();
+    }
 
+    // Draw box
+    ofColor(0, 0, 255);
+    ofFill();
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+    }
+    
     
 }
 
@@ -355,7 +383,34 @@ void testApp::keyPressed(int key){
 			if (threshold < 0) threshold = 0;
 			break;
 
-		case 'c': // clear
+        // Toggle original movie
+		case 'm':
+            if (moviePlay) moviePlay = false;
+            else moviePlay = true;
+			break;
+            
+		case 'M':
+            if (moviePlay) moviePlay = false;
+            else moviePlay = true;
+			break;
+
+
+        case 't':
+            aforce = 0.3;
+            
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                
+                b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
+                
+                (*iter)->getBody()->ApplyForce(
+                                               b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
+                                               b2Vec2(ofGetMouseX(), ofGetMouseY()));
+            }
+            
+            break;
+            
+        case 'c': // clear
 
             // clear b2Body
             for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
@@ -378,7 +433,7 @@ void testApp::keyReleased(int key){
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
     
-    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+//    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 
