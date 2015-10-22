@@ -185,11 +185,11 @@ void testApp::draw(){
     
     
     // Right bottom rect.
-    ofPushMatrix();
-    ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
-    ofScale(360.f / OPENCV_WIDTH, 280.f / OPENCV_HEIGHT);
-    movie.draw(0, 0);
-    ofPopMatrix();
+//    ofPushMatrix();
+//    ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
+//    ofScale(360.f / OPENCV_WIDTH, 280.f / OPENCV_HEIGHT);
+//    movie.draw(0, 0);
+//    ofPopMatrix();
 
     
 }

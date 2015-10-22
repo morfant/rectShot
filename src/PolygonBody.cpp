@@ -20,6 +20,11 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     posY = yy;
     maxVertexCount = maxVCount;
     
+    // vec direction check - CCw
+//    for (int i = 0; i < 4; i++){
+//        printf("vec[%d] x: %f, y: %f\n", i, vertices[i].x, vertices[i].y);
+//    }
+    
     for (int i = 0; i < maxVertexCount; i++) {
         mPts[i].x = _tovWorldX(vertices[i].x);
         mPts[i].y = _tovWorldY(vertices[i].y);
@@ -34,16 +39,16 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
-//	b2PolygonShape myPolygonShape;
-//    myPolygonShape.Set(mPts, maxVertexCount);
+	b2PolygonShape myPolygonShape;
+    myPolygonShape.Set(mPts, maxVertexCount);
 
-    b2ChainShape chain;
+//    b2ChainShape chain;
 //    chain.CreateChain(mPts, 8);
-    chain.CreateLoop(mPts, maxVertexCount);
+//    chain.CreateLoop(mPts, maxVertexCount);
 	   
 	b2FixtureDef myFixtureDef;
-//	myFixtureDef.shape = &myPolygonShape;
-	myFixtureDef.shape = &chain;
+	myFixtureDef.shape = &myPolygonShape;
+//	myFixtureDef.shape = &chain;
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);
@@ -141,12 +146,16 @@ void
 PolygonBody::renderAtBodyPosition()
 {
     b2Vec2 pos = mBody->GetPosition();
+    float32 angle = mBody->GetAngle();
+    printf("pbody angle: %f\n", angle);
+    
 //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
-    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
+//    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
     
     ofSetColor(0, 200, 25);
     ofPushMatrix();
     ofTranslate(_tovPixelX(pos.x), _tovPixelY(pos.y)); //Must use for image moving.
+    ofRotate(_toDegree(angle));
     ofBeginShape();
 
     for (int i = 0; i < maxVertexCount; i++) {
