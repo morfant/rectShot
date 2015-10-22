@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
+    ofSetWindowPosition(950, 0);
     
 	frameByframe = false;
     
@@ -202,6 +203,7 @@ void testApp::drawPolygonBodies(){
         (*iter)->renderAtBodyPosition();
     }
     
+    
 }
 
 void testApp::makePolygonBody(int blobNum){
@@ -375,6 +377,8 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
+    
+    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 

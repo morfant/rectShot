@@ -12,25 +12,25 @@
 
 // ----Birth & Death----
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float x, float y)
+PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy)
 {
     
     mWorld = aWorld;
-    posX = x;
-    posY = y;
+    posX = xx;
+    posY = yy;
     maxVertexCount = maxVCount;
     
     for (int i = 0; i < maxVertexCount; i++) {
-        mPts[i].x = _toWorldX(vertices[i].x);
-        mPts[i].y = _toWorldY(vertices[i].y);
+        mPts[i].x = _tovWorldX(vertices[i].x);
+        mPts[i].y = _tovWorldY(vertices[i].y);
     }
     
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
-//    myBodyDef.position.Set(_toWorldX(posX/2.f), _toWorldY(posY/2.f));
+    myBodyDef.position.Set(_tovWorldX(posX), _tovWorldY(posY));
     
-    myBodyDef.position.Set(0, 0);
+//    myBodyDef.position.Set(0, 0);
     
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -44,8 +44,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	b2FixtureDef myFixtureDef;
 //	myFixtureDef.shape = &myPolygonShape;
 	myFixtureDef.shape = &chain;
-//	myFixtureDef.density = 1.f;
-//    myFixtureDef.restitution = 0.5f;
+	myFixtureDef.density = 1.f;
+    myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);
 
 	
@@ -118,8 +118,8 @@ void
 PolygonBody::setVertices(b2Vec2* vertices)
 {
     for (int i = 0; i < maxVertexCount; i++) {
-        mPts[i].x = _toWorldX(vertices[i].x);
-        mPts[i].y = _toWorldY(vertices[i].y);
+        mPts[i].x = _tovWorldX(vertices[i].x);
+        mPts[i].y = _tovWorldY(vertices[i].y);
     }
     
     
@@ -141,19 +141,21 @@ void
 PolygonBody::renderAtBodyPosition()
 {
     b2Vec2 pos = mBody->GetPosition();
+//    printf("pbody pos: %f, %f\n", pos.x, pos.y);
+    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
     
-    ofSetColor(0, 200, 255);
-//    ofPushMatrix();
-//    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
+    ofSetColor(0, 200, 25);
+    ofPushMatrix();
+    ofTranslate(_tovPixelX(pos.x), _tovPixelY(pos.y)); //Must use for image moving.
     ofBeginShape();
 
     for (int i = 0; i < maxVertexCount; i++) {
-        ofVertex(_toPixelX(mPts[i].x), _toPixelY(mPts[i].y));
-//        ofVertex(mPts[i].x, mPts[i].y);
+//        ofVertex(_tovPixelX(mPts[i].x), _tovPixelY(mPts[i].y));
+        ofVertex(mPts[i].x * BOX2D_SCALE, mPts[i].y * BOX2D_SCALE * (-1.f) );
     }
     
     ofEndShape();
-//    ofPopMatrix();
+    ofPopMatrix();
 }
 
 

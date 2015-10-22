@@ -24,3 +24,8 @@
 #define _toWorldY(y)	(_round2(((ofGetHeight() / 2.f) - y) / BOX2D_SCALE))
 
 #define _toWorldScale(v) (_round2(v / BOX2D_SCALE))
+
+#define _tovPixelX(x)	(720.f / 2.f + (BOX2D_SCALE * x))
+#define _tovPixelY(y)	(480.f / 2.f - (BOX2D_SCALE * y))
+#define _tovWorldX(x)	(_round2(((720.f / 2.f) - x) / BOX2D_SCALE) * -1.f)
+#define _tovWorldY(y)	(_round2(((480.f / 2.f) - y) / BOX2D_SCALE))
