@@ -33,9 +33,10 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
-    myBodyDef.position.Set(_tovWorldX(posX), _tovWorldY(posY));
     
-//    myBodyDef.position.Set(0, 0);
+//    myBodyDef.position.Set(_tovWorldX(posX), _tovWorldY(posY));
+    
+    myBodyDef.position.Set(0, 0);
     
 	mBody = mWorld -> CreateBody(&myBodyDef);
     

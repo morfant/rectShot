@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    ofSetWindowPosition(950, 0);
+    ofSetWindowPosition(750, 0);
     
 	frameByframe = false;
     moviePlay = false;
@@ -26,7 +26,7 @@ void testApp::setup(){
 	grayDiff.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
 
 	bLearnBakground = true;
-	threshold = 115;
+	threshold = 35;
     
 
     
@@ -315,6 +315,9 @@ void testApp::makeBodyAtCvPosition(){
     
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
         PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y);
+        
+        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
+        
         pBodies.push_back(aPbody);
     }
     
@@ -401,7 +404,7 @@ void testApp::keyPressed(int key){
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 
                 b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
+//                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
                 
                 (*iter)->getBody()->ApplyForce(
                                                b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
@@ -433,7 +436,7 @@ void testApp::keyReleased(int key){
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
     
-//    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 
@@ -457,6 +460,8 @@ void testApp::mousePressed(int x, int y, int button){
     selBlobRect = 0;
     
     printf("Num of pbodies: %lu\n", pBodies.size());
+
+    
 
 
 }

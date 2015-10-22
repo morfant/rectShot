@@ -23,7 +23,7 @@ enum {
     OPENCV_WIDTH = 720,
     OPENCV_HEIGHT = 480,
     kBLOBNUM = 1,
-    kMAX_VERTICES = 100,
+    kMAX_VERTICES = 200,
     kMIN_BLOBAREA = 10000
 };
 
