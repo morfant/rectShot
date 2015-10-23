@@ -62,6 +62,12 @@ Wall::Wall(b2World* aWorld, int x, int y, float w, float h)
     
 	b2PolygonShape myPolygonShape;
 	myPolygonShape.SetAsBox(_toWorldScale(w)/2.f, _toWorldScale(h)/2.f);
+
+    // Store vertice
+    for (int i = 0; i < 4; i++){
+        vertice[i] = myPolygonShape.GetVertex(i);
+    }
+
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myPolygonShape;
@@ -105,6 +111,11 @@ Wall::getEndPoint()
     return mEndPoint;
 }
 
+b2Vec2
+Wall::getVertex(int idx)
+{
+    return vertice[idx];
+}
 
 void
 Wall::setX(float _posX)
@@ -122,8 +133,34 @@ Wall::setY(float _posY)
 void
 Wall::renderAtBodyPosition()
 {
+    /* // Edge body
     ofSetLineWidth(1.f);
     ofLine(mBeginPoint.x, mBeginPoint.y, mEndPoint.x, mEndPoint.y);
+     */
+
+    b2Vec2 pos = mBody->GetPosition();
+    
+//    printf("Wall pos: %f, %f\n", _toPixelX(pos.x), _toPixelY(pos.y));
+//    
+//    for (int i = 0; i < 4; i++){
+//            printf("vtestice %d: %f, %f\n", i, _toPixelX(vertice[i].x), _toPixelY(vertice[i].y));
+//    }
+    
+    float w = abs((vertice[0].x - vertice[1].x) * BOX2D_SCALE);
+    float h = abs((vertice[0].y - vertice[3].y) * BOX2D_SCALE);
+
+//    printf("Wall w: %f, h: %f\n", w, h);
+    
+    ofPushStyle();
+    ofSetRectMode(OF_RECTMODE_CENTER);
+    ofSetColor(100, 200, 200); // Wall color
+    ofFill();
+    ofPushMatrix();
+    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
+    ofRect(0, 0, w, h);
+    ofPopMatrix();
+    ofPopStyle();
+    
 }
 
 

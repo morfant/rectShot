@@ -6,7 +6,10 @@ void testApp::setup(){
     ofSetWindowPosition(750, 0);
     
 	frameByframe = false;
-    moviePlay = false;
+    movPlay = false;
+    movPlaySmall = false;
+    info = true;
+    grayPlay = false;
     
     
 	// Uncomment this to show movies with alpha channels
@@ -131,79 +134,60 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
     
-    // Set basic draw options
-    ofSetLineWidth(1.0);
-    ofSetRectMode(OF_RECTMODE_CORNER);
+    ofBackground(0, 0, 0);
+
+
+    // Draw movie file.
+    if (movPlay){
+        movie.draw(0, 0);
+    }
+
     
 	// draw the incoming, the grayscale, the bg and the thresholded difference
-	ofSetHexColor(0xffffff);
-//	colorImg.draw(20,20);
-//	grayImage.draw(360,20);
-//	grayBg.draw(20,280);
-//	grayDiff.draw(360,280);
-
-	// then draw the contours:
-	ofFill();
-	ofSetHexColor(0x333333);
-//	ofRect(360,540,320,240);
-	ofRect(0, 0, OPENCV_WIDTH, OPENCV_HEIGHT);
-	ofSetHexColor(0xffffff);
-
-	// we could draw the whole contour finder
-	//contourFinder.draw(360,540);
-
-	// or, instead we can draw each blob individually from the blobs vector,
-	// this is how to get access to them:
+//	ofSetHexColor(0xffffff);
+//	colorImg.draw(0,0);
     
-//    cout<<"nblobs: "<<contourFinder.nBlobs<<endl;
+    // Draw gray image.
+    if (grayPlay){
+        grayImage.draw(0,0);
+    }
+    
+//	grayBg.draw(0,0);
+//	grayDiff.draw(0,0);
+
+
+    // Draw contourFinder
+    ofPushStyle();
+    ofSetLineWidth(1.0);
     
     for (int i = 0; i < contourFinder.nBlobs; i++){
 //        contourFinder.blobs[i].draw(360,540);
         contourFinder.blobs[i].draw(0, 0);
-        
-		
-		// draw over the centroid if the blob is a hole
-//		ofSetColor(255);
-//		if(contourFinder.blobs[i].hole){
-//			ofDrawBitmapString("hole",
-//				contourFinder.blobs[i].boundingRect.getCenter().x + 360,
-//				contourFinder.blobs[i].boundingRect.getCenter().y + 540);
-//		}
     }
-
-	// finally, a report:
-	ofSetHexColor(0xffffff);
-	stringstream reportStr;
-	reportStr << "bg subtraction and blob detection" << endl
-			  << "press ' ' to capture bg" << endl
-			  << "threshold " << threshold << " (press: +/-)" << endl
-			  << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-	ofDrawBitmapString(reportStr.str(), 20, 600);
+    
+    ofPopStyle();
     
     
     // Draw ball
-    ofColor(255, 0, 0);
-    ofFill();
     for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
         (*iter)->renderAtBodyPosition();
     }
     
     // Draw Box2D walls
-    ofColor(255, 250, 0);
-    ofNoFill();
 //    left->renderAtBodyPosition();
 //    right->renderAtBodyPosition();
     floor->renderAtBodyPosition();
 //    ceil->renderAtBodyPosition();
 
     
+    
+    
     // Draw body at cv pos
     drawPolygonBodies();
     
     
-    if (moviePlay){
+    if (movPlaySmall){
         // Right bottom rect.
         ofPushMatrix();
         ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
@@ -211,12 +195,19 @@ void testApp::draw(){
         movie.draw(0, 0);
         ofPopMatrix();
     }
-
-    // Draw box
-    ofColor(0, 0, 255);
-    ofFill();
-    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
+    
+    
+	// finally, a report
+    if (info){
+        ofPushStyle();
+        ofSetHexColor(0x00ffaa);
+        stringstream reportStr;
+        reportStr << "bg subtraction and blob detection" << endl
+        << "press ' ' to capture bg" << endl
+        << "threshold " << threshold << " (press: +/-)" << endl
+        << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
+        ofDrawBitmapString(reportStr.str(), 10, 10);
+        ofPopStyle();
     }
     
     
@@ -335,7 +326,7 @@ void testApp::resetPolygonBody(){
     
 }
 
-// I don't know how it is works.
+// I don't know how it works.
 float testApp::getArea(b2Vec2* vertices, int maxVCount){
 
     int i,j;
@@ -353,22 +344,6 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
 }
 
 
-int testApp::selBlob(ofRectangle blobRect, float mx, float my){
-    
-//    for (int i = 0; i < nBlobRect; i++){
-//        
-//        if (blobRect.inside(mx, my)){
-//            
-//        }
-//    
-//    }
-    
-    
-    
-    
-    
-    
-}
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
@@ -381,23 +356,72 @@ void testApp::keyPressed(int key){
 			threshold ++;
 			if (threshold > 255) threshold = 255;
 			break;
+            
+		case '=':
+			threshold ++;
+			if (threshold > 255) threshold = 255;
+			break;
+            
 		case '-':
 			threshold --;
 			if (threshold < 0) threshold = 0;
 			break;
 
-        // Toggle original movie
+
+        // Toggle gray image play
+		case 'g':
+            if (grayPlay) grayPlay = false;
+            else grayPlay = true;
+			break;
+
+		case 'G':
+            if (grayPlay) grayPlay = false;
+            else grayPlay = true;
+			break;
+            
+            
+        // Toggle original movie play full screen
 		case 'm':
-            if (moviePlay) moviePlay = false;
-            else moviePlay = true;
+            if (movPlay) movPlay = false;
+            else{
+                grayPlay = false;
+                movPlay = true;
+            }
 			break;
             
 		case 'M':
-            if (moviePlay) moviePlay = false;
-            else moviePlay = true;
+            if (movPlay) movPlay = false;
+            else{
+                grayPlay = false;
+                movPlay = true;
+            }
+			break;
+            
+            
+        // Toggle original movie play at bottom right
+		case 'b':
+            if (movPlaySmall) movPlaySmall = false;
+            else movPlaySmall = true;
+			break;
+            
+		case 'B':
+            if (movPlaySmall) movPlaySmall = false;
+            else movPlaySmall = true;
 			break;
 
+        // Toggle text info report.
+		case 'i':
+            if (info) info = false;
+            else info = true;
+			break;
+            
+		case 'I':
+            if (info) info = false;
+            else info = true;
+			break;
+            
 
+        //Apply force to pBodies.
         case 't':
             aforce = 0.3;
             
@@ -436,7 +460,7 @@ void testApp::keyReleased(int key){
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
     
-    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+//    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 

@@ -44,6 +44,7 @@ public:
     float   getArea(b2Vec2* vertices, int maxVCount);
     float   getX();
     float   getY();
+    b2Vec2   getVertex(int i);
     
     b2World*    getWorld();
     b2Body*     getBody();

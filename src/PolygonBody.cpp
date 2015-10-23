@@ -94,6 +94,12 @@ PolygonBody::getY()
 }
 
 
+b2Vec2
+PolygonBody::getVertex(int idx)
+{
+    return mPts[idx];
+}
+
 b2World*
 PolygonBody::getWorld()
 {
@@ -154,7 +160,8 @@ PolygonBody::renderAtBodyPosition()
 //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
 //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
     
-    ofSetColor(0, 200, 25);
+    ofPushStyle();
+    ofSetColor(0, 200, 25); //Set Polygon body color
     ofPushMatrix();
     ofTranslate(_tovPixelX(pos.x), _tovPixelY(pos.y)); //Must use for image moving.
     ofRotate(_toDegree(angle));
@@ -167,6 +174,7 @@ PolygonBody::renderAtBodyPosition()
     
     ofEndShape();
     ofPopMatrix();
+    ofPopStyle();
 }
 
 

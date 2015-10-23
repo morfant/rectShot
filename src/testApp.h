@@ -47,8 +47,6 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
 
-        //cv
-    int selBlob(ofRectangle blobRect, float x, float y);
     
         //Box2d
         void makePolygonBody(int blobNum);
@@ -64,7 +62,11 @@ class testApp : public ofBaseApp{
         //video
         ofVideoPlayer 		movie;
         bool                frameByframe;
-        bool                moviePlay;
+        bool                movPlay;
+        bool                grayPlay;
+        bool                movPlaySmall;
+    
+        bool                info;
     
     
         //blob

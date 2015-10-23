@@ -93,11 +93,14 @@ Ball::renderAtBodyPosition()
 {
     b2Vec2 pos = mBody->GetPosition();
     
-    ofSetColor(255, 255, 0);
+    ofPushStyle();
+    ofSetColor(250, 250, 0); // Set ball color
+    ofFill();
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
     ofEllipse(0, 0, radius, radius);
     ofPopMatrix();
+    ofPopStyle();
 }
 
 

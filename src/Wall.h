@@ -32,6 +32,8 @@ protected:
     b2Vec2 mBeginPoint;
     b2Vec2 mEndPoint;
     
+    b2Vec2 vertice[4];
+    
 	// Body & world
 	b2Body*		mBody;
     b2World*    mWorld;
@@ -51,6 +53,8 @@ public:
     
     b2Vec2   getBeginPoint();
     b2Vec2   getEndPoint();
+    
+    b2Vec2  getVertex(int idx);
     
     // Setter
     void    setX(float posX);
