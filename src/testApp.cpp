@@ -5,25 +5,36 @@ void testApp::setup(){
 
     ofSetWindowPosition(500, 0);
     
+    camUse = false;
 	frameByframe = false;
     movPlay = false;
     movPlaySmall = false;
     info = true;
     grayPlay = false;
     
+    // Threshold inverting setting.
+    inverting[0] = true; // for vidGrabber
+    for (int i = 1; i < MOVNUM; i++) {
+        inverting[i] = false;
+    }
+    
     
 	// Uncomment this to show movies with alpha channels
 	// fingerMovie.setPixelFormat(OF_PIXELS_RGBA);
     
-    curMovie = 0;
+    curMovie = 1; // 0 means using vidGrabber.
     
-    movie[0].loadMovie("movies/test.mov");
-    movie[1].loadMovie("movies/fieldtest.mov");
-    movie[2].loadMovie("movies/rline.mov");
-    movie[3].loadMovie("movies/jump.mov");
+    movie[1].loadMovie("movies/test.mov");
+    movie[2].loadMovie("movies/fieldtest.mov");
+    movie[3].loadMovie("movies/rline.mov");
+    movie[4].loadMovie("movies/jump.mov");
+    
+    
     
     // Get movie Width / Height
-    for (int i = 0; i < MOVNUM; i++){
+    movRes[0] = ofVec2f(CV_CAM_WIDTH, CV_CAM_HEIGHT);
+    
+    for (int i = 1; i < MOVNUM; i++){
         movRes[i].x = movie[i].getWidth();
         movRes[i].y = movie[i].getHeight();
     }
@@ -32,26 +43,23 @@ void testApp::setup(){
     
     
     // OPEN CV
-//    vidGrabber.setVerbose(true);
-//    vidGrabber.initGrabber(OPENCV_WIDTH, OPENCV_HEIGHT);
+    // Using cam
+    vidGrabber.setVerbose(true);
+    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
 
-//    colorImg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-//	grayImage.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-//	grayBg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-//	grayDiff.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-    
+    // Using movie files
     colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
-	grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
-	grayBg.allocate(movRes[curMovie].x, movRes[curMovie].y);
-	grayDiff.allocate(movRes[curMovie].x, movRes[curMovie].y);
+    grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
+    grayBg.allocate(movRes[curMovie].x, movRes[curMovie].y);
+    grayDiff.allocate(movRes[curMovie].x, movRes[curMovie].y);
     
-	bLearnBakground = true;
     
     // Set cv threshold
-    threshold[0] = TH_1;
-    threshold[1] = TH_2;
-    threshold[2] = TH_3;
-    threshold[3] = TH_4;
+    threshold[0] = TH_CAM;
+    threshold[1] = TH_1;
+    threshold[2] = TH_2;
+    threshold[3] = TH_3;
+    threshold[4] = TH_4;
 
     
     // Box2D
@@ -74,10 +82,10 @@ void testApp::setup(){
 
     // Wall - box
     int thickness = 40;
-//    left = new Wall(iWorld, 0, ofGetHeight()/2, thickness, ofGetHeight());
-//    right = new Wall(iWorld, ofGetWidth(), ofGetHeight()/2, thickness, ofGetHeight());
+    left = new Wall(iWorld, 0, ofGetHeight()/2, thickness, ofGetHeight());
+    right = new Wall(iWorld, ofGetWidth(), ofGetHeight()/2, thickness, ofGetHeight());
     floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight(), ofGetWidth(), thickness);
-//    ceil = new Wall(iWorld, ofGetWidth()/2, 0, ofGetWidth(), thickness);
+    ceil = new Wall(iWorld, ofGetWidth()/2, 0, ofGetWidth(), thickness);
     
     
     // vector init
@@ -104,60 +112,45 @@ void testApp::update(){
     
     // opencv update
 	ofBackground(200, 200, 200);
-
     bool bNewFrame = false;
 
 
-    /*
-    //cam
-    vidGrabber.update();
-    bNewFrame = vidGrabber.isFrameNew();
-    */
-    
-    //movie
-    movie[curMovie].update();
 
-    bNewFrame = movie[curMovie].isFrameNew();
+    //cam
+    if (curMovie == 0) {
+        vidGrabber.update();
+        bNewFrame = vidGrabber.isFrameNew();
+    }else{
+        //movie
+        movie[curMovie].update();
+        bNewFrame = movie[curMovie].isFrameNew();
+    }
+
+    
 
 	if (bNewFrame){
-        
+
         // Resize allocated images.
         colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
         grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
-        grayBg.resize(movRes[curMovie].x, movRes[curMovie].y);
-        grayDiff.resize(movRes[curMovie].x, movRes[curMovie].y);
+    
+        if (curMovie == 0){// For vidGrabber
+            vidGrabber.update();
+            colorImg.setFromPixels(vidGrabber.getPixels(), movRes[curMovie].x, movRes[curMovie].y);
+        }else{// For vidPlayer
+            movie[curMovie].update();
+            colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
+        }
+    
+        grayImage.setFromColorImage(colorImg);
+        grayImage.threshold(threshold[curMovie], inverting[curMovie]);
+        contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
         
-		movie[curMovie].update();
-		colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-		grayImage.setFromColorImage(colorImg);
-		grayImage.threshold(threshold[curMovie]);
-		contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
-        
-        //clear containers
-        blobsVec.clear();
-        
-        // get vector<ofxCvBlob>
-        blobsVec = contourFinder.blobs;
+
+        blobsVec.clear(); //Init containers with clearing.
+        blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
         cvBlobNum = blobsVec.size();
         
-        
-        // cam -> colorImg
-//        colorImg.setFromPixels(vidGrabber.getPixels(), OPENCV_WIDTH,OPENCV_HEIGHT);
-//        colorImg.setFromPixels(movie.getPixels(), OPENCV_WIDTH,OPENCV_HEIGHT);
-
-        // with automatic change from color to grayscale.
-//        grayImage = colorImg;
-        
-//		if (bLearnBakground == true){
-//			grayBg = grayImage;		// the = sign copys the pixels from grayImage into grayBg (operator overloading)
-//			bLearnBakground = false;
-//		}
-
-		// take the abs value of the difference between background and incoming and then threshold:
-//		grayDiff.absDiff(grayBg, grayImage);
-//		grayDiff.threshold(threshold);
-//
-//		contourFinder.findContours(grayDiff, kMIN_BLOBAREA, (OPENCV_WIDTH*OPENCV_HEIGHT)/3, kBLOBNUM, true);	// find holes
 	}
 }
 
@@ -166,25 +159,20 @@ void testApp::draw(){
     
     ofBackground(0, 0, 0);
 
-
-    // Draw movie file.
+    // Draw movie.
     if (movPlay){
-        movie[curMovie].draw(0, 0);
+        if (curMovie == 0) {
+            vidGrabber.draw(0, 0);
+        }else{
+            movie[curMovie].draw(0, 0);
+        }
     }
 
-    
-	// draw the incoming, the grayscale, the bg and the thresholded difference
-//	ofSetHexColor(0xffffff);
-//	colorImg.draw(0,0);
     
     // Draw gray image.
     if (grayPlay){
         grayImage.draw(0,0);
     }
-    
-//	grayBg.draw(0,0);
-//	grayDiff.draw(0,0);
-
 
     // Draw contourFinder
     ofPushStyle();
@@ -194,20 +182,20 @@ void testApp::draw(){
 //        contourFinder.blobs[i].draw(360,540);
         contourFinder.blobs[i].draw(0, 0);
     }
-    
     ofPopStyle();
-    
+
     
     // Draw ball
     for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
         (*iter)->renderAtBodyPosition();
     }
     
+    
     // Draw Box2D walls
-//    left->renderAtBodyPosition();
-//    right->renderAtBodyPosition();
+    left->renderAtBodyPosition();
+    right->renderAtBodyPosition();
     floor->renderAtBodyPosition();
-//    ceil->renderAtBodyPosition();
+    ceil->renderAtBodyPosition();
 
     
     
@@ -215,15 +203,15 @@ void testApp::draw(){
     // Draw body at cv pos
     drawPolygonBodies();
     
-    
-    if (movPlaySmall){
-        // Right bottom rect.
-        ofPushMatrix();
-        ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
-        ofScale(360.f / movRes[curMovie].x, 280.f / movRes[curMovie].y);
-        movie[curMovie].draw(0, 0);
-        ofPopMatrix();
-    }
+//    
+//    if (movPlaySmall){
+//        // Right bottom rect.
+//        ofPushMatrix();
+//        ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
+//        ofScale(360.f / movRes[curMovie].x, 280.f / movRes[curMovie].y);
+//        movie[curMovie].draw(0, 0);
+//        ofPopMatrix();
+//    }
     
     
 	// finally, a report
@@ -232,11 +220,12 @@ void testApp::draw(){
         ofSetHexColor(0x00ffaa);
         stringstream reportStr;
         reportStr << "Mov : " << curMovie+1 << endl
-        << "bg subtraction and blob detection" << endl
-        << "press ' ' to capture bg" << endl
         << "threshold " << threshold[curMovie] << " (press: +/-)" << endl
-        << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
-        ofDrawBitmapString(reportStr.str(), 10, 10);
+        << "press ' ' to invert" << endl
+        << "num blobs found " << contourFinder.nBlobs << endl
+        << "num polygonBodies " << pBodies.size() << endl
+        << "FPS: " << ofGetFrameRate();
+        ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
     }
     
@@ -384,36 +373,43 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
 void testApp::keyPressed(int key){
 
 	switch (key){
-            
-        // Movie file select
-		case '1':
-            movie[curMovie].stop();
-			curMovie = 0;
-            movie[curMovie].play();
-			break;
 
-		case '2':
-            movie[curMovie].stop();
+        // Movie select - 0 means using vidGrabber
+		case '0':
+            if (curMovie != 0) movie[curMovie].stop();
+            curMovie = 0;
+			break;
+            
+		case '1':
+            if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 1;
             movie[curMovie].play();
 			break;
 
-		case '3':
-            movie[curMovie].stop();
+		case '2':
+            if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 2;
             movie[curMovie].play();
 			break;
 
-		case '4':
-            movie[curMovie].stop();
+		case '3':
+            if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 3;
+            movie[curMovie].play();
+			break;
+
+		case '4':
+            if (curMovie != 0) movie[curMovie].stop();
+			curMovie = 4;
             movie[curMovie].play();
 			break;
             
             
+        // Toggle threshold inverting.
 		case ' ':
-			bLearnBakground = true;
+            inverting[curMovie] = !inverting[curMovie];
 			break;
+            
 		case '+':
 			threshold[curMovie]++;
 			if (threshold[curMovie] > 255) threshold[curMovie] = 255;

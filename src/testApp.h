@@ -20,11 +20,14 @@
 
 // ---- Macros ----
 enum {
-    MOVNUM = 4,
+    MOVNUM = 5, //Num of movie files + cam
+    TH_CAM = 100,
     TH_1 = 100,
     TH_2 = 100,
     TH_3 = 100,
     TH_4 = 100,
+    CV_CAM_WIDTH = 720,
+    CV_CAM_HEIGHT = 480,
     kBLOBNUM = 2,
     kMAX_VERTICES = 100,
     kMIN_BLOBAREA = 100
@@ -63,10 +66,11 @@ class testApp : public ofBaseApp{
         ofVideoGrabber 		vidGrabber;
     
         //video
-        ofVideoPlayer 		movie[4];
-    
-        ofVec2f             movRes[4];
+        ofVideoPlayer 		movie[MOVNUM];
+        ofVec2f             movRes[MOVNUM];
+        bool                camUse;
         int                 curMovie;
+        int                 preMovie;
         bool                frameByframe;
         bool                movPlay;
         bool                grayPlay;
@@ -83,6 +87,7 @@ class testApp : public ofBaseApp{
         ofxCvContourFinder      contourFinder;
 
 		int                     threshold[MOVNUM];
+        bool                    inverting[MOVNUM];
 		bool                    bLearnBakground;
     
     
