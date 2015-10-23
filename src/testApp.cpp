@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    ofSetWindowPosition(750, 0);
+    ofSetWindowPosition(500, 0);
     
 	frameByframe = false;
     movPlay = false;
@@ -15,22 +15,43 @@ void testApp::setup(){
 	// Uncomment this to show movies with alpha channels
 	// fingerMovie.setPixelFormat(OF_PIXELS_RGBA);
     
-	movie.loadMovie("movies/test.mov");
-	movie.play();
+    curMovie = 0;
+    
+    movie[0].loadMovie("movies/test.mov");
+    movie[1].loadMovie("movies/fieldtest.mov");
+    movie[2].loadMovie("movies/rline.mov");
+    movie[3].loadMovie("movies/jump.mov");
+    
+    // Get movie Width / Height
+    for (int i = 0; i < MOVNUM; i++){
+        movRes[i].x = movie[i].getWidth();
+        movRes[i].y = movie[i].getHeight();
+    }
+
+    movie[curMovie].play();
     
     
     // OPEN CV
 //    vidGrabber.setVerbose(true);
 //    vidGrabber.initGrabber(OPENCV_WIDTH, OPENCV_HEIGHT);
 
-    colorImg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-	grayImage.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-	grayBg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-	grayDiff.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
-
-	bLearnBakground = true;
-	threshold = 35;
+//    colorImg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
+//	grayImage.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
+//	grayBg.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
+//	grayDiff.allocate(OPENCV_WIDTH, OPENCV_HEIGHT);
     
+    colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
+	grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
+	grayBg.allocate(movRes[curMovie].x, movRes[curMovie].y);
+	grayDiff.allocate(movRes[curMovie].x, movRes[curMovie].y);
+    
+	bLearnBakground = true;
+    
+    // Set cv threshold
+    threshold[0] = TH_1;
+    threshold[1] = TH_2;
+    threshold[2] = TH_3;
+    threshold[3] = TH_4;
 
     
     // Box2D
@@ -94,15 +115,23 @@ void testApp::update(){
     */
     
     //movie
-    movie.update();
-    bNewFrame = movie.isFrameNew();
+    movie[curMovie].update();
+
+    bNewFrame = movie[curMovie].isFrameNew();
 
 	if (bNewFrame){
-		movie.update();
-		colorImg.setFromPixels(movie.getPixels(), OPENCV_WIDTH, OPENCV_HEIGHT);
+        
+        // Resize allocated images.
+        colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
+        grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
+        grayBg.resize(movRes[curMovie].x, movRes[curMovie].y);
+        grayDiff.resize(movRes[curMovie].x, movRes[curMovie].y);
+        
+		movie[curMovie].update();
+		colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
 		grayImage.setFromColorImage(colorImg);
-		grayImage.threshold(threshold);
-		contourFinder.findContours(grayImage, kMIN_BLOBAREA, (OPENCV_WIDTH*OPENCV_HEIGHT)/3, kBLOBNUM, true);
+		grayImage.threshold(threshold[curMovie]);
+		contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
         
         //clear containers
         blobsVec.clear();
@@ -140,7 +169,7 @@ void testApp::draw(){
 
     // Draw movie file.
     if (movPlay){
-        movie.draw(0, 0);
+        movie[curMovie].draw(0, 0);
     }
 
     
@@ -191,8 +220,8 @@ void testApp::draw(){
         // Right bottom rect.
         ofPushMatrix();
         ofTranslate(ofGetWidth() - 360, ofGetHeight() - 280);
-        ofScale(360.f / OPENCV_WIDTH, 280.f / OPENCV_HEIGHT);
-        movie.draw(0, 0);
+        ofScale(360.f / movRes[curMovie].x, 280.f / movRes[curMovie].y);
+        movie[curMovie].draw(0, 0);
         ofPopMatrix();
     }
     
@@ -202,9 +231,10 @@ void testApp::draw(){
         ofPushStyle();
         ofSetHexColor(0x00ffaa);
         stringstream reportStr;
-        reportStr << "bg subtraction and blob detection" << endl
+        reportStr << "Mov : " << curMovie+1 << endl
+        << "bg subtraction and blob detection" << endl
         << "press ' ' to capture bg" << endl
-        << "threshold " << threshold << " (press: +/-)" << endl
+        << "threshold " << threshold[curMovie] << " (press: +/-)" << endl
         << "num blobs found " << contourFinder.nBlobs << ", fps: " << ofGetFrameRate();
         ofDrawBitmapString(reportStr.str(), 10, 10);
         ofPopStyle();
@@ -307,10 +337,15 @@ void testApp::makeBodyAtCvPosition(){
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
         PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y);
         
-        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
+//        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
         pBodies.push_back(aPbody);
     }
+    
+    // Reset blobs points vector
+    blobsPts.clear();
+    blobsPtsDiv.clear();
+    
     
 }
 
@@ -349,22 +384,49 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
 void testApp::keyPressed(int key){
 
 	switch (key){
+            
+        // Movie file select
+		case '1':
+            movie[curMovie].stop();
+			curMovie = 0;
+            movie[curMovie].play();
+			break;
+
+		case '2':
+            movie[curMovie].stop();
+			curMovie = 1;
+            movie[curMovie].play();
+			break;
+
+		case '3':
+            movie[curMovie].stop();
+			curMovie = 2;
+            movie[curMovie].play();
+			break;
+
+		case '4':
+            movie[curMovie].stop();
+			curMovie = 3;
+            movie[curMovie].play();
+			break;
+            
+            
 		case ' ':
 			bLearnBakground = true;
 			break;
 		case '+':
-			threshold ++;
-			if (threshold > 255) threshold = 255;
+			threshold[curMovie]++;
+			if (threshold[curMovie] > 255) threshold[curMovie] = 255;
 			break;
             
 		case '=':
-			threshold ++;
-			if (threshold > 255) threshold = 255;
+			threshold[curMovie] ++;
+			if (threshold[curMovie] > 255) threshold[curMovie] = 255;
 			break;
             
 		case '-':
-			threshold --;
-			if (threshold < 0) threshold = 0;
+			threshold[curMovie]--;
+			if (threshold[curMovie] < 0) threshold[curMovie] = 0;
 			break;
 
 

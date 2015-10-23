@@ -20,11 +20,14 @@
 
 // ---- Macros ----
 enum {
-    OPENCV_WIDTH = 720,
-    OPENCV_HEIGHT = 480,
-    kBLOBNUM = 1,
-    kMAX_VERTICES = 200,
-    kMIN_BLOBAREA = 10000
+    MOVNUM = 4,
+    TH_1 = 100,
+    TH_2 = 100,
+    TH_3 = 100,
+    TH_4 = 100,
+    kBLOBNUM = 2,
+    kMAX_VERTICES = 100,
+    kMIN_BLOBAREA = 100
 };
 
 
@@ -60,7 +63,10 @@ class testApp : public ofBaseApp{
         ofVideoGrabber 		vidGrabber;
     
         //video
-        ofVideoPlayer 		movie;
+        ofVideoPlayer 		movie[4];
+    
+        ofVec2f             movRes[4];
+        int                 curMovie;
         bool                frameByframe;
         bool                movPlay;
         bool                grayPlay;
@@ -76,7 +82,7 @@ class testApp : public ofBaseApp{
 		ofxCvGrayscaleImage 	grayDiff;
         ofxCvContourFinder      contourFinder;
 
-		int                     threshold;
+		int                     threshold[MOVNUM];
 		bool                    bLearnBakground;
     
     

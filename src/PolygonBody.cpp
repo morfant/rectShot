@@ -26,8 +26,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 //    }
     
     for (int i = 0; i < maxVertexCount; i++) {
-        mPts[i].x = _tovWorldX(vertices[i].x);
-        mPts[i].y = _tovWorldY(vertices[i].y);
+        mPts[i].x = _toWorldX(vertices[i].x);
+        mPts[i].y = _toWorldY(vertices[i].y);
     }
     
     
@@ -40,11 +40,12 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
+    // Polygon body
 //	b2PolygonShape myPolygonShape;
 //    myPolygonShape.Set(mPts, maxVertexCount);
 
+    // Chain loop body
     b2ChainShape chain;
-//    chain.CreateChain(mPts, 8);
     chain.CreateLoop(mPts, maxVertexCount);
 	   
 	b2FixtureDef myFixtureDef;
@@ -130,8 +131,8 @@ void
 PolygonBody::setVertices(b2Vec2* vertices)
 {
     for (int i = 0; i < maxVertexCount; i++) {
-        mPts[i].x = _tovWorldX(vertices[i].x);
-        mPts[i].y = _tovWorldY(vertices[i].y);
+        mPts[i].x = _toWorldX(vertices[i].x);
+        mPts[i].y = _toWorldY(vertices[i].y);
     }
     
     
@@ -163,7 +164,7 @@ PolygonBody::renderAtBodyPosition()
     ofPushStyle();
     ofSetColor(0, 200, 25); //Set Polygon body color
     ofPushMatrix();
-    ofTranslate(_tovPixelX(pos.x), _tovPixelY(pos.y)); //Must use for image moving.
+    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
     ofRotate(_toDegree(angle));
     ofBeginShape();
 
