@@ -8,6 +8,8 @@
 
 // ----Preprocessor command----
 #pragma once
+//#define POLYGON_BODY
+
 
 
 // ----Headers----

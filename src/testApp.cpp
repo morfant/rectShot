@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    ofSetWindowPosition(500, 0);
+    ofSetWindowPosition(300, 0);
     
     camUse = false;
 	frameByframe = false;
@@ -152,6 +152,10 @@ void testApp::update(){
         cvBlobNum = blobsVec.size();
         
 	}
+    
+    //Box2d Manifold
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -187,6 +191,12 @@ void testApp::draw(){
     
     // Draw ball
     for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+    }
+
+    
+    // Draw boxes
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
         (*iter)->renderAtBodyPosition();
     }
     
@@ -229,7 +239,15 @@ void testApp::draw(){
         ofPopStyle();
     }
     
-    
+    // Touching check
+    if (boxes.size() != 0){
+        b2ContactEdge* contact = aBox->getBody()->GetContactList();
+        
+        if (contact) {
+            b2Body* other = aBox->getBody()->GetContactList()->other;
+            cout << other << endl;
+        }
+    }
 }
 
 void testApp::drawPolygonBodies(){
@@ -478,6 +496,15 @@ void testApp::keyPressed(int key){
             else info = true;
 			break;
             
+        // Toggle making sensor at mouse point
+		case 'x':
+            if (boxes.size() == 0){
+                aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
+                boxes.push_back(aBox);
+            }
+            
+			break;
+            
 
         //Apply force to pBodies.
         case 't':
@@ -512,12 +539,20 @@ void testApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
+	switch (key){
+    
+        case 'x':
+            delete boxes[0];
+            boxes.clear();
+            break;
+    }
 
 }
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
     
+
 //    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }

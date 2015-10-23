@@ -26,7 +26,7 @@ protected:
     float   posY;
     
     // Size
-    float   size = 20.f;
+    float   size = 10.f;
     
 	// Box2D
 	b2Body*		mBody;

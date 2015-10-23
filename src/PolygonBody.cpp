@@ -33,24 +33,30 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
-    
-//    myBodyDef.position.Set(_tovWorldX(posX), _tovWorldY(posY));
-    
     myBodyDef.position.Set(0, 0);
-    
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
+    
+#ifdef POLYGON_BODY
     // Polygon body
-//	b2PolygonShape myPolygonShape;
-//    myPolygonShape.Set(mPts, maxVertexCount);
-
+	b2PolygonShape myPolygonShape;
+    myPolygonShape.Set(mPts, maxVertexCount);
+#else
     // Chain loop body
     b2ChainShape chain;
     chain.CreateLoop(mPts, maxVertexCount);
-	   
+#endif
+    
+    
+    
 	b2FixtureDef myFixtureDef;
-//	myFixtureDef.shape = &myPolygonShape;
+    
+#ifdef POLYGON_BODY
+	myFixtureDef.shape = &myPolygonShape;
+#else
 	myFixtureDef.shape = &chain;
+#endif
+    
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);

@@ -91,6 +91,10 @@ class testApp : public ofBaseApp{
 		bool                    bLearnBakground;
     
     
+        //Box2d
+        b2WorldManifold*        worldManifold;
+        b2Contact*              contact;
+    
         // World
         World*                  aWorld;
         b2World*                iWorld; //aWorld -> getWorld()
