@@ -17,6 +17,11 @@
 #include "Wall.h"
 #include "PolygonBody.h"
 #include "Box.h"
+#include "ofxOsc.h"
+
+#define HOST "localhost"
+#define PORT 57120
+
 
 // ---- Macros ----
 enum {
@@ -53,6 +58,12 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);		
 
+        // OSC
+        void oscSendMsg(string addr, float data);
+        void oscSendMsg(string addr, ofVec2f data);
+    
+        // CV
+        void sendBlobsOSC();
     
         //Box2d
         void makePolygonBody(int blobNum);
@@ -108,6 +119,10 @@ class testApp : public ofBaseApp{
     
         // Box
         Box*                    aBox;
+    
+    
+        // OSC
+        ofxOscSender            sender;
     
         // container
     ofPoint cvBlobPos;

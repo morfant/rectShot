@@ -3,6 +3,9 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
+	// open an outgoing connection to HOST:PORT
+	sender.setup(HOST, PORT);
+
     ofSetWindowPosition(300, 0);
     
     camUse = false;
@@ -100,6 +103,9 @@ void testApp::setup(){
         balls.push_back(aBall);
     }
     
+    
+    // OSC
+    
 }
 
 //--------------------------------------------------------------
@@ -155,7 +161,7 @@ void testApp::update(){
         
 	}
     
-    //Box2d Manifold
+    sendBlobsOSC();
     
     
 }
@@ -281,6 +287,23 @@ void testApp::drawPolygonBodies(){
     
 }
 
+void testApp::sendBlobsOSC()
+{
+    int i = 0;
+    for(vector<ofxCvBlob>::iterator iter = blobsVec.begin(); iter != blobsVec.end(); iter++){
+        
+        ofxOscMessage m;
+        m.setAddress("/fromOF");
+        m.addFloatArg(i);
+        m.addFloatArg(iter->centroid.x);
+        m.addFloatArg(iter->centroid.y);
+        m.addFloatArg(iter->area);
+        sender.sendMessage(m);
+        i++;
+    }
+}
+
+
 void testApp::makePolygonBody(int blobNum){
     
     if (blobNum != 0){ // blobNum 0 means "Nothing selected".
@@ -404,6 +427,25 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
     
 }
 
+// OSC
+//--------------------------------------------------------------
+void testApp::oscSendMsg(string addr, float data)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addFloatArg(data);
+    sender.sendMessage(m);
+}
+
+
+void testApp::oscSendMsg(string addr, ofVec2f data)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addFloatArg(data.x);
+    m.addFloatArg(data.y);
+    sender.sendMessage(m);
+}
 
 
 //--------------------------------------------------------------
