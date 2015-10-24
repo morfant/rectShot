@@ -63,7 +63,7 @@ void testApp::setup(){
 
     
     // Box2D
-    
+    aforce = 0.3f;
     touched = false;
     // Make & init containder - balls
     balls.clear();
@@ -236,6 +236,7 @@ void testApp::draw(){
         << "press ' ' to invert" << endl
         << "num blobs found " << contourFinder.nBlobs << endl
         << "num polygonBodies " << pBodies.size() << endl
+        << "aforce: " << aforce << endl
         << "FPS: " << ofGetFrameRate();
         ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
@@ -514,36 +515,53 @@ void testApp::keyPressed(int key){
             else info = true;
 			break;
             
-        // Clear selected pbodies.
+        // Delete selected pbodies.
 		case 'x':
-            
-//            printf("Before delete size: %lu\n", pBodies.size());
-            
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected) {
                     delete (*iter);
                     iter = pBodies.erase(iter);
-                    
-                    //printf("After delete size: %lu\n", pBodies.size());
                 }else{
                     iter++;
                 }
             }
-            
-            
+//            printf("After delete size: %lu\n", pBodies.size());
+			break;
+
+        // Delete all polygon bodies
+		case 'X':
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+                    delete (*iter);
+                    iter = pBodies.erase(iter);
+
+            }
+//            printf("After delete size: %lu\n", pBodies.size());
 			break;
             
 
         // Apply force to pBodies.
         case 't':
-            aforce = 0.3;
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                bool isSelected = (*iter)->getSelectState();
+                
+                if (isSelected) {
+                    b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+                    (*iter)->getBody()->ApplyForce(
+                                                   b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
+                                                   b2Vec2(ofGetMouseX(), ofGetMouseY()));
+                }
+            }
             
+            break;
+
+            
+        case 'T':
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 
                 b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-//                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
+                //                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
                 
                 (*iter)->getBody()->ApplyForce(
                                                b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
@@ -551,6 +569,8 @@ void testApp::keyPressed(int key){
             }
             
             break;
+            
+            
             
         case 'c': // clear
 
@@ -563,10 +583,14 @@ void testApp::keyPressed(int key){
             balls.clear();
 			break;
             
-        case 'a':
-            
-
+        case OF_KEY_UP:
+            aforce = aforce + 0.05f;
             break;
+
+        case OF_KEY_DOWN:
+            aforce = aforce - 0.05f;
+            break;
+
 
 	}
 }
@@ -604,14 +628,14 @@ void testApp::mousePressed(int x, int y, int button){
     for (int i = 0; i < cvBlobNum; i++){
         if (blobsVec[i].boundingRect.inside(x, y)){
             selBlobRect = i + 1;
-            printf("Selected blob rect number: %d\n", selBlobRect);
+//            printf("Selected blob rect number: %d\n", selBlobRect);
             makePolygonBody(selBlobRect);
         }
     }
     
     selBlobRect = 0;
     
-    printf("Num of pbodies: %lu\n", pBodies.size());
+//    printf("Num of pbodies: %lu\n", pBodies.size());
     
     
     // For polygon body selection
