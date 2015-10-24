@@ -60,14 +60,34 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);
+    
+    
+    // Set default status
+    selected = false;
+    defaultColor = ofColor(0, 200, 25);
+    selectedColor = ofColor(200, 10, 20);
 
 	
 }
 
 PolygonBody::~PolygonBody()
 {
+    mWorld->DestroyBody(mBody);
+    mBody = NULL;
+}
 
 
+void
+PolygonBody::setSelectState(bool isSelected)
+{
+    selected = isSelected;
+}
+
+
+bool
+PolygonBody::getSelectState()
+{
+    return selected;
 }
 
 
@@ -168,7 +188,14 @@ PolygonBody::renderAtBodyPosition()
 //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
     
     ofPushStyle();
-    ofSetColor(0, 200, 25); //Set Polygon body color
+//    ofSetColor(0, 200, 25); //Set Polygon body color
+
+    if (selected) {
+        ofSetColor(selectedColor);
+    }else{
+        ofSetColor(defaultColor);
+    }
+
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
     ofRotate(_toDegree(angle));

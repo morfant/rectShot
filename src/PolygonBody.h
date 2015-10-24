@@ -35,6 +35,13 @@ protected:
     
     int     maxVertexCount; // maxVertexCount
     
+    // Color
+    ofColor     defaultColor;
+    ofColor     selectedColor;
+    
+    // Select interface
+    bool        selected;
+    
     
 public:
     // Birth and Death
@@ -51,7 +58,10 @@ public:
     b2World*    getWorld();
     b2Body*     getBody();
     
+    bool    getSelectState();
+    
     // Setter
+    void    setSelectState(bool isSelect);
     void    setX(float posX);
     void    setY(float posY);
     void    setVertices(b2Vec2* vertices);

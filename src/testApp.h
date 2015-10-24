@@ -92,8 +92,7 @@ class testApp : public ofBaseApp{
     
     
         //Box2d
-        b2WorldManifold*        worldManifold;
-        b2Contact*              contact;
+        bool                    touched;
     
         // World
         World*                  aWorld;

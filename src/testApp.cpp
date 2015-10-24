@@ -63,6 +63,8 @@ void testApp::setup(){
 
     
     // Box2D
+    
+    touched = false;
     // Make & init containder - balls
     balls.clear();
     pBodies.clear();
@@ -211,7 +213,7 @@ void testApp::draw(){
     
     
     // Draw body at cv pos
-    drawPolygonBodies();
+    if(pBodies.size()) drawPolygonBodies();
     
 //    
 //    if (movPlaySmall){
@@ -239,15 +241,31 @@ void testApp::draw(){
         ofPopStyle();
     }
     
+    
     // Touching check
     if (boxes.size() != 0){
         b2ContactEdge* contact = aBox->getBody()->GetContactList();
         
         if (contact) {
             b2Body* other = aBox->getBody()->GetContactList()->other;
-            cout << other << endl;
+            
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+
+                bool isSelect = (*iter)->getSelectState();
+                if ((*iter)->getBody() == other && touched == false){
+                    
+                    if (isSelect) (*iter)->setSelectState(false);
+                    else (*iter)->setSelectState(true);
+                    
+                    // Latch
+                    touched = true;
+                }
+            }
         }
     }
+    
+    
+    
 }
 
 void testApp::drawPolygonBodies(){
@@ -496,17 +514,29 @@ void testApp::keyPressed(int key){
             else info = true;
 			break;
             
-        // Toggle making sensor at mouse point
+        // Clear selected pbodies.
 		case 'x':
-            if (boxes.size() == 0){
-                aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
-                boxes.push_back(aBox);
+            
+//            printf("Before delete size: %lu\n", pBodies.size());
+            
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+                bool isSelected = (*iter)->getSelectState();
+                
+                if (isSelected) {
+                    delete (*iter);
+                    iter = pBodies.erase(iter);
+                    
+                    //printf("After delete size: %lu\n", pBodies.size());
+                }else{
+                    iter++;
+                }
             }
+            
             
 			break;
             
 
-        //Apply force to pBodies.
+        // Apply force to pBodies.
         case 't':
             aforce = 0.3;
             
@@ -532,6 +562,11 @@ void testApp::keyPressed(int key){
             // clear circle
             balls.clear();
 			break;
+            
+        case 'a':
+            
+
+            break;
 
 	}
 }
@@ -541,10 +576,6 @@ void testApp::keyPressed(int key){
 void testApp::keyReleased(int key){
 	switch (key){
     
-        case 'x':
-            delete boxes[0];
-            boxes.clear();
-            break;
     }
 
 }
@@ -559,8 +590,12 @@ void testApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
+
+    // Add balls
     Ball * aBall = new Ball(iWorld, x, y);
     balls.push_back(aBall);
+
+
 }
 
 //--------------------------------------------------------------
@@ -577,6 +612,14 @@ void testApp::mousePressed(int x, int y, int button){
     selBlobRect = 0;
     
     printf("Num of pbodies: %lu\n", pBodies.size());
+    
+    
+    // For polygon body selection
+    if (boxes.size() == 0){
+        aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
+        boxes.push_back(aBox);
+    }
+    
 
     
 
@@ -585,7 +628,14 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
+
+    // Reset booleans.
     selBlobRect = 0;
+    touched = false;
+    
+    // Delete touch box(sensor object).
+    delete boxes[0];
+    boxes.clear();
 
 }
 
