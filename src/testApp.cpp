@@ -6,7 +6,7 @@ void testApp::setup(){
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
 
-    ofSetWindowPosition(300, 0);
+    ofSetWindowPosition(0, 0);
     
     camUse = false;
 	frameByframe = false;
@@ -14,6 +14,7 @@ void testApp::setup(){
     movPlaySmall = false;
     info = true;
     grayPlay = false;
+    drawBlob = true;
     
     // Threshold inverting setting.
     inverting[0] = true; // for vidGrabber
@@ -40,6 +41,7 @@ void testApp::setup(){
     for (int i = 1; i < MOVNUM; i++){
         movRes[i].x = movie[i].getWidth();
         movRes[i].y = movie[i].getHeight();
+        movie[i].setVolume(0.0f); // Mute sound of movie.
     }
 
     movie[curMovie].play();
@@ -75,6 +77,8 @@ void testApp::setup(){
     // World
     aWorld = new World();
     iWorld = aWorld -> getWorld();
+    contactlistener = new ContactListener();
+    iWorld->SetContactListener(contactlistener);
 
     /*
     // Wall - edge body
@@ -98,7 +102,7 @@ void testApp::setup(){
     blobsPtsDiv.clear();
     
     // make balls
-    for (int i = 0; i < 60; i++){
+    for (int i = 0; i < 1; i++){
         Ball * aBall = new Ball(iWorld, ofGetWidth()/2.0f + i, ofGetHeight()/2.0f - i);
         balls.push_back(aBall);
     }
@@ -187,14 +191,16 @@ void testApp::draw(){
     }
 
     // Draw contourFinder
-    ofPushStyle();
-    ofSetLineWidth(1.0);
-    
-    for (int i = 0; i < contourFinder.nBlobs; i++){
-//        contourFinder.blobs[i].draw(360,540);
-        contourFinder.blobs[i].draw(0, 0);
+    if (drawBlob){
+        ofPushStyle();
+        ofSetLineWidth(1.0);
+        
+        for (int i = 0; i < contourFinder.nBlobs; i++){
+    //        contourFinder.blobs[i].draw(360,540);
+            contourFinder.blobs[i].draw(0, 0);
+        }
+        ofPopStyle();
     }
-    ofPopStyle();
 
     
     // Draw ball
@@ -535,15 +541,15 @@ void testApp::keyPressed(int key){
 			break;
             
             
-        // Toggle original movie play at bottom right
+        // Toggle blobs drawing.
 		case 'b':
-            if (movPlaySmall) movPlaySmall = false;
-            else movPlaySmall = true;
+            if (drawBlob) drawBlob = false;
+            else drawBlob = true;
 			break;
             
 		case 'B':
-            if (movPlaySmall) movPlaySmall = false;
-            else movPlaySmall = true;
+            if (drawBlob) drawBlob = false;
+            else drawBlob = true;
 			break;
 
         // Toggle text info report.

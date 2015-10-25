@@ -18,6 +18,8 @@
 #include "PolygonBody.h"
 #include "Box.h"
 #include "ofxOsc.h"
+#include "ContactListener.h"
+
 
 #define HOST "localhost"
 #define PORT 57120
@@ -99,27 +101,19 @@ class testApp : public ofBaseApp{
 
 		int                     threshold[MOVNUM];
         bool                    inverting[MOVNUM];
-		bool                    bLearnBakground;
+        bool                    drawBlob;
     
     
         //Box2d
-        bool                    touched;
-    
-        // World
         World*                  aWorld;
         b2World*                iWorld; //aWorld -> getWorld()
-        
-        // Ball
         Ball*                   aBall;
-        
         ofVec2f                 tVec;
-        
-        // Wall
         Wall                    *left, *right, *floor, *ceil;
-    
-        // Box
         Box*                    aBox;
+        ContactListener*        contactlistener;
     
+        bool                    touched;
     
         // OSC
         ofxOscSender            sender;

@@ -12,16 +12,17 @@
 
 
 // ----Class definition----
-class ContactListener{
+class ContactListener : public b2ContactListener{
+
 protected:
     
     
     
 public:
     // Birth and Death
-    ContactListener(b2World* world, float x, float y);
+    ContactListener();
     ~ContactListener();
-    
+        
     void BeginContact(b2Contact* contact);
     void EndContact(b2Contact* contact);
     void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);

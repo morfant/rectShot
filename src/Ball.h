@@ -42,6 +42,8 @@ public:
     float   getX();
     float   getY();
     
+    // Userdata
+    int     ballUserdata;
     
     b2World*    getWorld();
     b2Body*     getBody();

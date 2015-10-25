@@ -15,16 +15,22 @@
 Ball::Ball(b2World* aWorld, float x, float y)
 {
     
+    // Set Userdata
+    ballUserdata = 1;
+    
     mWorld = aWorld;
     posX = x;
     posY = y;
     
-    radius = 10.f;
+    radius = 40.f;
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
+    
+    mBody->SetUserData((void*)ballUserdata);
+//    mBody->SetUserData(this);
     
     
 	b2CircleShape myCircleShape;
@@ -46,7 +52,6 @@ Ball::~Ball()
 
 
 }
-
 
 // getter & setter
 float
