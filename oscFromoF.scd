@@ -14,13 +14,12 @@ SynthDef.new(\di,
 
 SynthDef.new(\ti,
 	{
-		arg freq = 50, mf = 10, cf = 10, panfreq = 1/10, amp = 0.4;
-		var mod = SinOsc.kr(mf);
-		var fm = SinOsc.kr(cf);
-//		var sig = LFNoise0.ar(freq, mul: mod);
-		var sig = Impulse.ar(freq);
-		var pan = SinOsc.kr(panfreq);
-		Out.ar(0, Pan2.ar(sig, 0, amp));
+		arg freq = 50, amfreq = 10, panfreq = 1/10, amp = 0.4, gate = 1;
+		var sig, amsig, env, pan;
+		amsig = SinOsc.kr(amfreq);
+		sig = SinOsc.ar(freq, mul: amsig);
+		env = EnvGen.kr(Env.perc(0.01, 0.2), gate, doneAction: 2);
+		Out.ar(0, Pan2.ar(sig*env, 0, amp));
 	}
 ).add;
 )
@@ -52,20 +51,21 @@ p = OSCFunc({|msg, time, addr, recvPort|
 
 p.free;
 
+q.free;q = OSCFunc({|msg, time, addr, recvPort| msg.postln;}, '/fromOF_Ball');
 
 
 // Set Synthes with blobs info.(position, area)
 (
-
-a = Array.newClear(10);
+var syn, oscf;
+syn = Array.newClear(10);
 
 for(0, 9, {|i|
-	a[i] = Synth(\di, [\amp, 0])
+	syn[i] = Synth(\di, [\amp, 0])
 });
 
-o.free;o = OSCFunc({|msg, time, addr, recvPort| msg.postln;
+oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort| msg.postln;
 	// for(0, 9, {|i|
-	a[msg[1].asInteger].set(
+	syn[msg[1].asInteger].set(
 			\freq, (480 - msg[3]),
 			\amp, msg[4].linlin(0, 200000, 0, 1),
 			\pan, msg[2].linlin(0, 720, -1, 1)
@@ -76,7 +76,23 @@ o.free;o = OSCFunc({|msg, time, addr, recvPort| msg.postln;
 );
 
 
-q = OSCFunc({|msg, time, addr, recvPort| msg.postln;}, '/test');
+
+
+(
+var syn, oscf;
+
+syn = Array.newClear(10);
+// for(0, 9, {|i|
+// 	syn[i] = Synth(\ti, [\amp, 0])
+// });
+
+oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort| msg.postln;
+	// for(0, 9, {|i|
+	syn[0] = Synth(\ti, [\freq, msg[1].linlin(0, 1024, 80, 2000), \amfreq, msg[2].linlin(768, 0, 1, 30)]);
+//		};
+//	);
+}, '/fromOF_Ball')
+);
 
 
 

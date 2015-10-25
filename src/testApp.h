@@ -17,12 +17,10 @@
 #include "Wall.h"
 #include "PolygonBody.h"
 #include "Box.h"
-#include "ofxOsc.h"
+//#include "ofxOsc.h"
 #include "ContactListener.h"
 
 
-#define HOST "localhost"
-#define PORT 57120
 
 
 // ---- Macros ----

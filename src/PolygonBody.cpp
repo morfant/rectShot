@@ -14,6 +14,10 @@
 
 PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy)
 {
+
+    // Set Userdata
+    pBodyUserData = 2;
+    
     
     mWorld = aWorld;
     posX = xx;
@@ -34,6 +38,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(0, 0);
+//    myBodyDef.linearVelocity.Set(4.0f, 0);
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
     
@@ -60,6 +65,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.8f;
     mBody->CreateFixture(&myFixtureDef);
+    mBody->SetUserData((void*)pBodyUserData);
+//    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
     
     
     // Set default status
@@ -216,6 +223,7 @@ PolygonBody::renderAtBodyPosition()
 void
 PolygonBody::update()
 {
+    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
     
 }
 

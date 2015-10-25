@@ -42,6 +42,9 @@ protected:
     // Select interface
     bool        selected;
     
+    // Userdata
+    int pBodyUserData;
+    
     
 public:
     // Birth and Death

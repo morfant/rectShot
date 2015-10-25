@@ -43,7 +43,7 @@ public:
     float   getY();
     
     // Userdata
-    int     ballUserdata;
+    int     ballUserData;
     
     b2World*    getWorld();
     b2Body*     getBody();

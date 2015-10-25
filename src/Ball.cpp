@@ -16,20 +16,20 @@ Ball::Ball(b2World* aWorld, float x, float y)
 {
     
     // Set Userdata
-    ballUserdata = 1;
+    ballUserData = 1;
     
     mWorld = aWorld;
     posX = x;
     posY = y;
     
-    radius = 40.f;
+    radius = 60.f;
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
-    mBody->SetUserData((void*)ballUserdata);
+    mBody->SetUserData((void*)ballUserData);
 //    mBody->SetUserData(this);
     
     
@@ -40,7 +40,7 @@ Ball::Ball(b2World* aWorld, float x, float y)
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myCircleShape;	
 	myFixtureDef.density = 1.f;
-    myFixtureDef.restitution = 0.99f;
+    myFixtureDef.restitution = 1.01f;
     myFixtureDef.friction = 0.7f;
     mBody->CreateFixture(&myFixtureDef);
 

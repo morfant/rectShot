@@ -20,6 +20,8 @@ Wall::Wall()
 //Wall::Wall(b2World* aWorld, b2Vec2 beginPoint, b2Vec2 endPoint, float length)
 Wall::Wall(b2World* aWorld, int x, int y, float w, float h)
 {
+
+
     mWorld = aWorld;
     
 //    cout << "addr of aWorld in Wall: " << aWorld << endl;
@@ -56,6 +58,20 @@ Wall::Wall(b2World* aWorld, int x, int y, float w, float h)
 	myBodyDef.type = b2_staticBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
+    
+    
+    // Allot user data to each wall.
+    if (w > h){
+        if (y < (ofGetHeight()/2.f)) wallUserData = TOP;
+        else wallUserData = BOTTOM;
+        
+    }else{
+        if (x > (ofGetWidth()/2.f)) wallUserData = RIGHT;
+        else wallUserData = LEFT;
+    }
+    
+    
+    mBody->SetUserData((void*)wallUserData);
     
     //    cout << "addr of aWorld in Box: " << aWorld << endl;
     

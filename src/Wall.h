@@ -38,6 +38,9 @@ protected:
 	b2Body*		mBody;
     b2World*    mWorld;
     
+    // Userdata
+    int wallUserData;
+    
     
 public:
     // Birth and Death

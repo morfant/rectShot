@@ -9,8 +9,18 @@
 // ----Preprocessor command----
 #pragma once
 
+// ---- Macros ----
+enum { //For wall
+    TOP = 5,
+    BOTTOM,
+    LEFT,
+    RIGHT
+};
+
+
 // ----Headers----
 #include "ofMain.h"
+
 
 // ----Define----
 #define _round2(f)      (floor(f * 100.f) / 100.f)

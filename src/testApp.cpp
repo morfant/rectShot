@@ -121,6 +121,11 @@ void testApp::update(){
 	int32 positionIterations = 2;
     iWorld->Step(timeStep, velocityIterations, positionIterations);
     
+    // Polygon bodies update
+    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+//        (*iter)->getBody()->SetLinearVelocity(b2Vec2(1.f, 0));
+    }
+    
     
     // opencv update
 	ofBackground(200, 200, 200);
@@ -619,8 +624,17 @@ void testApp::keyPressed(int key){
             break;
             
             
+        // Add ball
+        case 'a':
             
-        case 'c': // clear
+            aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY());
+            balls.push_back(aBall);
+            
+            break;
+            
+            
+        // Clear balls
+        case 'c':
 
             // clear b2Body
             for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
@@ -664,8 +678,8 @@ void testApp::mouseMoved(int x, int y ){
 void testApp::mouseDragged(int x, int y, int button){
 
     // Add balls
-    Ball * aBall = new Ball(iWorld, x, y);
-    balls.push_back(aBall);
+//    Ball * aBall = new Ball(iWorld, x, y);
+//    balls.push_back(aBall);
 
 
 }
