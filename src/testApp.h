@@ -34,7 +34,6 @@ enum {
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
     kBLOBNUM = 2,
-    kMAX_VERTICES = 100,
     kMIN_BLOBAREA = 100
 };
 
@@ -70,8 +69,8 @@ class testApp : public ofBaseApp{
         void drawPolygonBodies();
         void resetPolygonBody();
         void makeBodyAtCvPosition();
-        float getArea(b2Vec2* vertices, int maxVCount);
     
+        float getArea(b2Vec2* vertices, int maxVCount);    
     
         //cam
         ofVideoGrabber 		vidGrabber;
@@ -130,7 +129,9 @@ class testApp : public ofBaseApp{
     
         vector<b2Vec2>          blobsPtsDiv;
         vector<b2Vec2>          rBlobsPtsDiv;
-        
+
+    
+    
         float                   divNum;
     
     float                   aforce;

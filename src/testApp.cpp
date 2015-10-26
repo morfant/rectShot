@@ -170,6 +170,8 @@ void testApp::update(){
         
 	}
     
+    
+    // OSC
     sendBlobsOSC();
     
     
@@ -230,7 +232,10 @@ void testApp::draw(){
     
     
     // Draw body at cv pos
-    if(pBodies.size()) drawPolygonBodies();
+    if(pBodies.size()){
+        drawPolygonBodies();
+//        polyLinerUpdate();
+    }
     
 //    
 //    if (movPlaySmall){
@@ -293,6 +298,7 @@ void testApp::drawPolygonBodies(){
     
     for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
         (*iter)->renderAtBodyPosition();
+        (*iter)->update();
     }
     
     

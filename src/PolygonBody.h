@@ -31,7 +31,8 @@ protected:
     b2World*    mWorld;
 	b2Body*		mBody;
 
-    b2Vec2 mPts[320];
+    b2Vec2 mPts[kMAX_VERTICES];
+    b2Vec2 mVertice[kMAX_VERTICES];
     
     int     maxVertexCount; // maxVertexCount
     
@@ -44,6 +45,13 @@ protected:
     
     // Userdata
     int pBodyUserData;
+    
+    // Polyliner
+    int curSection;
+    int curPointofSection;
+    vector<float>           dists;
+    vector<ofVec2f>         addDist;
+    
     
     
 public:
@@ -71,10 +79,13 @@ public:
         
     // Render
     void    renderAtBodyPosition();
+    void    getSection();
     
     // Update & draw
     void    update();
     void    draw();
+    
+    
     
     
     

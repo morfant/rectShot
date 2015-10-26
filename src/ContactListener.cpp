@@ -51,16 +51,21 @@ ContactListener::BeginContact(b2Contact* contact)
             case 2: // Polygon body
             {
              
+                
+                b2Body* pBody = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();
                 
                 if ((int)other->GetUserData() == LEFT) {
                     printf("Touch LEFT end.\n");
+                    pBody->SetLinearVelocity(b2Vec2(-10.f, 0));
+                    
                 }else if ((int)other->GetUserData() == RIGHT){
                     printf("Touch RIGHT end.\n");
+                    pBody->SetLinearVelocity(b2Vec2(10.f, 0));
                 }else if ((int)other->GetUserData() == TOP){
                     printf("Touch TOP end.\n");
                 }else if ((int)other->GetUserData() == BOTTOM){
-                    printf("Touch RIGHT end.\n");
+                    printf("Touch BOTTOM end.\n");
                 }
                 
             }

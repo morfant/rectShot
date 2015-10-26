@@ -18,6 +18,18 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     // Set Userdata
     pBodyUserData = 2;
     
+    curSection = 0;
+    curPointofSection = 0;
+
+    // Store for later use
+    for (int i = 0; i < kMAX_VERTICES; i++) {
+        mVertice[i] = vertices[i];
+//        printf("vertice cp check from: %f, %f\n", vertices[i].x, vertices[i].y);
+//        
+//        printf("vertice cp check to: %f, %f\n", mVertice[i].x, mVertice[i].y);
+    }
+    getSection();
+    
     
     mWorld = aWorld;
     posX = xx;
@@ -219,11 +231,60 @@ PolygonBody::renderAtBodyPosition()
 }
 
 
+void PolygonBody::getSection()
+{
+    // Get each distance from current point to next point.
+    for (int i = 0; i < kMAX_VERTICES - 1; i++){
+        
+        float dist = ofDist(mVertice[i].x, mVertice[i].y, mVertice[i+1].x, mVertice[i+1].y);
+        
+        dists.push_back(dist);
+        
+        float incX = abs(mVertice[i+1].x - mVertice[i].x) / dists[i];
+        float incY = abs(mVertice[i+1].y - mVertice[i].y) / dists[i];
+        
+        addDist.push_back(ofVec2f(incX, incY));
+        
+    }
+}
+
+
 // Update & draw
 void
 PolygonBody::update()
 {
-    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
+    
+    ofVec2f curPoint = ofVec2f(mVertice[curSection].x, mVertice[curSection].y);
+    ofVec2f nextPoint = ofVec2f(
+            mVertice[curSection].x + (addDist[curSection].x * (curPointofSection + 1)),
+            mVertice[curSection].y + (addDist[curSection].y * (curPointofSection + 1)));
+    
+    
+    ofPushStyle();
+    ofSetColor(10, 200, 100);
+    ofFill();
+    
+    ofPushMatrix();
+    ofTranslate(curPoint.x, curPoint.y);
+    ofLine(0, 0, nextPoint.x, nextPoint.y);
+    ofPoint(0, 0, 0);
+    
+    ofPopMatrix();
+    ofPopStyle();
+    
+    float distBetweenPoint = ofDist(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
+    
+    if (distBetweenPoint >= dists[curSection] ) {
+        curSection++;
+        if (curSection > kMAX_VERTICES) {
+            curSection = 0;
+        }
+        
+        curPointofSection = 0;
+    }else{
+        curPointofSection++;
+    }
+
     
 }
 

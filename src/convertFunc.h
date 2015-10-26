@@ -18,6 +18,11 @@ enum { //For wall
 };
 
 
+enum {
+    kMAX_VERTICES = 100
+};
+
+
 // ----Headers----
 #include "ofMain.h"
 
