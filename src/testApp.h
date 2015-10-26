@@ -110,6 +110,8 @@ class testApp : public ofBaseApp{
         Box*                    aBox;
         ContactListener*        contactlistener;
     
+        int                     pBodyIdx;
+    
         bool                    touched;
     
         // OSC

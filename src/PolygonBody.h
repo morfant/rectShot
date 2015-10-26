@@ -18,6 +18,10 @@
 #include "Box2D.h"
 #include "convertFunc.h"
 
+#define HOST "localhost"
+#define PORT 57120
+
+
 
 // ----Class definition----
 class PolygonBody{
@@ -35,6 +39,7 @@ protected:
     b2Vec2 mVertice[kMAX_VERTICES];
     
     int     maxVertexCount; // maxVertexCount
+    int     index;
     
     // Color
     ofColor     defaultColor;
@@ -52,11 +57,15 @@ protected:
     vector<float>           dists;
     vector<ofVec2f>         addDist;
     
+    // OSC
+    ofxOscSender            sender;
+    
+    
     
     
 public:
     // Birth and Death
-    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y);
+    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx);
     
     ~PolygonBody();
     
@@ -84,6 +93,8 @@ public:
     // Update & draw
     void    update();
     void    draw();
+    
+
     
     
     

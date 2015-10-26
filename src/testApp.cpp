@@ -16,6 +16,8 @@ void testApp::setup(){
     grayPlay = false;
     drawBlob = true;
     
+    pBodyIdx = 0;
+    
     // Threshold inverting setting.
     inverting[0] = true; // for vidGrabber
     for (int i = 1; i < MOVNUM; i++) {
@@ -401,12 +403,15 @@ void testApp::makeBodyAtCvPosition(){
     
     
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx);
         
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
         pBodies.push_back(aPbody);
+        pBodyIdx++;
     }
+    
+    
     
     // Reset blobs points vector
     blobsPts.clear();

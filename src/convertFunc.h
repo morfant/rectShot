@@ -23,8 +23,10 @@ enum {
 };
 
 
-// ----Headers----
+// ----Common Headers----
 #include "ofMain.h"
+#include "ofxOsc.h"
+
 
 
 // ----Define----

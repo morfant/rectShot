@@ -12,9 +12,14 @@
 
 // ----Birth & Death----
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy)
+PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
 {
 
+	// open an outgoing connection to HOST:PORT
+	sender.setup(HOST, PORT);
+    
+    index = idx;
+    
     // Set Userdata
     pBodyUserData = 2;
     
@@ -91,6 +96,14 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 
 PolygonBody::~PolygonBody()
 {
+    ofxOscMessage m;
+    m.setAddress("/fromOF_pBody");
+    m.addIntArg(index);    
+    m.addFloatArg(-1);
+    m.addFloatArg(-1);
+    
+    sender.sendMessage(m);
+    
     mWorld->DestroyBody(mBody);
     mBody = NULL;
 }
@@ -234,16 +247,19 @@ PolygonBody::renderAtBodyPosition()
 void PolygonBody::getSection()
 {
     // Get each distance from current point to next point.
-    for (int i = 0; i < kMAX_VERTICES - 1; i++){
+    for (int i = 0; i < (kMAX_VERTICES - 1); i++){
         
         float dist = ofDist(mVertice[i].x, mVertice[i].y, mVertice[i+1].x, mVertice[i+1].y);
         
         dists.push_back(dist);
+        cout << "dists: " << i << " -  " << dists[i] << endl;
         
-        float incX = abs(mVertice[i+1].x - mVertice[i].x) / dists[i];
-        float incY = abs(mVertice[i+1].y - mVertice[i].y) / dists[i];
+        
+        float incX = (mVertice[i + 1].x - mVertice[i].x) / dists[i];
+        float incY = (mVertice[i + 1].y - mVertice[i].y) / dists[i];
         
         addDist.push_back(ofVec2f(incX, incY));
+        cout << "addDist: " << i << " x : " << addDist[i].x << " y : " << addDist[i].y << endl;
         
     }
 }
@@ -253,39 +269,56 @@ void PolygonBody::getSection()
 void
 PolygonBody::update()
 {
-    
+    b2Vec2 bodyPos = mBody->GetPosition();
+//    cout << "bodypos: x: " << bodyPos.x << " y: " << bodyPos.y << endl;
+//    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
     ofVec2f curPoint = ofVec2f(mVertice[curSection].x, mVertice[curSection].y);
     ofVec2f nextPoint = ofVec2f(
             mVertice[curSection].x + (addDist[curSection].x * (curPointofSection + 1)),
             mVertice[curSection].y + (addDist[curSection].y * (curPointofSection + 1)));
     
-    
-    ofPushStyle();
-    ofSetColor(10, 200, 100);
-    ofFill();
-    
-    ofPushMatrix();
-    ofTranslate(curPoint.x, curPoint.y);
-    ofLine(0, 0, nextPoint.x, nextPoint.y);
-    ofPoint(0, 0, 0);
-    
-    ofPopMatrix();
-    ofPopStyle();
-    
     float distBetweenPoint = ofDist(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
-    
-    if (distBetweenPoint >= dists[curSection] ) {
+
+    if (distBetweenPoint < dists[curSection]){
+        
+        ofxOscMessage m;
+        m.setAddress("/fromOF_pBody");
+        m.addIntArg(index);
+        m.addFloatArg(bodyPos.x * BOX2D_SCALE + nextPoint.x);
+        m.addFloatArg(bodyPos.y * BOX2D_SCALE + nextPoint.y);
+        sender.sendMessage(m);
+        
+        
+        ofPushStyle();
+        ofSetColor(10, 200, 100);
+        ofFill();
+        
+        ofPushMatrix();
+        ofTranslate(bodyPos.x * BOX2D_SCALE, bodyPos.y * BOX2D_SCALE * (-1));
+//        ofTranslate(curPoint.x, curPoint.y);
+//        ofLine(0, 0, nextPoint.x - curPoint.x, nextPoint.y - curPoint.y);
+//        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
+//        ofCircle(curPoint.x, curPoint.y, 10.f);
+        ofSetColor(200, 200, 150);
+        ofCircle(nextPoint.x, nextPoint.y, 3.f);
+        //    ofPoint(0, 0, 0);
+        
+        ofPopMatrix();
+        ofPopStyle();
+        
+        curPointofSection++;
+//        cout << "curPointofSection: " << curPointofSection << endl;
+
+    }else{
         curSection++;
-        if (curSection > kMAX_VERTICES) {
+//        cout << "curSection: " << curSection << endl;
+        
+        if (curSection == (kMAX_VERTICES - 1) ) {
             curSection = 0;
         }
         
         curPointofSection = 0;
-    }else{
-        curPointofSection++;
     }
-
-    
 }
 
 

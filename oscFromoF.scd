@@ -22,6 +22,18 @@ SynthDef.new(\ti,
 		Out.ar(0, Pan2.ar(sig*env, 0, amp));
 	}
 ).add;
+
+SynthDef.new(\ai,
+	{
+		arg freq = 50, panfreq = 1/10, amp = 0.4, gate = 1, rq = 0.05;
+		var sig, env, pan, fil;
+		sig = Dust.ar(10, amp);
+		fil = RLPF.ar(sig, freq, rq);
+		env = EnvGen.kr(Env.adsr, gate, doneAction: 2);
+		Out.ar(0, Pan2.ar(fil*env, 0, amp));
+	}
+).add;
+
 )
 
 1.asDigit
@@ -63,7 +75,8 @@ for(0, 9, {|i|
 	syn[i] = Synth(\di, [\amp, 0])
 });
 
-oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort| msg.postln;
+oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
+//	msg.postln;
 	// for(0, 9, {|i|
 	syn[msg[1].asInteger].set(
 			\freq, (480 - msg[3]),
@@ -86,7 +99,8 @@ syn = Array.newClear(10);
 // 	syn[i] = Synth(\ti, [\amp, 0])
 // });
 
-oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort| msg.postln;
+oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
+//	msg.postln;
 	// for(0, 9, {|i|
 	syn[0] = Synth(\ti, [\freq, msg[1].linlin(0, 1024, 80, 2000), \amfreq, msg[2].linlin(768, 0, 1, 30)]);
 //		};
@@ -96,3 +110,26 @@ oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort| msg.postln;
 
 
 
+( // Pbody pointer.
+var syn, oscf;
+
+syn = Array.newClear(10);
+// for(0, 9, {|i|
+// 	syn[i] = Synth(\ai, [\amp, 0])
+// });
+
+oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
+//	msg.postln;
+	if ((msg[2].asInteger == -1),{
+		("kill " + msg[1] + " : " + msg[2]).postln;
+		syn[msg[1].asInteger].set(\gate, 0);
+		},{
+			syn[msg[1].asInteger] = Synth(\ai, []);
+			.set(
+			\gate, 1,
+			\amp, 0.4,
+			\freq, msg[2].linlin(0, 1024, 50, 3000),
+			\rq, msg[3].linlin(0, 769, 0, 1));
+	});
+}, '/fromOF_pBody')
+);

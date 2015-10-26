@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include "Box2D.h"
-#include "ofxOsc.h"
 #include "convertFunc.h"
 
 #define HOST "localhost"
@@ -20,7 +19,10 @@
 class ContactListener : public b2ContactListener{
 
 protected:
-    
+
+    // OSC
+    ofxOscSender            sender;
+
     
     
 public:
@@ -34,8 +36,6 @@ public:
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
     
     
-    // OSC
-    ofxOscSender            sender;
     
 
     
