@@ -30,10 +30,12 @@ void testApp::setup(){
     
     curMovie = 1; // 0 means using vidGrabber.
     
-    movie[1].loadMovie("movies/test.mov");
-    movie[2].loadMovie("movies/fieldtest.mov");
-    movie[3].loadMovie("movies/rline.mov");
-    movie[4].loadMovie("movies/jump.mov");
+    movie[1].loadMovie("movies/aya.mov");
+    movie[2].loadMovie("movies/aya2.mov");
+    movie[3].loadMovie("movies/aya3.mov");
+    movie[4].loadMovie("movies/ayaVater.mov");
+    movie[5].loadMovie("movies/ayaundsister.mov");
+    movie[6].loadMovie("movies/ihreFreunde.mov");
     
     
     
@@ -67,6 +69,8 @@ void testApp::setup(){
     threshold[2] = TH_2;
     threshold[3] = TH_3;
     threshold[4] = TH_4;
+    threshold[5] = TH_5;
+    threshold[6] = TH_6;
 
     
     // Box2D
@@ -502,6 +506,18 @@ void testApp::keyPressed(int key){
 		case '4':
             if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 4;
+            movie[curMovie].play();
+			break;
+
+		case '5':
+            if (curMovie != 0) movie[curMovie].stop();
+			curMovie = 5;
+            movie[curMovie].play();
+			break;
+
+		case '6':
+            if (curMovie != 0) movie[curMovie].stop();
+			curMovie = 6;
             movie[curMovie].play();
 			break;
             

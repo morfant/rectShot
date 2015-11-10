@@ -25,15 +25,17 @@
 
 // ---- Macros ----
 enum {
-    MOVNUM = 5, //Num of movie files + cam
+    MOVNUM = 7, //Num of movie files + cam
     TH_CAM = 100,
     TH_1 = 100,
     TH_2 = 100,
     TH_3 = 100,
     TH_4 = 100,
+    TH_5 = 100,
+    TH_6 = 100,
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
-    kBLOBNUM = 2,
+    kBLOBNUM = 4,
     kMIN_BLOBAREA = 100
 };
 

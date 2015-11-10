@@ -6,7 +6,7 @@ o.free;
 (
 SynthDef.new(\di,
 	{
-		arg freq = 50, mf = 10, cf = 10, pan = 0, amp = 0.4;
+		arg freq = 50, mf = 10, cf = 10, pan = 0, amp = 0.4, freq2 = 10;
 		var sig = SinOsc.ar(freq, mul: amp);
 		Out.ar(0, Pan2.ar(sig, pan, 1));
 	}
@@ -81,6 +81,7 @@ oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
 	syn[msg[1].asInteger].set(
 			\freq, (480 - msg[3]),
 			\amp, msg[4].linlin(0, 200000, 0, 1),
+//			\freq2, msg[4].linlin(0, 200000, 2, 200),
 			\pan, msg[2].linlin(0, 720, -1, 1)
 		);
 //		};
@@ -114,9 +115,9 @@ oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
 var syn, oscf;
 
 syn = Array.newClear(10);
-// for(0, 9, {|i|
-// 	syn[i] = Synth(\ai, [\amp, 0])
-// });
+for(0, 9, {|i|
+	syn[i] = Synth(\ai, [\amp, 0])
+});
 
 oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
 //	msg.postln;
@@ -124,8 +125,7 @@ oscf.free;oscf = OSCFunc({|msg, time, addr, recvPort|
 		("kill " + msg[1] + " : " + msg[2]).postln;
 		syn[msg[1].asInteger].set(\gate, 0);
 		},{
-			syn[msg[1].asInteger] = Synth(\ai, []);
-			.set(
+			syn[msg[1].asInteger].set(
 			\gate, 1,
 			\amp, 0.4,
 			\freq, msg[2].linlin(0, 1024, 50, 3000),

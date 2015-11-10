@@ -34,8 +34,11 @@ protected:
 	// Box2D
     b2World*    mWorld;
 	b2Body*		mBody;
+    b2Body*     mBody2;
+
 
     b2Vec2 mPts[kMAX_VERTICES];
+    b2Vec2 mPtsP[kMAX_VERTICES];
     b2Vec2 mVertice[kMAX_VERTICES];
     
     int     maxVertexCount; // maxVertexCount

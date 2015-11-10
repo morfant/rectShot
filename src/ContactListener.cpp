@@ -36,7 +36,7 @@ ContactListener::BeginContact(b2Contact* contact)
         switch ((int)userData_A) {
             case 1: // Ball
             {
-                printf("A, Ball contact begin!\n");
+//                printf("A, Ball contact begin!\n");
                 b2Body* ball = contact->GetFixtureA()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
@@ -56,38 +56,38 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* other = contact->GetFixtureB()->GetBody();
                 
                 if ((int)other->GetUserData() == LEFT) {
-                    printf("Touch LEFT end.\n");
+//                    printf("Touch LEFT end.\n");
                     pBody->SetLinearVelocity(b2Vec2(-10.f, 0));
                     
                 }else if ((int)other->GetUserData() == RIGHT){
-                    printf("Touch RIGHT end.\n");
+//                    printf("Touch RIGHT end.\n");
                     pBody->SetLinearVelocity(b2Vec2(10.f, 0));
                 }else if ((int)other->GetUserData() == TOP){
-                    printf("Touch TOP end.\n");
+//                    printf("Touch TOP end.\n");
                 }else if ((int)other->GetUserData() == BOTTOM){
-                    printf("Touch BOTTOM end.\n");
+//                    printf("Touch BOTTOM end.\n");
                 }
                 
             }
                 break;
                 
             case TOP:
-                printf("A, touch TOP.\n");
+//                printf("A, touch TOP.\n");
                 
                 break;
                 
             case BOTTOM:
-                printf("A, touch BOTTOM.\n");
+//                printf("A, touch BOTTOM.\n");
                 
                 break;
                 
             case LEFT:
-                printf("A, touch LEFT.\n");
+//                printf("A, touch LEFT.\n");
                 
                 break;
                 
             case RIGHT:
-                printf("A, touch RIGHT.\n");
+//                printf("A, touch RIGHT.\n");
                 
                 break;
                 
@@ -103,7 +103,7 @@ ContactListener::BeginContact(b2Contact* contact)
         switch ((int)userData_B) {
             case 1: // Ball
             {
-                printf("B, Ball contact begin!\n");
+//                printf("B, Ball contact begin!\n");
                 b2Body* ball = contact->GetFixtureB()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
@@ -120,13 +120,13 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* other = contact->GetFixtureA()->GetBody();
                 
                 if ((int)other->GetUserData() == LEFT) {
-                    printf("Touch LEFT end.\n");
+//                    printf("Touch LEFT end.\n");
                 }else if ((int)other->GetUserData() == RIGHT){
-                    printf("Touch RIGHT end.\n");
+//                    printf("Touch RIGHT end.\n");
                 }else if ((int)other->GetUserData() == TOP){
-                    printf("Touch TOP end.\n");
+//                    printf("Touch TOP end.\n");
                 }else if ((int)other->GetUserData() == BOTTOM){
-                    printf("Touch RIGHT end.\n");
+//                    printf("Touch RIGHT end.\n");
                 }
                 
             }

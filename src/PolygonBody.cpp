@@ -57,12 +57,18 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     myBodyDef.position.Set(0, 0);
 //    myBodyDef.linearVelocity.Set(4.0f, 0);
 	mBody = mWorld -> CreateBody(&myBodyDef);
+//    mBody2 = mWorld -> CreateBody(&myBodyDef);
     
     
 #ifdef POLYGON_BODY
     // Polygon body
 	b2PolygonShape myPolygonShape;
-    myPolygonShape.Set(mPts, maxVertexCount);
+    for (int i = 0; i < kMAX_VERTICES - 1; i++) {
+        mPtsP[i].x = mPts[i].x * 1.0;
+        mPtsP[i].y = mPts[i].y * 1.0;
+    }
+    
+    myPolygonShape.Set(mPtsP, maxVertexCount);
 #else
     // Chain loop body
     b2ChainShape chain;
@@ -72,11 +78,14 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     
 	b2FixtureDef myFixtureDef;
+//	b2FixtureDef myFixtureDef2;
     
 #ifdef POLYGON_BODY
+//	myFixtureDef2.shape = &myPolygonShape;
 	myFixtureDef.shape = &myPolygonShape;
 #else
 	myFixtureDef.shape = &chain;
+
 #endif
     
 	myFixtureDef.density = 1.f;
@@ -84,12 +93,37 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     mBody->CreateFixture(&myFixtureDef);
     mBody->SetUserData((void*)pBodyUserData);
 //    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
+
+    
+//	myFixtureDef2.density = 1.f;
+//    myFixtureDef2.restitution = 0.8f;
+//    mBody2->CreateFixture(&myFixtureDef2);
+//    mBody2->SetUserData((void*)pBodyUserData);
     
     
     // Set default status
     selected = false;
     defaultColor = ofColor(0, 200, 25);
     selectedColor = ofColor(200, 10, 20);
+    
+    
+    // sub body
+//	b2BodyDef myBodyDef;
+	myBodyDef.type = b2_kinematicBody;
+    myBodyDef.position.Set(0, 0);
+	mBody2 = mWorld -> CreateBody(&myBodyDef);
+    
+	b2CircleShape myCircleShape;
+	myCircleShape.m_p.Set(0, 0);
+	myCircleShape.m_radius = _toWorldScale(100.f/2.f);
+	
+//	b2FixtureDef myFixtureDef;
+	myFixtureDef.shape = &myCircleShape;
+	myFixtureDef.density = 100.f;
+    myFixtureDef.restitution = 1.01f;
+    myFixtureDef.friction = 0.7f;
+    mBody2->CreateFixture(&myFixtureDef);
+    
 
 	
 }
@@ -105,7 +139,9 @@ PolygonBody::~PolygonBody()
     sender.sendMessage(m);
     
     mWorld->DestroyBody(mBody);
+    mWorld->DestroyBody(mBody2);
     mBody = NULL;
+    mBody2 = NULL;
 }
 
 
@@ -212,8 +248,15 @@ void
 PolygonBody::renderAtBodyPosition()
 {
 
+
+//    b2Vec2 pos2 = mBody2->GetPosition();
+//    float32 pangle = mBody2->GetAngle();
+//    cout << "x: " << (pos2.x * BOX2D_SCALE) << " / y: " << (pos2.y * BOX2D_SCALE * -1) << " / angle: " << pangle << endl;
+
+//    mBody->SetTransform(pos2, pangle);
     b2Vec2 pos = mBody->GetPosition();
     float32 angle = mBody->GetAngle();
+    
 //    printf("pbody angle: %f\n", angle);
     
 //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
@@ -252,14 +295,14 @@ void PolygonBody::getSection()
         float dist = ofDist(mVertice[i].x, mVertice[i].y, mVertice[i+1].x, mVertice[i+1].y);
         
         dists.push_back(dist);
-        cout << "dists: " << i << " -  " << dists[i] << endl;
+        //cout << "dists: " << i << " -  " << dists[i] << endl;
         
         
         float incX = (mVertice[i + 1].x - mVertice[i].x) / dists[i];
         float incY = (mVertice[i + 1].y - mVertice[i].y) / dists[i];
         
         addDist.push_back(ofVec2f(incX, incY));
-        cout << "addDist: " << i << " x : " << addDist[i].x << " y : " << addDist[i].y << endl;
+        //cout << "addDist: " << i << " x : " << addDist[i].x << " y : " << addDist[i].y << endl;
         
     }
 }
@@ -269,6 +312,7 @@ void PolygonBody::getSection()
 void
 PolygonBody::update()
 {
+    
     b2Vec2 bodyPos = mBody->GetPosition();
 //    cout << "bodypos: x: " << bodyPos.x << " y: " << bodyPos.y << endl;
 //    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
@@ -301,6 +345,7 @@ PolygonBody::update()
 //        ofCircle(curPoint.x, curPoint.y, 10.f);
         ofSetColor(200, 200, 150);
         ofCircle(nextPoint.x, nextPoint.y, 3.f);
+        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
         //    ofPoint(0, 0, 0);
         
         ofPopMatrix();
@@ -319,6 +364,13 @@ PolygonBody::update()
         
         curPointofSection = 0;
     }
+    
+    mBody2->SetTransform(b2Vec2(nextPoint.x + (bodyPos.x * BOX2D_SCALE), nextPoint.y + (bodyPos.y * BOX2D_SCALE * (-1))), 0);
+    
+    b2Vec2 spos = mBody2->GetPosition();
+//        cout << "spos: x: " << spos.x << " y: " << spos.y << endl;
+   
+    
 }
 
 
