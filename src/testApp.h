@@ -17,8 +17,9 @@
 #include "Wall.h"
 #include "PolygonBody.h"
 #include "Box.h"
-//#include "ofxOsc.h"
+#include "ofxOsc.h"
 #include "ContactListener.h"
+#include "colorTrack.h"
 
 
 
@@ -134,11 +135,14 @@ class testApp : public ofBaseApp{
         vector<b2Vec2>          blobsPtsDiv;
         vector<b2Vec2>          rBlobsPtsDiv;
 
-    
-    
         float                   divNum;
+        float                   aforce;
     
-    float                   aforce;
+    
+        // ColorTrack
+    ColorTrack              colorTracker;
+    
+
 
 
 };

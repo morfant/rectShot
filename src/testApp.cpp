@@ -2,7 +2,12 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+    
 
+
+    // ColorTracker
+    colorTracker = ColorTrack();
+    
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
 
@@ -53,9 +58,18 @@ void testApp::setup(){
     
     // OPEN CV
     // Using cam
-    vidGrabber.setVerbose(true);
-    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
+//    ofSetLogLevel(OF_LOG_VERBOSE);
+//    vidGrabber.listDevices();
+//    vidGrabber.setDeviceID(1);
+//    vidGrabber.setVerbose(true);
+//    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
 
+//	usbcam.setDeviceID(1);
+//    usbcam.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT, true);
+//    usbcam.listDevices();
+//    colorTracker.setGrabber(&usbcam);
+    
+    
     // Using movie files
     colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
     grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
@@ -181,13 +195,23 @@ void testApp::update(){
     sendBlobsOSC();
     
     
+    try{
+        // ColorTracker
+        colorTracker.update();
+    }
+    catch(cv::Exception& e)
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+    }
+    
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
     
     ofBackground(0, 0, 0);
-
+    
     // Draw movie.
     if (movPlay){
         if (curMovie == 0) {
@@ -252,6 +276,19 @@ void testApp::draw(){
 //        movie[curMovie].draw(0, 0);
 //        ofPopMatrix();
 //    }
+    
+
+    // ColorTracker
+    try{
+        // ColorTracker
+        colorTracker.draw(ofGetWidth()-640, ofGetHeight()-480);
+    }
+    catch(cv::Exception& e)
+    {
+        const char* err_msg = e.what();
+        std::cout << "exception caught: " << err_msg << std::endl;
+    }
+
     
     
 	// finally, a report

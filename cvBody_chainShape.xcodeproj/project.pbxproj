@@ -77,6 +77,7 @@
 		6758AA5917D386670078FA56 /* Box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6758AA5717D386670078FA56 /* Box.cpp */; };
 		6768AA041BDA689A00BEA93C /* ContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6768AA021BDA689A00BEA93C /* ContactListener.cpp */; };
 		6780BE0517D36759006095C4 /* PolygonBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6780BE0317D36759006095C4 /* PolygonBody.cpp */; };
+		678DF0D41BF83B750050F20F /* colorTrack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 678DF0D21BF83B750050F20F /* colorTrack.cpp */; };
 		67E8112117D321A70094D376 /* Wall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67E8111F17D321A70094D376 /* Wall.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -301,6 +302,8 @@
 		6768AA031BDA689A00BEA93C /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
 		6780BE0317D36759006095C4 /* PolygonBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolygonBody.cpp; sourceTree = "<group>"; };
 		6780BE0417D36759006095C4 /* PolygonBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonBody.h; sourceTree = "<group>"; };
+		678DF0D21BF83B750050F20F /* colorTrack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = colorTrack.cpp; sourceTree = "<group>"; };
+		678DF0D31BF83B750050F20F /* colorTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = colorTrack.h; sourceTree = "<group>"; };
 		67E8111D17D31C1D0094D376 /* convertFunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = convertFunc.h; sourceTree = "<group>"; };
 		67E8111F17D321A70094D376 /* Wall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Wall.cpp; sourceTree = "<group>"; };
 		67E8112017D321A70094D376 /* Wall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wall.h; sourceTree = "<group>"; };
@@ -842,8 +845,10 @@
 				67E8111F17D321A70094D376 /* Wall.cpp */,
 				67347D7817D171A00023B9AE /* Ball.h */,
 				67347D7717D171A00023B9AE /* Ball.cpp */,
-				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
 				6768AA031BDA689A00BEA93C /* ContactListener.h */,
+				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
+				678DF0D31BF83B750050F20F /* colorTrack.h */,
+				678DF0D21BF83B750050F20F /* colorTrack.cpp */,
 			);
 			name = class;
 			sourceTree = "<group>";
@@ -1163,6 +1168,7 @@
 				1d5f3298c2fa073628012944 /* ofxCvContourFinder.cpp in Sources */,
 				672068FB1BDBB50500D435E1 /* OscPrintReceivedElements.cpp in Sources */,
 				e212c821d1064b92dd953a42 /* ofxCvHaarFinder.cpp in Sources */,
+				678DF0D41BF83B750050F20F /* colorTrack.cpp in Sources */,
 				63020f16c7e8ded980111241 /* ofxCvImage.cpp in Sources */,
 				6720A8E617CF9C2500669E43 /* b2BroadPhase.cpp in Sources */,
 				6720A8E717CF9C2500669E43 /* b2CollideCircle.cpp in Sources */,
@@ -1531,13 +1537,17 @@
 					"/Users/giy/Box2D_v2.2.1/**",
 					/opt/X11/include,
 					"/Users/giy/of_v0.8.4_osx_release/apps/myApps/cvBody_chainShape/ofxOsc/**",
+					"/Users/giy/of_v0.8.4_osx_release/addons/ofxPS3EyeGrabber/**",
 				);
 				ICON = "$(ICON_NAME_DEBUG)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_GENERATE_MAP_FILE = YES;
-				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/ofxKinect/libs/libusb-1.0/lib/osx",
+					"/Users/giy/of_v0.8.4_osx_release/addons/ofxKinect/libs/libusb-1.0/lib/osx",
+				);
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
@@ -1627,13 +1637,17 @@
 					"/Users/giy/Box2D_v2.2.1/**",
 					/opt/X11/include,
 					"/Users/giy/of_v0.8.4_osx_release/apps/myApps/cvBody_chainShape/ofxOsc/**",
+					"/Users/giy/of_v0.8.4_osx_release/addons/ofxPS3EyeGrabber/**",
 				);
 				ICON = "$(ICON_NAME_RELEASE)";
 				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_GENERATE_MAP_FILE = NO;
-				LIBRARY_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/ofxKinect/libs/libusb-1.0/lib/osx",
+					"/Users/giy/of_v0.8.4_osx_release/addons/ofxKinect/libs/libusb-1.0/lib/osx",
+				);
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
