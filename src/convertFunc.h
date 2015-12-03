@@ -19,7 +19,8 @@ enum { //For wall
 
 
 enum {
-    kMAX_VERTICES = 100
+    kMAX_VERTICES = 100,
+    kSAMPLING_INTV = 10
 };
 
 

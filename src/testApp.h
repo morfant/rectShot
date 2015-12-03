@@ -19,7 +19,6 @@
 #include "Box.h"
 #include "ofxOsc.h"
 #include "ContactListener.h"
-#include "colorTrack.h"
 
 
 
@@ -137,13 +136,6 @@ class testApp : public ofBaseApp{
 
         float                   divNum;
         float                   aforce;
-    
-    
-        // ColorTrack
-    ColorTrack              colorTracker;
-    
-
-
 
 };
 

@@ -144,6 +144,55 @@ PolygonBody::~PolygonBody()
     mBody2 = NULL;
 }
 
+void
+PolygonBody::breakBody(float x, float y)
+{
+    // get intervald virtices
+    // divNum = sampling interval
+    int sampledSize = kMAX_VERTICES/kSAMPLING_INTV;
+    
+    // Add first point of blob polygon shape.
+    b2Vec2 first = b2Vec2(0, 0);
+    first.x = mVertice[0].x;
+    first.y = mVertice[0].y;
+    mVerticeDiv[0] = first;
+    
+    // Add middle points of blob polygon shape.
+    for (int i = 1; i < (sampledSize - 1); i++) {
+        b2Vec2 temp = b2Vec2(0, 0);
+        temp.x = mVertice[kSAMPLING_INTV * i].x;
+        temp.y = mVertice[kSAMPLING_INTV * i].y;
+        mVerticeDiv[i] = temp;
+    }
+    
+    // Add end point of blob polygon shape
+    b2Vec2 last = b2Vec2(0, 0);
+    last.x = mVertice[kMAX_VERTICES - 1].x;
+    last.y = mVertice[kMAX_VERTICES - 1].y;
+    mVerticeDiv[sampledSize - 1] = last;
+    
+    for (int i = 0; i < sampledSize; i++){
+        cout << i << ": " <<  mVerticeDiv[i].x << " / " << mVerticeDiv[i].y << endl;
+    }
+    
+
+//    b2Vec2 centerPoint = b2Vec2(posX, posY);
+    for (int i = 0; i < kSAMPLING_INTV - 1; i++){
+        ofTriangle(posX, posY,
+                   mVerticeDiv[i].x, mVerticeDiv[i].y,
+                   mVerticeDiv[i+1].x, mVerticeDiv[i+1].y);
+    }
+    
+    
+    
+}
+
+b2Vec2*
+PolygonBody::getBreakArray()
+{
+    return mVerticeDiv;
+}
+
 
 void
 PolygonBody::setSelectState(bool isSelected)

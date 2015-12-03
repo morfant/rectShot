@@ -40,6 +40,7 @@ protected:
     b2Vec2 mPts[kMAX_VERTICES];
     b2Vec2 mPtsP[kMAX_VERTICES];
     b2Vec2 mVertice[kMAX_VERTICES];
+    b2Vec2 mVerticeDiv[kMAX_VERTICES/kSAMPLING_INTV];
     
     int     maxVertexCount; // maxVertexCount
     int     index;
@@ -77,6 +78,7 @@ public:
     float   getX();
     float   getY();
     b2Vec2   getVertex(int i);
+    b2Vec2* getBreakArray();
     
     b2World*    getWorld();
     b2Body*     getBody();
@@ -92,6 +94,7 @@ public:
     // Render
     void    renderAtBodyPosition();
     void    getSection();
+    void    breakBody(float x, float y);
     
     // Update & draw
     void    update();

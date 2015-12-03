@@ -3,10 +3,6 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
-
-
-    // ColorTracker
-    colorTracker = ColorTrack();
     
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
@@ -40,7 +36,7 @@ void testApp::setup(){
     movie[3].loadMovie("movies/aya3.mov");
     movie[4].loadMovie("movies/ayaVater.mov");
     movie[5].loadMovie("movies/ayaundsister.mov");
-    movie[6].loadMovie("movies/ihreFreunde.mov");
+    movie[6].loadMovie("movies/test.mov");
     
     
     
@@ -58,17 +54,11 @@ void testApp::setup(){
     
     // OPEN CV
     // Using cam
-//    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_VERBOSE);
 //    vidGrabber.listDevices();
-//    vidGrabber.setDeviceID(1);
-//    vidGrabber.setVerbose(true);
-//    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
-
-//	usbcam.setDeviceID(1);
-//    usbcam.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT, true);
-//    usbcam.listDevices();
-//    colorTracker.setGrabber(&usbcam);
-    
+    vidGrabber.setDeviceID(0);
+    vidGrabber.setVerbose(true);
+    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
     
     // Using movie files
     colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
@@ -194,17 +184,6 @@ void testApp::update(){
     // OSC
     sendBlobsOSC();
     
-    
-    try{
-        // ColorTracker
-        colorTracker.update();
-    }
-    catch(cv::Exception& e)
-    {
-        const char* err_msg = e.what();
-        std::cout << "exception caught: " << err_msg << std::endl;
-    }
-    
 }
 
 //--------------------------------------------------------------
@@ -276,21 +255,46 @@ void testApp::draw(){
 //        movie[curMovie].draw(0, 0);
 //        ofPopMatrix();
 //    }
-    
-
-    // ColorTracker
-    try{
-        // ColorTracker
-        colorTracker.draw(ofGetWidth()-640, ofGetHeight()-480);
-    }
-    catch(cv::Exception& e)
-    {
-        const char* err_msg = e.what();
-        std::cout << "exception caught: " << err_msg << std::endl;
-    }
 
     
-    
+    // Breakbody test
+    for (int i = 0; i < kSAMPLING_INTV; i++) {
+        for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            
+            bool isSelect = (*iter)->getSelectState();
+            
+            if(isSelect){
+                b2Vec2* tvec = (*iter)->getBreakArray();
+                b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+                
+                
+                // draw points
+                for(int i = 0; i < kSAMPLING_INTV; i++)
+                {
+                    ofSetColor(255);
+                    ofFill();
+                    ofEllipse(tvec[i].x, tvec[i].y, 2, 2);
+                }
+                
+                // draw triangles
+                ofSetColor(0, 0, 250);
+                ofFill();
+                ofEllipse((pBodypos.x), (pBodypos.y), 100, 100);
+                cout <<pBodypos.x << "/" << pBodypos.y << endl;
+                
+//                for (int i = 0; i < kSAMPLING_INTV - 1; i++){
+//                    ofSetColor(255);
+//                    ofNoFill();
+//                    ofTriangle(_toPixelX(pBodypos.x), _toPixelY(pBodypos.y),
+//                               tvec[i].x, tvec[i].y,
+//                               tvec[i+1].x, tvec[i+1].y);
+//                }
+                
+            }
+
+        }
+    }
+
 	// finally, a report
     if (info){
         ofPushStyle();
@@ -716,6 +720,21 @@ void testApp::keyPressed(int key){
         case OF_KEY_DOWN:
             aforce = aforce - 0.05f;
             break;
+            
+        case 'h': //simulaton 'h'itting body
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                bool isSelected = (*iter)->getSelectState();
+                
+                if (isSelected) {
+                    b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+                    (*iter)->breakBody(pBodypos.x, pBodypos.y);
+
+
+                }
+            }
+            
+            break;
+            
 
 
 	}
