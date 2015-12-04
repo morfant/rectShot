@@ -55,6 +55,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(0, 0);
+//    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 //    myBodyDef.linearVelocity.Set(4.0f, 0);
 	mBody = mWorld -> CreateBody(&myBodyDef);
 //    mBody2 = mWorld -> CreateBody(&myBodyDef);
@@ -109,7 +110,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     // sub body
 //	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_kinematicBody;
+	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(0, 0);
 	mBody2 = mWorld -> CreateBody(&myBodyDef);
     
@@ -176,12 +177,72 @@ PolygonBody::breakBody(float x, float y)
     }
     
 
-//    b2Vec2 centerPoint = b2Vec2(posX, posY);
+    float cx = (mBody->GetWorldCenter().x * BOX2D_SCALE) + posX;
+    float cy = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f)) + posY;
+
     for (int i = 0; i < kSAMPLING_INTV - 1; i++){
-        ofTriangle(posX, posY,
-                   mVerticeDiv[i].x, mVerticeDiv[i].y,
-                   mVerticeDiv[i+1].x, mVerticeDiv[i+1].y);
+        b2Vec2 vertices[3];
+        b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+        b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+        
+        ofVec2f vA = (b.y - a.y) / (b.x - a.x));
+        float aAB = ((b.y - a.y) / (b.x - a.x));
+        float aAC = ((c.y - a.y) / (c.x - a.x));
+        
+        // To keep CCW direction.
+        if (aAB > 0){
+            if (aAB > aAC){
+                for (int j = 0; j < 3; j++){
+                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+                }
+            }else{
+                for (int j = 0; j < 3; j++){
+                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+                }
+        }else{
+            if (aAB > aAC){
+                for (int j = 0; j < 3; j++){
+                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+                }
+            }else{
+                for (int j = 0; j < 3; j++){
+                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+                }
+        }
+        if (aAB > aAC){
+            for (int j = 0; j < 3; j++){
+                vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+                vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+            }
+        }else{
+            for (int j = 0; j < 3; j++){
+                vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+                vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+                vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+            }
+        }
+        
+        cout << "triangle " << i << " : " << "\n" <<
+        vertices[0].x << " / " << vertices[0].y << "\n" <<
+        vertices[1].x << " / " << vertices[1].y << "\n" <<
+        vertices[2].x << " / " << vertices[2].y << "\n" <<
+        endl;
+        
+        Frag * aFrag = new Frag(mWorld, cx, cy, vertices);
+        mFrags.push_back(aFrag);
+        
     }
+    
     
     
     
@@ -228,13 +289,17 @@ PolygonBody::getArea(b2Vec2* vertices, int maxVCount)
 float
 PolygonBody::getX()
 {
-    return _toPixelX(mBody->GetPosition().x);
+//    return _toPixelX(mBody->GetPosition().x);
+//    return (mBody->GetPosition().x);
+    return posX;
 }
 
 float
 PolygonBody::getY()
 {
-    return _toPixelY(mBody->GetPosition().y);
+//    return _toPixelY(mBody->GetPosition().y);
+//    return (mBody->GetPosition().y);
+    return posY;
 }
 
 
@@ -294,6 +359,16 @@ PolygonBody::setVertices(b2Vec2* vertices)
 }
 
 void
+PolygonBody::renderFrags()
+{
+    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+        (*iter)->render();
+    }
+    
+}
+
+
+void
 PolygonBody::renderAtBodyPosition()
 {
 
@@ -333,6 +408,10 @@ PolygonBody::renderAtBodyPosition()
     ofEndShape();
     ofPopMatrix();
     ofPopStyle();
+    
+    
+    // Draw fragments
+    renderFrags();
 }
 
 

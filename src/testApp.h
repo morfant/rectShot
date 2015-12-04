@@ -57,11 +57,11 @@ class testApp : public ofBaseApp{
 		void mouseReleased(int x, int y, int button);
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);		
+		void gotMessage(ofMessage msg);
 
         // OSC
         void oscSendMsg(string addr, float data);
-        void oscSendMsg(string addr, ofVec2f data);
+        void oscSendMsg2(string addr, ofVec2f data);
     
         // CV
         void sendBlobsOSC();

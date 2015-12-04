@@ -29,7 +29,7 @@ void testApp::setup(){
 	// Uncomment this to show movies with alpha channels
 	// fingerMovie.setPixelFormat(OF_PIXELS_RGBA);
     
-    curMovie = 1; // 0 means using vidGrabber.
+    curMovie = 3; // 0 means using vidGrabber.
     
     movie[1].loadMovie("movies/aya.mov");
     movie[2].loadMovie("movies/aya2.mov");
@@ -112,10 +112,10 @@ void testApp::setup(){
     blobsPtsDiv.clear();
     
     // make balls
-    for (int i = 0; i < 1; i++){
-        Ball * aBall = new Ball(iWorld, ofGetWidth()/2.0f + i, ofGetHeight()/2.0f - i);
-        balls.push_back(aBall);
-    }
+//    for (int i = 0; i < 1; i++){
+//        Ball * aBall = new Ball(iWorld, ofGetWidth()/2.0f + i, ofGetHeight()/2.0f - i);
+//        balls.push_back(aBall);
+//    }
     
     
     // OSC
@@ -266,6 +266,9 @@ void testApp::draw(){
             if(isSelect){
                 b2Vec2* tvec = (*iter)->getBreakArray();
                 b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+//                cout << pBodypos.x << " / " << pBodypos.y << endl;
+                float cx = (*iter)->getX();
+                float cy = (*iter)->getY();
                 
                 
                 // draw points
@@ -279,8 +282,18 @@ void testApp::draw(){
                 // draw triangles
                 ofSetColor(0, 0, 250);
                 ofFill();
-                ofEllipse((pBodypos.x), (pBodypos.y), 100, 100);
-                cout <<pBodypos.x << "/" << pBodypos.y << endl;
+                
+                ofPushMatrix();
+//                ofTranslate((pBodypos.x) * BOX2D_SCALE, (pBodypos.y) * BOX2D_SCALE * (-1.f));
+                ofTranslate((*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE, (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE * (-1.f));
+                
+                //cout << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE << " / " << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE * (-1.f) << endl;
+                
+                
+                ofEllipse(cx, cy, 100, 100);
+                ofPopMatrix();
+                
+//                cout <<pBodypos.x << "/" << pBodypos.y << endl;
                 
 //                for (int i = 0; i < kSAMPLING_INTV - 1; i++){
 //                    ofSetColor(255);
@@ -505,7 +518,7 @@ void testApp::oscSendMsg(string addr, float data)
 }
 
 
-void testApp::oscSendMsg(string addr, ofVec2f data)
+void testApp::oscSendMsg2(string addr, ofVec2f data)
 {
     ofxOscMessage m;
     m.setAddress(addr);
@@ -728,7 +741,9 @@ void testApp::keyPressed(int key){
                 if (isSelected) {
                     b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                     (*iter)->breakBody(pBodypos.x, pBodypos.y);
-
+                    
+                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
+                    
 
                 }
             }

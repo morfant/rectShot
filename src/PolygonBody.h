@@ -16,6 +16,7 @@
 #include <iostream>
 #include "ofMain.h"
 #include "Box2D.h"
+#include "Frag.h"
 #include "convertFunc.h"
 
 #define HOST "localhost"
@@ -35,6 +36,7 @@ protected:
     b2World*    mWorld;
 	b2Body*		mBody;
     b2Body*     mBody2;
+    vector<Frag*>   mFrags;
 
 
     b2Vec2 mPts[kMAX_VERTICES];
@@ -93,6 +95,7 @@ public:
         
     // Render
     void    renderAtBodyPosition();
+    void    renderFrags();
     void    getSection();
     void    breakBody(float x, float y);
     

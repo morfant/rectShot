@@ -76,6 +76,7 @@
 		67347D8117D171A00023B9AE /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67347D7C17D171A00023B9AE /* World.cpp */; };
 		6758AA5917D386670078FA56 /* Box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6758AA5717D386670078FA56 /* Box.cpp */; };
 		6768AA041BDA689A00BEA93C /* ContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6768AA021BDA689A00BEA93C /* ContactListener.cpp */; };
+		6771F1B81C115A120005B432 /* Frag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6771F1B61C115A120005B432 /* Frag.cpp */; };
 		6780BE0517D36759006095C4 /* PolygonBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6780BE0317D36759006095C4 /* PolygonBody.cpp */; };
 		67E8112117D321A70094D376 /* Wall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67E8111F17D321A70094D376 /* Wall.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
@@ -299,6 +300,8 @@
 		6758AA5817D386670078FA56 /* Box.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box.h; sourceTree = "<group>"; };
 		6768AA021BDA689A00BEA93C /* ContactListener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContactListener.cpp; sourceTree = "<group>"; };
 		6768AA031BDA689A00BEA93C /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
+		6771F1B61C115A120005B432 /* Frag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Frag.cpp; sourceTree = "<group>"; };
+		6771F1B71C115A120005B432 /* Frag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frag.h; sourceTree = "<group>"; };
 		6780BE0317D36759006095C4 /* PolygonBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolygonBody.cpp; sourceTree = "<group>"; };
 		6780BE0417D36759006095C4 /* PolygonBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonBody.h; sourceTree = "<group>"; };
 		67E8111D17D31C1D0094D376 /* convertFunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = convertFunc.h; sourceTree = "<group>"; };
@@ -844,6 +847,8 @@
 				67347D7717D171A00023B9AE /* Ball.cpp */,
 				6768AA031BDA689A00BEA93C /* ContactListener.h */,
 				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
+				6771F1B71C115A120005B432 /* Frag.h */,
+				6771F1B61C115A120005B432 /* Frag.cpp */,
 			);
 			name = class;
 			sourceTree = "<group>";
@@ -1193,6 +1198,7 @@
 				672068F71BDBB50500D435E1 /* UdpSocket.cpp in Sources */,
 				6720A8FE17CF9C2500669E43 /* b2ChainAndCircleContact.cpp in Sources */,
 				6720A8FF17CF9C2500669E43 /* b2ChainAndPolygonContact.cpp in Sources */,
+				6771F1B81C115A120005B432 /* Frag.cpp in Sources */,
 				6720A90017CF9C2500669E43 /* b2CircleContact.cpp in Sources */,
 				672068F91BDBB50500D435E1 /* UdpSocketWin.cpp in Sources */,
 				6720A90117CF9C2500669E43 /* b2Contact.cpp in Sources */,
