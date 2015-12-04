@@ -186,51 +186,32 @@ PolygonBody::breakBody(float x, float y)
         b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
         b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
         
-        ofVec2f vA = (b.y - a.y) / (b.x - a.x));
-        float aAB = ((b.y - a.y) / (b.x - a.x));
-        float aAC = ((c.y - a.y) / (c.x - a.x));
+        ofVec2f vh(-1, 0);
+        ofVec2f vAB(b.x - a.x, b.y - a.y);
+        ofVec2f vAC(c.x - a.x, c.y - a.y);
         
+        vh.normalize();
+        vAB.normalize();
+        vAC.normalize();
+        
+        float angleHAB = acos(vh.dot(vAB));
+        float angleHAC = acos(vh.dot(vAC));
+        
+        cout << "angleHAB : " << (-1.f) * _toDegree(angleHAB) << endl;
+        cout << "angleHAC : " << (-1.f) * _toDegree(angleHAC) << endl;
+
+        for (int j = 0; j < 3; j++){
+            vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+        }
+
         // To keep CCW direction.
-        if (aAB > 0){
-            if (aAB > aAC){
-                for (int j = 0; j < 3; j++){
-                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-                }
-            }else{
-                for (int j = 0; j < 3; j++){
-                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-                }
-        }else{
-            if (aAB > aAC){
-                for (int j = 0; j < 3; j++){
-                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-                }
-            }else{
-                for (int j = 0; j < 3; j++){
-                    vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                    vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-                    vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-                }
+        if (angleHAC > angleHAB){
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
         }
-        if (aAB > aAC){
-            for (int j = 0; j < 3; j++){
-                vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-                vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-            }
-        }else{
-            for (int j = 0; j < 3; j++){
-                vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
-                vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-                vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-            }
-        }
+        
         
         cout << "triangle " << i << " : " << "\n" <<
         vertices[0].x << " / " << vertices[0].y << "\n" <<
@@ -238,12 +219,12 @@ PolygonBody::breakBody(float x, float y)
         vertices[2].x << " / " << vertices[2].y << "\n" <<
         endl;
         
+        
         Frag * aFrag = new Frag(mWorld, cx, cy, vertices);
         mFrags.push_back(aFrag);
         
+    
     }
-    
-    
     
     
 }
