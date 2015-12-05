@@ -280,17 +280,17 @@ void testApp::draw(){
                 }
                 
                 // draw triangles
-                ofSetColor(0, 0, 250);
+                ofSetColor(200, 100, 250);
                 ofFill();
                 
                 ofPushMatrix();
 //                ofTranslate((pBodypos.x) * BOX2D_SCALE, (pBodypos.y) * BOX2D_SCALE * (-1.f));
                 ofTranslate((*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE, (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE * (-1.f));
                 
-                //cout << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE << " / " << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE * (-1.f) << endl;
+                cout << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE << " / " << (*iter)->getBody()->GetWorldCenter().x * BOX2D_SCALE * (-1.f) << endl;
                 
                 
-                ofEllipse(cx, cy, 100, 100);
+                ofEllipse(0, 0, 100, 100);
                 ofPopMatrix();
                 
 //                cout <<pBodypos.x << "/" << pBodypos.y << endl;
@@ -655,6 +655,7 @@ void testApp::keyPressed(int key){
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected) {
+                    (*iter)->clearFrags();
                     delete (*iter);
                     iter = pBodies.erase(iter);
                 }else{

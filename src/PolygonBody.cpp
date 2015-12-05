@@ -148,28 +148,44 @@ PolygonBody::~PolygonBody()
 void
 PolygonBody::breakBody(float x, float y)
 {
+    
+
+
+    float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
+    float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
+
+    float cx = posX + movX;
+    float cy = posY + movY;
+//    float movX = _toPixelX(mBody->GetWorldCenter().x) + posX;
+//    float movY = _toPixelY(mBody->GetWorldCenter().y) + posY;
+    
+    
+//    float movX = posX;
+//    float movY = posY;
+    
+    
     // get intervald virtices
     // divNum = sampling interval
     int sampledSize = kMAX_VERTICES/kSAMPLING_INTV;
     
     // Add first point of blob polygon shape.
     b2Vec2 first = b2Vec2(0, 0);
-    first.x = mVertice[0].x;
-    first.y = mVertice[0].y;
+    first.x = mVertice[0].x + movX;
+    first.y = mVertice[0].y + movY;
     mVerticeDiv[0] = first;
     
     // Add middle points of blob polygon shape.
     for (int i = 1; i < (sampledSize - 1); i++) {
         b2Vec2 temp = b2Vec2(0, 0);
-        temp.x = mVertice[kSAMPLING_INTV * i].x;
-        temp.y = mVertice[kSAMPLING_INTV * i].y;
+        temp.x = mVertice[kSAMPLING_INTV * i].x + movX;
+        temp.y = mVertice[kSAMPLING_INTV * i].y + movY;
         mVerticeDiv[i] = temp;
     }
     
     // Add end point of blob polygon shape
     b2Vec2 last = b2Vec2(0, 0);
-    last.x = mVertice[kMAX_VERTICES - 1].x;
-    last.y = mVertice[kMAX_VERTICES - 1].y;
+    last.x = mVertice[kMAX_VERTICES - 1].x + movX;
+    last.y = mVertice[kMAX_VERTICES - 1].y + movY;
     mVerticeDiv[sampledSize - 1] = last;
     
     for (int i = 0; i < sampledSize; i++){
@@ -177,39 +193,61 @@ PolygonBody::breakBody(float x, float y)
     }
     
 
-    float cx = (mBody->GetWorldCenter().x * BOX2D_SCALE) + posX;
-    float cy = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f)) + posY;
 
     for (int i = 0; i < kSAMPLING_INTV - 1; i++){
         b2Vec2 vertices[3];
+//        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
         b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
         b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
         b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
         
         ofVec2f vh(-1, 0);
+        ofVec2f vv(0, 1);
         ofVec2f vAB(b.x - a.x, b.y - a.y);
+        ofVec2f vBC(c.x - b.x, c.y - b.y);
         ofVec2f vAC(c.x - a.x, c.y - a.y);
         
         vh.normalize();
+        vv.normalize();
         vAB.normalize();
+        vBC.normalize();
         vAC.normalize();
         
         float angleHAB = acos(vh.dot(vAB));
         float angleHAC = acos(vh.dot(vAC));
+        float angleVAB = acos(vv.dot(vAB));
+        float angleVAC = acos(vv.dot(vAC));
+        float angleABBC = acos(vAB.dot(vBC));
+        
         
         cout << "angleHAB : " << (-1.f) * _toDegree(angleHAB) << endl;
         cout << "angleHAC : " << (-1.f) * _toDegree(angleHAC) << endl;
 
+        cout << "angleVAB : " << (-1.f) * _toDegree(angleVAB) << endl;
+        cout << "angleVAC : " << (-1.f) * _toDegree(angleVAC) << endl;
+        
+        cout << "angleAB-BC : " << (-1.f) * _toDegree(angleABBC) << endl;
+        
+        
         for (int j = 0; j < 3; j++){
+//            vertices[0] = b2Vec2(_toWorldX(movX), _toWorldY(movY));
             vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
             vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
             vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
         }
 
         // To keep CCW direction.
-        if (angleHAC > angleHAB){
+        if (angleHAB < angleHAC && angleVAB > angleVAC){
+            cout << "2 and 1 changed\n" << endl;
+//        if (angleVAC > angleVAB){
             vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
             vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        }else if(angleHAB > angleHAC && angleVAB < angleVAC){
+            cout << "2 and 1 changed\n" << endl;
+            //        if (angleVAC > angleVAB){
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+            
         }
         
         
@@ -220,7 +258,9 @@ PolygonBody::breakBody(float x, float y)
         endl;
         
         
-        Frag * aFrag = new Frag(mWorld, cx, cy, vertices);
+//        mWorld->DestroyBody(mBody);
+        
+        Frag * aFrag = new Frag(mWorld, cx, cy, movX, movY, vertices);
         mFrags.push_back(aFrag);
         
     
@@ -249,6 +289,13 @@ PolygonBody::getSelectState()
     return selected;
 }
 
+void
+PolygonBody::clearFrags()
+{
+    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+        delete (*iter);
+    }
+}
 
 // getter & setter
 float
@@ -378,6 +425,8 @@ PolygonBody::renderAtBodyPosition()
 
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
+    ofSetColor(199, 199, 199);
+    ofEllipse(0, 0, 50, 50);
     ofRotate(_toDegree(angle));
     ofBeginShape();
 

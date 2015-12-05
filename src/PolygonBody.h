@@ -87,6 +87,8 @@ public:
     
     bool    getSelectState();
     
+    void    clearFrags();
+    
     // Setter
     void    setSelectState(bool isSelect);
     void    setX(float posX);

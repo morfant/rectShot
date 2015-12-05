@@ -11,12 +11,14 @@
 
 // ----Birth & Death----
 
-Frag::Frag(b2World* aWorld, float x, float y, b2Vec2* vertices)
+Frag::Frag(b2World* aWorld, float x, float y, float mx, float my, b2Vec2* vertices)
 {
     
     mWorld = aWorld;
     posX = x;
     posY = y;
+    movX = mx;
+    movY = my;
     
     for (int i = 0; i < 3; i++){
         mVertice[i] = vertices[i];
@@ -25,7 +27,8 @@ Frag::Frag(b2World* aWorld, float x, float y, b2Vec2* vertices)
     
 	b2BodyDef myBodyDef;
 	myBodyDef.type = b2_dynamicBody;
-    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+//    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+    myBodyDef.position.Set(0, 0);
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
 	b2PolygonShape triangle;
@@ -38,8 +41,8 @@ Frag::Frag(b2World* aWorld, float x, float y, b2Vec2* vertices)
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &triangle;
-	myFixtureDef.density = 20.f;
-    myFixtureDef.restitution = 0.5f;
+//	myFixtureDef.density = 20.f;
+//    myFixtureDef.restitution = 0.5f;
     myFixtureDef.isSensor = false;
     mBody->CreateFixture(&myFixtureDef);
     
@@ -96,14 +99,32 @@ Frag::setY(float _posY)
 void
 Frag::render()
 {
-    b2Vec2 pos = mBody->GetPosition();
+//    b2Vec2 pos = mBody->GetPosition();
+
+//    cout << pos.x << " / " << pos.y << endl;
+//    cout << _toPixelX(pos.x)<< " / " << _toPixelY(pos.y) << endl;
+    ofPushMatrix();
+    ofTranslate(movX, movY);
+    ofSetColor(244, 122, 0);
+    ofEllipse(0, 0, 20, 20);
+    ofPopMatrix();
     
     ofPushStyle();
     ofSetColor(0, 200, 255);
     ofFill();
     ofPushMatrix();
-    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
-    ofTriangle(mVertice[0].x, mVertice[0].y, mVertice[1].x, mVertice[1].y, mVertice[2].x, mVertice[2].y);
+//    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
+    ofTranslate((posX), (posY)); //Must use for image moving.
+    ofEllipse(0, 0, 10, 10);
+    ofBeginShape();
+    
+    for (int i = 0; i < 3; i++) {
+        //        ofVertex(_tovPixelX(mPts[i].x), _tovPixelY(mPts[i].y));
+        ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );
+    }
+    
+    ofEndShape();
+    
     ofPopMatrix();
     ofPopStyle();
 }

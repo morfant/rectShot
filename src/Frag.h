@@ -24,6 +24,8 @@ protected:
     // Position
     float   posX;
     float   posY;
+    float   movX;
+    float   movY;
     
     // Size
     float   size = 10.f;
@@ -36,7 +38,7 @@ protected:
     
 public:
     // Birth and Death
-    Frag(b2World* world, float x, float y, b2Vec2* vertices);
+    Frag(b2World* world, float x, float y, float mx, float my, b2Vec2* vertices);
     ~Frag();
     
     // Getter
