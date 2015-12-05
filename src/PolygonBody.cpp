@@ -145,6 +145,19 @@ PolygonBody::~PolygonBody()
     mBody2 = NULL;
 }
 
+float
+PolygonBody::perp_dot(ofVec2f a, ofVec2f b)
+{
+    return (-1.f) * a.y * b.x + a.x * b.y;
+}
+
+float
+PolygonBody::perp_dot(b2Vec2 a, b2Vec2 b)
+{
+    return (-1.f) * a.y * b.x + a.x * b.y;
+}
+
+
 void
 PolygonBody::breakBody(float x, float y)
 {
@@ -200,9 +213,14 @@ PolygonBody::breakBody(float x, float y)
         b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
         b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
         b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+
+//        b2Vec2 a = b2Vec2(1, 1);
+//        b2Vec2 b = b2Vec2(2, 3);
+//        b2Vec2 c = b2Vec2(0, 0);
         
+
         ofVec2f vh(-1, 0);
-        ofVec2f vv(0, 1);
+        ofVec2f vv(0, -1);
         ofVec2f vAB(b.x - a.x, b.y - a.y);
         ofVec2f vBC(c.x - b.x, c.y - b.y);
         ofVec2f vAC(c.x - a.x, c.y - a.y);
@@ -212,6 +230,14 @@ PolygonBody::breakBody(float x, float y)
         vAB.normalize();
         vBC.normalize();
         vAC.normalize();
+
+//        float d = perp_dot(b - a, c - b);
+        float d = perp_dot(vAB, vBC);
+        if(d < 0){
+            cout << "RIGHT\n";
+        }else{
+            cout << "LEFT\n";
+        }
         
         float angleHAB = acos(vh.dot(vAB));
         float angleHAC = acos(vh.dot(vAC));
@@ -237,17 +263,10 @@ PolygonBody::breakBody(float x, float y)
         }
 
         // To keep CCW direction.
-        if (angleHAB < angleHAC && angleVAB > angleVAC){
+        if (d < 0){
             cout << "2 and 1 changed\n" << endl;
-//        if (angleVAC > angleVAB){
             vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
             vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-        }else if(angleHAB > angleHAC && angleVAB < angleVAC){
-            cout << "2 and 1 changed\n" << endl;
-            //        if (angleVAC > angleVAB){
-            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
-            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
-            
         }
         
         
@@ -258,11 +277,10 @@ PolygonBody::breakBody(float x, float y)
         endl;
         
         
-//        mWorld->DestroyBody(mBody);
-        
+        mWorld->DestroyBody(mBody);
+
         Frag * aFrag = new Frag(mWorld, cx, cy, movX, movY, vertices);
         mFrags.push_back(aFrag);
-        
     
     }
     

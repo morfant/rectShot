@@ -105,6 +105,10 @@ public:
     void    update();
     void    draw();
     
+    float   perp_dot(ofVec2f a, ofVec2f b);
+    float   perp_dot(b2Vec2 a, b2Vec2 b);
+    
+    
 
     
     
