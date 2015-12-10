@@ -41,8 +41,9 @@ Frag::Frag(b2World* aWorld, float x, float y, float mx, float my, b2Vec2* vertic
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &triangle;
-//	myFixtureDef.density = 20.f;
-//    myFixtureDef.restitution = 0.5f;
+	myFixtureDef.density = 0.5f;
+//    myFixtureDef.restitution = 0.01f;
+//    myFixtureDef.friction = 0.7f;
     myFixtureDef.isSensor = false;
     mBody->CreateFixture(&myFixtureDef);
     
@@ -99,7 +100,9 @@ Frag::setY(float _posY)
 void
 Frag::render()
 {
-//    b2Vec2 pos = mBody->GetPosition();
+    b2Vec2 pos = mBody->GetPosition();
+    float32 angle = mBody->GetAngle();
+
 
 //    cout << pos.x << " / " << pos.y << endl;
 //    cout << _toPixelX(pos.x)<< " / " << _toPixelY(pos.y) << endl;
@@ -113,9 +116,10 @@ Frag::render()
     ofSetColor(0, 200, 255);
     ofFill();
     ofPushMatrix();
-//    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
-    ofTranslate((posX), (posY)); //Must use for image moving.
-    ofEllipse(0, 0, 10, 10);
+    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
+    ofRotate(_toDegree(angle));
+//    ofTranslate((posX), (posY)); //Must use for image moving.
+//    ofEllipse(0, 0, 10, 10);
     ofBeginShape();
     
     for (int i = 0; i < 3; i++) {

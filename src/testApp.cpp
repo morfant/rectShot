@@ -189,7 +189,7 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
     
-    ofBackground(0, 0, 0);
+    ofBackground(255);
     
     // Draw movie.
     if (movPlay){
@@ -243,10 +243,24 @@ void testApp::draw(){
     // Draw body at cv pos
     if(pBodies.size()){
         drawPolygonBodies();
+        
+
+        for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            if ( (*iter)->isThereMBody() ){
+//                cout << (*iter)->isThereMBody() << endl;
+//                delete (*iter);
+//                iter = pBodies.erase(iter);
+            }else{
+//                iter++;
+            }
+        }
+        
 //        polyLinerUpdate();
     }
+
+
     
-//    
+//
 //    if (movPlaySmall){
 //        // Right bottom rect.
 //        ofPushMatrix();
@@ -256,7 +270,7 @@ void testApp::draw(){
 //        ofPopMatrix();
 //    }
 
-    
+    /*
     // Breakbody test
     for (int i = 0; i < kSAMPLING_INTV; i++) {
         for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
@@ -280,7 +294,8 @@ void testApp::draw(){
                 }
                 
                 // draw triangles
-                ofSetColor(200, 100, 250);
+                //ofSetColor(200, 100, 250);
+                ofSetColor(0);
                 ofFill();
                 
                 ofPushMatrix();
@@ -307,7 +322,7 @@ void testApp::draw(){
 
         }
     }
-
+*/
 	// finally, a report
     if (info){
         ofPushStyle();
@@ -333,15 +348,17 @@ void testApp::draw(){
             b2Body* other = aBox->getBody()->GetContactList()->other;
             
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                if ((*iter)->isThereMBody()){
 
-                bool isSelect = (*iter)->getSelectState();
-                if ((*iter)->getBody() == other && touched == false){
-                    
-                    if (isSelect) (*iter)->setSelectState(false);
-                    else (*iter)->setSelectState(true);
-                    
-                    // Latch
-                    touched = true;
+                    bool isSelect = (*iter)->getSelectState();
+                    if ((*iter)->getBody() == other && touched == false){
+                        
+                        if (isSelect) (*iter)->setSelectState(false);
+                        else (*iter)->setSelectState(true);
+                        
+                        // Latch
+                        touched = true;
+                    }
                 }
             }
         }
@@ -353,8 +370,8 @@ void testApp::draw(){
 
 void testApp::drawPolygonBodies(){
     
-    ofColor(0, 255, 0);
-    ofFill();
+//    ofColor(0, 5, 0);
+//    ofFill();
     
     for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
         (*iter)->renderAtBodyPosition();
@@ -482,7 +499,7 @@ void testApp::resetPolygonBody(){
     
     // clear b2Body
     for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-        iWorld->DestroyBody((*iter)->getBody()); //b2Body*
+        delete (*iter);
     }
     
     // clear circle
@@ -668,6 +685,8 @@ void testApp::keyPressed(int key){
         // Delete all polygon bodies
 		case 'X':
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+                
+                    (*iter)->clearFrags();
                     delete (*iter);
                     iter = pBodies.erase(iter);
 
@@ -739,7 +758,7 @@ void testApp::keyPressed(int key){
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 bool isSelected = (*iter)->getSelectState();
                 
-                if (isSelected) {
+                if (isSelected && (*iter)->isThereMBody()) {
                     b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                     (*iter)->breakBody(pBodypos.x, pBodypos.y);
                     
@@ -751,7 +770,10 @@ void testApp::keyPressed(int key){
             
             break;
             
-
+        case OF_KEY_LEFT:
+            cout << "count: " << iWorld->GetBodyCount() << endl;
+            cout << "list: " << iWorld->GetBodyList() << endl;
+            break;
 
 	}
 }

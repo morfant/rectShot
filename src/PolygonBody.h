@@ -35,7 +35,7 @@ protected:
 	// Box2D
     b2World*    mWorld;
 	b2Body*		mBody;
-    b2Body*     mBody2;
+    b2Body*     mBody2; //Small body tracking on outline.
     vector<Frag*>   mFrags;
 
 
@@ -53,6 +53,7 @@ protected:
     
     // Select interface
     bool        selected;
+    bool        isThereMbodybool;
     
     // Userdata
     int pBodyUserData;
@@ -86,6 +87,7 @@ public:
     b2Body*     getBody();
     
     bool    getSelectState();
+    bool    isThereMBody();
     
     void    clearFrags();
     
@@ -94,6 +96,7 @@ public:
     void    setX(float posX);
     void    setY(float posY);
     void    setVertices(b2Vec2* vertices);
+    void    delMbody();
         
     // Render
     void    renderAtBodyPosition();

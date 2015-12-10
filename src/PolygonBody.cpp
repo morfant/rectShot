@@ -14,6 +14,7 @@
 
 PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
 {
+    isThereMbodybool = true;
 
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
@@ -104,15 +105,16 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     // Set default status
     selected = false;
-    defaultColor = ofColor(0, 200, 25);
-    selectedColor = ofColor(200, 10, 20);
-    
+    //defaultColor = ofColor(0, 200, 25);
+    defaultColor = ofColor(0, 200, 0);
+    //selectedColor = ofColor(200, 10, 20);
+    selectedColor = ofColor(0, 0, 20);
     
     // sub body
-//	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_dynamicBody;
-    myBodyDef.position.Set(0, 0);
-	mBody2 = mWorld -> CreateBody(&myBodyDef);
+	b2BodyDef myBodyDef2;
+	myBodyDef2.type = b2_dynamicBody;
+    myBodyDef2.position.Set(0, 0);
+	mBody2 = mWorld -> CreateBody(&myBodyDef2);
     
 	b2CircleShape myCircleShape;
 	myCircleShape.m_p.Set(0, 0);
@@ -125,6 +127,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     myFixtureDef.friction = 0.7f;
     mBody2->CreateFixture(&myFixtureDef);
     
+//    cout << "count: " <<mWorld->GetBodyCount() << endl;
+//    cout << "list: " << mWorld->GetBodyList() << endl;
 
 	
 }
@@ -139,10 +143,11 @@ PolygonBody::~PolygonBody()
     
     sender.sendMessage(m);
     
-    mWorld->DestroyBody(mBody);
-    mWorld->DestroyBody(mBody2);
-    mBody = NULL;
-    mBody2 = NULL;
+    if (isThereMbodybool){
+        mWorld->DestroyBody(mBody2);
+        mWorld->DestroyBody(mBody);
+    }
+
 }
 
 float
@@ -277,7 +282,7 @@ PolygonBody::breakBody(float x, float y)
         endl;
         
         
-        mWorld->DestroyBody(mBody);
+        if (isThereMbodybool) delMbody();
 
         Frag * aFrag = new Frag(mWorld, cx, cy, movX, movY, vertices);
         mFrags.push_back(aFrag);
@@ -305,6 +310,12 @@ bool
 PolygonBody::getSelectState()
 {
     return selected;
+}
+
+bool
+PolygonBody::isThereMBody()
+{
+    return isThereMbodybool;
 }
 
 void
@@ -404,11 +415,26 @@ PolygonBody::setVertices(b2Vec2* vertices)
 
 }
 
+
+void
+PolygonBody::delMbody()
+{
+    cout << "count: " << mWorld->GetBodyCount() << endl;
+    cout << "list: " << mWorld->GetBodyList() << endl;
+    
+    mWorld->DestroyBody(mBody2);
+    mWorld->DestroyBody(mBody);
+    isThereMbodybool = false;
+}
+
+
 void
 PolygonBody::renderFrags()
 {
-    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
-        (*iter)->render();
+    if (!isThereMbodybool){
+        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+            (*iter)->render();
+        }
     }
     
 }
@@ -417,69 +443,73 @@ PolygonBody::renderFrags()
 void
 PolygonBody::renderAtBodyPosition()
 {
+    if (isThereMbodybool){
 
 
-//    b2Vec2 pos2 = mBody2->GetPosition();
-//    float32 pangle = mBody2->GetAngle();
-//    cout << "x: " << (pos2.x * BOX2D_SCALE) << " / y: " << (pos2.y * BOX2D_SCALE * -1) << " / angle: " << pangle << endl;
+    //    b2Vec2 pos2 = mBody2->GetPosition();
+    //    float32 pangle = mBody2->GetAngle();
+    //    cout << "x: " << (pos2.x * BOX2D_SCALE) << " / y: " << (pos2.y * BOX2D_SCALE * -1) << " / angle: " << pangle << endl;
 
-//    mBody->SetTransform(pos2, pangle);
-    b2Vec2 pos = mBody->GetPosition();
-    float32 angle = mBody->GetAngle();
-    
-//    printf("pbody angle: %f\n", angle);
-    
-//    printf("pbody pos: %f, %f\n", pos.x, pos.y);
-//    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
-    
-    ofPushStyle();
-//    ofSetColor(0, 200, 25); //Set Polygon body color
+    //    mBody->SetTransform(pos2, pangle);
+        b2Vec2 pos = mBody->GetPosition();
+        float32 angle = mBody->GetAngle();
+        
+    //    printf("pbody angle: %f\n", angle);
+        
+    //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
+    //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
+        
+        ofPushStyle();
+    //    ofSetColor(0, 200, 25); //Set Polygon body color
 
-    if (selected) {
-        ofSetColor(selectedColor);
+        if (selected) {
+            ofSetColor(selectedColor);
+        }else{
+            ofSetColor(defaultColor);
+        }
+
+        ofPushMatrix();
+        ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
+    //    ofSetColor(199, 199, 199);
+    //    ofSetColor(0);
+        ofEllipse(0, 0, 50, 50);
+        ofRotate(_toDegree(angle));
+        ofBeginShape();
+        for (int i = 0; i < maxVertexCount; i++) {
+    //        ofVertex(_tovPixelX(mPts[i].x), _tovPixelY(mPts[i].y));
+            ofVertex(mPts[i].x * BOX2D_SCALE, mPts[i].y * BOX2D_SCALE * (-1.f) );
+        }
+        
+        ofEndShape();
+        ofPopMatrix();
+        ofPopStyle();
     }else{
-        ofSetColor(defaultColor);
+    
+        // Draw fragments
+        renderFrags();
     }
-
-    ofPushMatrix();
-    ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
-    ofSetColor(199, 199, 199);
-    ofEllipse(0, 0, 50, 50);
-    ofRotate(_toDegree(angle));
-    ofBeginShape();
-
-    for (int i = 0; i < maxVertexCount; i++) {
-//        ofVertex(_tovPixelX(mPts[i].x), _tovPixelY(mPts[i].y));
-        ofVertex(mPts[i].x * BOX2D_SCALE, mPts[i].y * BOX2D_SCALE * (-1.f) );
-    }
-    
-    ofEndShape();
-    ofPopMatrix();
-    ofPopStyle();
-    
-    
-    // Draw fragments
-    renderFrags();
 }
 
 
 void PolygonBody::getSection()
 {
-    // Get each distance from current point to next point.
-    for (int i = 0; i < (kMAX_VERTICES - 1); i++){
-        
-        float dist = ofDist(mVertice[i].x, mVertice[i].y, mVertice[i+1].x, mVertice[i+1].y);
-        
-        dists.push_back(dist);
-        //cout << "dists: " << i << " -  " << dists[i] << endl;
-        
-        
-        float incX = (mVertice[i + 1].x - mVertice[i].x) / dists[i];
-        float incY = (mVertice[i + 1].y - mVertice[i].y) / dists[i];
-        
-        addDist.push_back(ofVec2f(incX, incY));
-        //cout << "addDist: " << i << " x : " << addDist[i].x << " y : " << addDist[i].y << endl;
-        
+    if (isThereMbodybool){
+        // Get each distance from current point to next point.
+        for (int i = 0; i < (kMAX_VERTICES - 1); i++){
+            
+            float dist = ofDist(mVertice[i].x, mVertice[i].y, mVertice[i+1].x, mVertice[i+1].y);
+            
+            dists.push_back(dist);
+            //cout << "dists: " << i << " -  " << dists[i] << endl;
+            
+            
+            float incX = (mVertice[i + 1].x - mVertice[i].x) / dists[i];
+            float incY = (mVertice[i + 1].y - mVertice[i].y) / dists[i];
+            
+            addDist.push_back(ofVec2f(incX, incY));
+            //cout << "addDist: " << i << " x : " << addDist[i].x << " y : " << addDist[i].y << endl;
+            
+        }
     }
 }
 
@@ -488,65 +518,66 @@ void PolygonBody::getSection()
 void
 PolygonBody::update()
 {
-    
-    b2Vec2 bodyPos = mBody->GetPosition();
-//    cout << "bodypos: x: " << bodyPos.x << " y: " << bodyPos.y << endl;
-//    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
-    ofVec2f curPoint = ofVec2f(mVertice[curSection].x, mVertice[curSection].y);
-    ofVec2f nextPoint = ofVec2f(
-            mVertice[curSection].x + (addDist[curSection].x * (curPointofSection + 1)),
-            mVertice[curSection].y + (addDist[curSection].y * (curPointofSection + 1)));
-    
-    float distBetweenPoint = ofDist(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
+    if (isThereMbodybool){
+        b2Vec2 bodyPos = mBody->GetPosition();
+    //    cout << "bodypos: x: " << bodyPos.x << " y: " << bodyPos.y << endl;
+    //    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
+        ofVec2f curPoint = ofVec2f(mVertice[curSection].x, mVertice[curSection].y);
+        ofVec2f nextPoint = ofVec2f(
+                mVertice[curSection].x + (addDist[curSection].x * (curPointofSection + 1)),
+                mVertice[curSection].y + (addDist[curSection].y * (curPointofSection + 1)));
+        
+        float distBetweenPoint = ofDist(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
 
-    if (distBetweenPoint < dists[curSection]){
-        
-        ofxOscMessage m;
-        m.setAddress("/fromOF_pBody");
-        m.addIntArg(index);
-        m.addFloatArg(bodyPos.x * BOX2D_SCALE + nextPoint.x);
-        m.addFloatArg(bodyPos.y * BOX2D_SCALE + nextPoint.y);
-        sender.sendMessage(m);
-        
-        
-        ofPushStyle();
-        ofSetColor(10, 200, 100);
-        ofFill();
-        
-        ofPushMatrix();
-        ofTranslate(bodyPos.x * BOX2D_SCALE, bodyPos.y * BOX2D_SCALE * (-1));
-//        ofTranslate(curPoint.x, curPoint.y);
-//        ofLine(0, 0, nextPoint.x - curPoint.x, nextPoint.y - curPoint.y);
-//        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
-//        ofCircle(curPoint.x, curPoint.y, 10.f);
-        ofSetColor(200, 200, 150);
-        ofCircle(nextPoint.x, nextPoint.y, 3.f);
-        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
-        //    ofPoint(0, 0, 0);
-        
-        ofPopMatrix();
-        ofPopStyle();
-        
-        curPointofSection++;
-//        cout << "curPointofSection: " << curPointofSection << endl;
+        if (distBetweenPoint < dists[curSection]){
+            
+            ofxOscMessage m;
+            m.setAddress("/fromOF_pBody");
+            m.addIntArg(index);
+            m.addFloatArg(bodyPos.x * BOX2D_SCALE + nextPoint.x);
+            m.addFloatArg(bodyPos.y * BOX2D_SCALE + nextPoint.y);
+            sender.sendMessage(m);
+            
+            
+            ofPushStyle();
+            ofSetColor(10, 200, 100);
+            ofFill();
+            
+            ofPushMatrix();
+            ofTranslate(bodyPos.x * BOX2D_SCALE, bodyPos.y * BOX2D_SCALE * (-1));
+    //        ofTranslate(curPoint.x, curPoint.y);
+    //        ofLine(0, 0, nextPoint.x - curPoint.x, nextPoint.y - curPoint.y);
+    //        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
+    //        ofCircle(curPoint.x, curPoint.y, 10.f);
+            //ofSetColor(200, 200, 150);
+            ofSetColor(200, 200, 150);
+            ofCircle(nextPoint.x, nextPoint.y, 30.f);
+            ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
+            //    ofPoint(0, 0, 0);
+            
+            ofPopMatrix();
+            ofPopStyle();
+            
+            curPointofSection++;
+    //        cout << "curPointofSection: " << curPointofSection << endl;
 
-    }else{
-        curSection++;
-//        cout << "curSection: " << curSection << endl;
-        
-        if (curSection == (kMAX_VERTICES - 1) ) {
-            curSection = 0;
+        }else{
+            curSection++;
+    //        cout << "curSection: " << curSection << endl;
+            
+            if (curSection == (kMAX_VERTICES - 1) ) {
+                curSection = 0;
+            }
+            
+            curPointofSection = 0;
         }
         
-        curPointofSection = 0;
+        mBody2->SetTransform(b2Vec2(nextPoint.x + (bodyPos.x * BOX2D_SCALE), nextPoint.y + (bodyPos.y * BOX2D_SCALE * (-1))), 0);
+        
+        b2Vec2 spos = mBody2->GetPosition();
+    //        cout << "spos: x: " << spos.x << " y: " << spos.y << endl;
+       
     }
-    
-    mBody2->SetTransform(b2Vec2(nextPoint.x + (bodyPos.x * BOX2D_SCALE), nextPoint.y + (bodyPos.y * BOX2D_SCALE * (-1))), 0);
-    
-    b2Vec2 spos = mBody2->GetPosition();
-//        cout << "spos: x: " << spos.x << " y: " << spos.y << endl;
-   
-    
 }
 
 
