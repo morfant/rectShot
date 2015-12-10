@@ -13,6 +13,9 @@
 
 ContactListener::ContactListener()
 {
+
+    forceMul = 1000.f;
+
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
     
@@ -31,6 +34,7 @@ ContactListener::BeginContact(b2Contact* contact)
     
     // Ball - userData = 1
     void* userData_A = contact->GetFixtureA()->GetBody()->GetUserData();
+    
     if (userData_A) {
 
         switch ((int)userData_A) {
@@ -45,6 +49,22 @@ ContactListener::BeginContact(b2Contact* contact)
                 m.addFloatArg(_toPixelX(pos.x));
                 m.addFloatArg(_toPixelY(pos.y));
                 sender.sendMessage(m);
+                
+                // Make pushing force
+                b2Body* self = contact->GetFixtureA()->GetBody();
+                b2Body* other = contact->GetFixtureB()->GetBody();
+                b2Vec2 selfPos = self->GetPosition();
+                b2Vec2 otherPos = other->GetPosition();
+                
+//                cout << "self pos: " << selfPos.x << " / " << selfPos.y << endl;
+//                cout << "other pos: " << otherPos.x << " / " << otherPos.y << endl;
+                
+                other->ApplyForce(b2Vec2(
+                                         (selfPos.x - otherPos.x) * forceMul,
+                                         (otherPos.y - selfPos.y) * forceMul),
+                                  selfPos);
+                
+                
             }
                 break;
                 
@@ -112,6 +132,24 @@ ContactListener::BeginContact(b2Contact* contact)
                 m.addFloatArg(_toPixelX(pos.x));
                 m.addFloatArg(_toPixelY(pos.y));
                 sender.sendMessage(m);
+                
+                
+                // Make pushing force
+                b2Body* self = contact->GetFixtureB()->GetBody();
+                b2Body* other = contact->GetFixtureA()->GetBody();
+                b2Vec2 selfPos = self->GetPosition();
+                b2Vec2 otherPos = other->GetPosition();
+                
+//                cout << "self pos: " << selfPos.x << " / " << selfPos.y << endl;
+//                cout << "other pos: " << otherPos.x << " / " << otherPos.y << endl;
+                
+                other->ApplyForce(b2Vec2(
+                                         (selfPos.x - otherPos.x) * forceMul,
+                                         (otherPos.y - selfPos.y) * forceMul),
+                                  selfPos);
+                
+                
+                
             }
                 break;
 

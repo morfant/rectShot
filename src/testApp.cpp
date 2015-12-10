@@ -808,41 +808,54 @@ void testApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
     
-    for (int i = 0; i < cvBlobNum; i++){
-        if (blobsVec[i].boundingRect.inside(x, y)){
-            selBlobRect = i + 1;
-//            printf("Selected blob rect number: %d\n", selBlobRect);
-            makePolygonBody(selBlobRect);
+    if (button == 0){
+        for (int i = 0; i < cvBlobNum; i++){
+            if (blobsVec[i].boundingRect.inside(x, y)){
+                selBlobRect = i + 1;
+    //            printf("Selected blob rect number: %d\n", selBlobRect);
+                makePolygonBody(selBlobRect);
+            }
+        }
+        
+        selBlobRect = 0;
+        
+    //    printf("Num of pbodies: %lu\n", pBodies.size());
+        
+        
+        // For polygon body selection
+        if (boxes.size() == 0){
+            aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
+            boxes.push_back(aBox);
         }
     }
     
-    selBlobRect = 0;
-    
-//    printf("Num of pbodies: %lu\n", pBodies.size());
-    
-    
-    // For polygon body selection
-    if (boxes.size() == 0){
-        aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
-        boxes.push_back(aBox);
+
+    // Right click
+    if (button == 2){
+        
+        aBall = new Ball(iWorld, x, y);
+        balls.push_back(aBall);
     }
     
-
-    
-
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
 
-    // Reset booleans.
-    selBlobRect = 0;
-    touched = false;
+    if (button == 0){
+        // Reset booleans.
+        selBlobRect = 0;
+        touched = false;
+        
+        // Delete touch box(sensor object).
+        delete boxes[0];
+        boxes.clear();
+        
+    }else if(button == 2){
+        delete balls[0];
+        balls.clear();
+    }
     
-    // Delete touch box(sensor object).
-    delete boxes[0];
-    boxes.clear();
 
 }
 

@@ -89,6 +89,8 @@ public:
     bool    getSelectState();
     bool    isThereMBody();
     
+    vector<Frag*> *  getFrags();
+    
     void    clearFrags();
     
     // Setter
@@ -97,12 +99,15 @@ public:
     void    setY(float posY);
     void    setVertices(b2Vec2* vertices);
     void    delMbody();
+    void    pushForce(float x, float y);
         
     // Render
     void    renderAtBodyPosition();
     void    renderFrags();
     void    getSection();
     void    breakBody(float x, float y);
+    void    breakFrags();
+
     
     // Update & draw
     void    update();

@@ -25,7 +25,8 @@ Ball::Ball(b2World* aWorld, float x, float y)
     radius = 30.f;
     
 	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_dynamicBody;
+//	myBodyDef.type = b2_dynamicBody;
+	myBodyDef.type = b2_staticBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -39,9 +40,17 @@ Ball::Ball(b2World* aWorld, float x, float y)
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myCircleShape;	
-	myFixtureDef.density = 1.f;
-    myFixtureDef.restitution = 1.01f;
+
+    // Normal ball
+//	myFixtureDef.density = 1.f;
+//    myFixtureDef.restitution = 1.01f;
+//    myFixtureDef.friction = 0.7f;
+
+    // Pushing ball
+	myFixtureDef.density = 100.f;
+    myFixtureDef.restitution = 0.01f;
     myFixtureDef.friction = 0.7f;
+    
     mBody->CreateFixture(&myFixtureDef);
 
 	
@@ -49,8 +58,7 @@ Ball::Ball(b2World* aWorld, float x, float y)
 
 Ball::~Ball()
 {
-
-
+    mWorld->DestroyBody(mBody);
 }
 
 // getter & setter

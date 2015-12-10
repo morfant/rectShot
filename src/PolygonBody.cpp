@@ -167,8 +167,9 @@ void
 PolygonBody::breakBody(float x, float y)
 {
     
+    if (isThereMbodybool) delMbody();
 
-
+    
     float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
     float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
 
@@ -207,11 +208,11 @@ PolygonBody::breakBody(float x, float y)
     mVerticeDiv[sampledSize - 1] = last;
     
     for (int i = 0; i < sampledSize; i++){
-        cout << i << ": " <<  mVerticeDiv[i].x << " / " << mVerticeDiv[i].y << endl;
+//        cout << i << ": " <<  mVerticeDiv[i].x << " / " << mVerticeDiv[i].y << endl;
     }
     
 
-
+    int fragIdx = 0;
     for (int i = 0; i < kSAMPLING_INTV - 1; i++){
         b2Vec2 vertices[3];
 //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
@@ -224,40 +225,40 @@ PolygonBody::breakBody(float x, float y)
 //        b2Vec2 c = b2Vec2(0, 0);
         
 
-        ofVec2f vh(-1, 0);
-        ofVec2f vv(0, -1);
+//        ofVec2f vh(-1, 0);
+//        ofVec2f vv(0, -1);
         ofVec2f vAB(b.x - a.x, b.y - a.y);
         ofVec2f vBC(c.x - b.x, c.y - b.y);
-        ofVec2f vAC(c.x - a.x, c.y - a.y);
+//        ofVec2f vAC(c.x - a.x, c.y - a.y);
         
-        vh.normalize();
-        vv.normalize();
+//        vh.normalize();
+//        vv.normalize();
         vAB.normalize();
         vBC.normalize();
-        vAC.normalize();
+//        vAC.normalize();
 
 //        float d = perp_dot(b - a, c - b);
         float d = perp_dot(vAB, vBC);
         if(d < 0){
-            cout << "RIGHT\n";
+//            cout << "RIGHT\n";
         }else{
-            cout << "LEFT\n";
+//            cout << "LEFT\n";
         }
         
-        float angleHAB = acos(vh.dot(vAB));
-        float angleHAC = acos(vh.dot(vAC));
-        float angleVAB = acos(vv.dot(vAB));
-        float angleVAC = acos(vv.dot(vAC));
-        float angleABBC = acos(vAB.dot(vBC));
-        
-        
-        cout << "angleHAB : " << (-1.f) * _toDegree(angleHAB) << endl;
-        cout << "angleHAC : " << (-1.f) * _toDegree(angleHAC) << endl;
-
-        cout << "angleVAB : " << (-1.f) * _toDegree(angleVAB) << endl;
-        cout << "angleVAC : " << (-1.f) * _toDegree(angleVAC) << endl;
-        
-        cout << "angleAB-BC : " << (-1.f) * _toDegree(angleABBC) << endl;
+//        float angleHAB = acos(vh.dot(vAB));
+//        float angleHAC = acos(vh.dot(vAC));
+//        float angleVAB = acos(vv.dot(vAB));
+//        float angleVAC = acos(vv.dot(vAC));
+//        float angleABBC = acos(vAB.dot(vBC));
+//        
+//        
+//        cout << "angleHAB : " << (-1.f) * _toDegree(angleHAB) << endl;
+//        cout << "angleHAC : " << (-1.f) * _toDegree(angleHAC) << endl;
+//
+//        cout << "angleVAB : " << (-1.f) * _toDegree(angleVAB) << endl;
+//        cout << "angleVAC : " << (-1.f) * _toDegree(angleVAC) << endl;
+//        
+//        cout << "angleAB-BC : " << (-1.f) * _toDegree(angleABBC) << endl;
         
         
         for (int j = 0; j < 3; j++){
@@ -269,28 +270,40 @@ PolygonBody::breakBody(float x, float y)
 
         // To keep CCW direction.
         if (d < 0){
-            cout << "2 and 1 changed\n" << endl;
+//            cout << "2 and 1 changed\n" << endl;
             vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
             vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
         }
         
         
-        cout << "triangle " << i << " : " << "\n" <<
-        vertices[0].x << " / " << vertices[0].y << "\n" <<
-        vertices[1].x << " / " << vertices[1].y << "\n" <<
-        vertices[2].x << " / " << vertices[2].y << "\n" <<
-        endl;
-        
-        
-        if (isThereMbodybool) delMbody();
+//        cout << "triangle " << i << " : " << "\n" <<
+//        vertices[0].x << " / " << vertices[0].y << "\n" <<
+//        vertices[1].x << " / " << vertices[1].y << "\n" <<
+//        vertices[2].x << " / " << vertices[2].y << "\n" <<
+//        endl;
 
         Frag * aFrag = new Frag(mWorld, cx, cy, movX, movY, vertices);
         mFrags.push_back(aFrag);
+        fragIdx++;
     
     }
     
+//    breakFrags();
+    pushForce(cx, cy);
+    
     
 }
+
+
+void
+PolygonBody::breakFrags()
+{
+    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+        (*iter)->breakSelf();
+
+    }
+}
+
 
 b2Vec2*
 PolygonBody::getBreakArray()
@@ -316,6 +329,12 @@ bool
 PolygonBody::isThereMBody()
 {
     return isThereMbodybool;
+}
+
+vector<Frag*> *
+PolygonBody::getFrags()
+{
+    return &mFrags;
 }
 
 void
@@ -429,10 +448,33 @@ PolygonBody::delMbody()
 
 
 void
+PolygonBody::pushForce(float x, float y)
+{
+    
+//    cout << "cx: " << x << " / " << "cy: " << y << endl;
+    
+    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+        
+        float forceMul = 0.005f;
+        b2Vec2 centerPoint = (*iter)->getBody(0)->GetWorldCenter();
+        
+//        cout << "idx: " << i << " - centerPoint of frags: " << _toPixelX(centerPoint.x) << " / " << _toPixelY(centerPoint.y) << endl;
+        
+        (*iter)->getBody(0)->ApplyForce(
+                                   b2Vec2( (x - _toPixelX(centerPoint.x)) * forceMul,
+                                          -1.f * (y - _toPixelY(centerPoint.y)) * forceMul ),
+                                   b2Vec2(x, y));
+    }
+    
+}
+
+
+void
 PolygonBody::renderFrags()
 {
     if (!isThereMbodybool){
         for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+//            (*iter)->breakSelf();
             (*iter)->render();
         }
     }
@@ -472,7 +514,7 @@ PolygonBody::renderAtBodyPosition()
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
     //    ofSetColor(199, 199, 199);
     //    ofSetColor(0);
-        ofEllipse(0, 0, 50, 50);
+//        ofEllipse(0, 0, 50, 50);
         ofRotate(_toDegree(angle));
         ofBeginShape();
         for (int i = 0; i < maxVertexCount; i++) {
