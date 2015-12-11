@@ -423,6 +423,13 @@ PolygonBody::getY()
     return posY;
 }
 
+int
+PolygonBody::getIndex()
+{
+    return index;
+}
+
+
 
 b2Vec2
 PolygonBody::getVertex(int idx)

@@ -15,10 +15,11 @@
 #include "World.h"
 #include "Ball.h"
 #include "Wall.h"
-#include "PolygonBody.h"
+//#include "PolygonBody.h"
 #include "Box.h"
 #include "ofxOsc.h"
 #include "ContactListener.h"
+#include "Tm.h"
 
 
 
@@ -75,6 +76,8 @@ class testApp : public ofBaseApp{
         void makeBodyAtCvPosition(b2Vec2* vertices);
         void makeBodyAtCvPosition(vector<b2Vec2> vertices);
     
+    void dupPbody(PolygonBody* pb, float x, float y);
+    
         float getArea(b2Vec2* vertices, int maxVCount);    
     
         //cam
@@ -130,6 +133,10 @@ class testApp : public ofBaseApp{
         ofxOscSender            sender;
         ofxOscReceiver          receiver;
     
+    //Target Manager
+    Tm*         tMan;
+    bool        isTm;
+    
     
         // container
     ofPoint cvBlobPos;
@@ -144,6 +151,8 @@ class testApp : public ofBaseApp{
         vector<ofVec2f>         blobCenterPos;
     
         vector<b2Vec2>          blobsPtsDiv;
+    
+        vector<ofPoint>          faceCentroids;
     
         vector< vector<b2Vec2> >  faceVertices;
     

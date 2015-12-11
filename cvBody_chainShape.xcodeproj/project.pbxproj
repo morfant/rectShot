@@ -78,6 +78,7 @@
 		6768AA041BDA689A00BEA93C /* ContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6768AA021BDA689A00BEA93C /* ContactListener.cpp */; };
 		6771F1B81C115A120005B432 /* Frag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6771F1B61C115A120005B432 /* Frag.cpp */; };
 		6780BE0517D36759006095C4 /* PolygonBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6780BE0317D36759006095C4 /* PolygonBody.cpp */; };
+		67AC82C41C1AF46500F7A687 /* Tm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67AC82C21C1AF46500F7A687 /* Tm.cpp */; };
 		67E8112117D321A70094D376 /* Wall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67E8111F17D321A70094D376 /* Wall.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
@@ -304,6 +305,8 @@
 		6771F1B71C115A120005B432 /* Frag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frag.h; sourceTree = "<group>"; };
 		6780BE0317D36759006095C4 /* PolygonBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolygonBody.cpp; sourceTree = "<group>"; };
 		6780BE0417D36759006095C4 /* PolygonBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonBody.h; sourceTree = "<group>"; };
+		67AC82C21C1AF46500F7A687 /* Tm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tm.cpp; sourceTree = "<group>"; };
+		67AC82C31C1AF46500F7A687 /* Tm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tm.h; sourceTree = "<group>"; };
 		67E8111D17D31C1D0094D376 /* convertFunc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = convertFunc.h; sourceTree = "<group>"; };
 		67E8111F17D321A70094D376 /* Wall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Wall.cpp; sourceTree = "<group>"; };
 		67E8112017D321A70094D376 /* Wall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wall.h; sourceTree = "<group>"; };
@@ -849,6 +852,8 @@
 				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
 				6771F1B71C115A120005B432 /* Frag.h */,
 				6771F1B61C115A120005B432 /* Frag.cpp */,
+				67AC82C31C1AF46500F7A687 /* Tm.h */,
+				67AC82C21C1AF46500F7A687 /* Tm.cpp */,
 			);
 			name = class;
 			sourceTree = "<group>";
@@ -1179,6 +1184,7 @@
 				6720A8ED17CF9C2500669E43 /* b2TimeOfImpact.cpp in Sources */,
 				672068F61BDBB50500D435E1 /* NetworkingUtils.cpp in Sources */,
 				6720A8EE17CF9C2500669E43 /* b2ChainShape.cpp in Sources */,
+				67AC82C41C1AF46500F7A687 /* Tm.cpp in Sources */,
 				6720A8EF17CF9C2500669E43 /* b2CircleShape.cpp in Sources */,
 				6720A8F017CF9C2500669E43 /* b2EdgeShape.cpp in Sources */,
 				6720A8F117CF9C2500669E43 /* b2PolygonShape.cpp in Sources */,

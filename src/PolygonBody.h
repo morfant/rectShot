@@ -84,6 +84,7 @@ public:
     float   getArea(b2Vec2* vertices, int maxVCount);
     float   getX();
     float   getY();
+    int     getIndex();
     b2Vec2   getVertex(int i);
     b2Vec2*  getVertices();
     b2Vec2* getBreakArray();

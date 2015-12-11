@@ -3,6 +3,8 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    //Tm
+    isTm = false;
     
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
@@ -224,6 +226,16 @@ void testApp::update(){
     }
     
 //    sendBlobsOSC();
+    
+    //Tm
+    if (isTm){
+        
+        PolygonBody* tBody = tMan->update();
+        
+        if (tBody != NULL){
+            pBodies.push_back(tBody);
+        }
+    }
     
 }
 
@@ -457,6 +469,7 @@ void testApp::makePolygonBody(int blobNum){
         if(cvBlobNum != 0){
             blobsPts = blobsVec[blobNum - 1].pts;
             cvBlobPos = blobsVec[blobNum - 1].centroid;
+//            faceCentroids.push_back(cvBlobPos); //Store centroid of pBody
         }
         
         //        for (int i = 0; i < blobsPts.size(); i++){
@@ -519,7 +532,7 @@ void testApp::makeBodyAtCvPosition(){
         pBodyIdx++;
     }
     
-    faceVertices.push_back(blobsPtsDiv);
+//    faceVertices.push_back(blobsPtsDiv);
     
     // Reset blobs points vector
     blobsPts.clear();
@@ -546,6 +559,36 @@ void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
         pBodies.push_back(aPbody);
         pBodyIdx++;
     }
+}
+
+void
+testApp::dupPbody(PolygonBody* pbody, float x, float y)
+{
+    // GET Centroid
+    float pbx = pbody->getX();
+    float pby = pbody->getY();
+//    cout << "pbx: " << pbx << " / " << " pby: " << pby << endl;
+    
+
+    float dx = x - pbx;
+    float dy = y - pby;
+//    cout << "dx: " << dx << " / " << " dy: " << dy << endl;
+    
+    b2Vec2* pVertice;
+    pVertice = pbody->getVertices();
+    b2Vec2 tVertice[kMAX_VERTICES];
+    
+    // Translate vertices
+    for (int i = 0; i < kMAX_VERTICES; i++) {
+        
+        tVertice[i].x = (pVertice[i].x + dx);
+        tVertice[i].y = (pVertice[i].y + dy);
+//        cout << "tVertice: " << i << " : "<< tVertice[i].x << " / " << tVertice[i].y << endl;
+    }
+    
+    makeBodyAtCvPosition(tVertice);
+    
+    
 }
 
 void testApp::resetPolygonBody(){
@@ -876,8 +919,21 @@ void testApp::keyPressed(int key){
             break;
 
         case 'd':
-            makeBodyAtCvPosition(faceVertices[0]);
+            cout << "d pressde" << endl;
+            printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+            
+            dupPbody(pBodies[0], ofGetMouseX(), ofGetMouseY());
             break;
+            
+            
+        case 'j':
+            cout << "j pressde" << endl;
+            
+            tMan = new Tm(iWorld, pBodies[0], 10000); //10sec
+            isTm = true;
+            
+            break;
+            
 	}
 }
 
