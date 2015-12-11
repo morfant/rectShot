@@ -71,6 +71,8 @@ class testApp : public ofBaseApp{
         void drawPolygonBodies();
         void resetPolygonBody();
         void makeBodyAtCvPosition();
+        void makeBodyAtCvPosition(b2Vec2* vertices);
+        void makeBodyAtCvPosition(vector<b2Vec2> vertices);
     
         float getArea(b2Vec2* vertices, int maxVCount);    
     
@@ -132,7 +134,9 @@ class testApp : public ofBaseApp{
         vector<ofVec2f>         blobCenterPos;
     
         vector<b2Vec2>          blobsPtsDiv;
-        vector<b2Vec2>          rBlobsPtsDiv;
+    
+        vector< vector<b2Vec2> >  faceVertices;
+    
 
         float                   divNum;
         float                   aforce;

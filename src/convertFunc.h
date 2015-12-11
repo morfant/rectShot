@@ -20,7 +20,7 @@ enum { //For wall
 
 enum {
     kMAX_VERTICES = 100,
-    kSAMPLING_INTV = 10
+    kSAMPLING_INTV = 1 //Fewer value makes more frags
 };
 
 

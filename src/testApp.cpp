@@ -405,7 +405,6 @@ void testApp::makePolygonBody(int blobNum){
         blobsVec.clear();
         blobsPts.clear();
         blobsPtsDiv.clear();
-        rBlobsPtsDiv.clear();
         blobCenterPos.clear();
         
         // get vector<ofxCvBlob>
@@ -470,13 +469,6 @@ void testApp::makePolygonBody(int blobNum){
 
 void testApp::makeBodyAtCvPosition(){
 
-    for (vector<b2Vec2>::iterator ir = blobsPtsDiv.end(); ir != blobsPtsDiv.begin(); ir--) {
-        rBlobsPtsDiv.push_back(*(ir));
-    }
-    
-//    cout << "b[0] / r[7] " << blobsPtsDiv[0].x << " / " << rBlobsPtsDiv[7].x << endl;
-    
-    
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
         PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx);
         
@@ -486,13 +478,33 @@ void testApp::makeBodyAtCvPosition(){
         pBodyIdx++;
     }
     
-    
+    faceVertices.push_back(blobsPtsDiv);
     
     // Reset blobs points vector
     blobsPts.clear();
     blobsPtsDiv.clear();
     
     
+}
+
+void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
+    
+    if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx);
+        
+        pBodies.push_back(aPbody);
+        pBodyIdx++;
+    }
+}
+
+void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
+    
+    if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx);
+        
+        pBodies.push_back(aPbody);
+        pBodyIdx++;
+    }
 }
 
 void testApp::resetPolygonBody(){
@@ -775,6 +787,9 @@ void testApp::keyPressed(int key){
             cout << "list: " << iWorld->GetBodyList() << endl;
             break;
 
+        case 'd':
+            makeBodyAtCvPosition(faceVertices[0]);
+            break;
 	}
 }
 

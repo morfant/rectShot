@@ -22,7 +22,8 @@ protected:
 
     // OSC
     ofxOscSender            sender;
-    float                   forceMul; // Pushing force of virtual bullet
+    float                   forceMul;
+    // Pushing force of virtual bullet
 
     
     

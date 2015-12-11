@@ -14,6 +14,7 @@
 ContactListener::ContactListener()
 {
 
+    // Adjust pushing force of virtual bullet
     forceMul = 1000.f;
 
 	// open an outgoing connection to HOST:PORT

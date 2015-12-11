@@ -26,8 +26,6 @@ protected:
     void *     origin;
     
     // Position
-    float   posX;
-    float   posY;
     float   movX;
     float   movY;
     
@@ -35,9 +33,9 @@ protected:
     float   size = 10.f;
     
 	// Frag2D
-	vector<b2Body*> mPartialofFrags;
     
     b2World*    mWorld;
+    b2Body*     mBody;
     b2Vec2 mVertice[3];
     
     Frag * childFrag_0;
@@ -45,8 +43,7 @@ protected:
     
 public:
     // Birth and Death
-    Frag(b2World* world, float x, float y, float mx, float my, b2Vec2* vertices);
-    Frag(b2World* world, b2Vec2* vertices);
+    Frag(b2World* world, float mx, float my, b2Vec2* vertices);
     ~Frag();
     
     // Getter

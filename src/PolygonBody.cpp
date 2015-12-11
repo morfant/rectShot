@@ -212,8 +212,7 @@ PolygonBody::breakBody(float x, float y)
     }
     
 
-    int fragIdx = 0;
-    for (int i = 0; i < kSAMPLING_INTV - 1; i++){
+    for (int i = 0; i < sampledSize - 1; i++){
         b2Vec2 vertices[3];
 //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
         b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
@@ -282,9 +281,8 @@ PolygonBody::breakBody(float x, float y)
 //        vertices[2].x << " / " << vertices[2].y << "\n" <<
 //        endl;
 
-        Frag * aFrag = new Frag(mWorld, cx, cy, movX, movY, vertices);
+        Frag * aFrag = new Frag(mWorld, movX, movY, vertices);
         mFrags.push_back(aFrag);
-        fragIdx++;
     
     }
     
@@ -295,14 +293,14 @@ PolygonBody::breakBody(float x, float y)
 }
 
 
-void
-PolygonBody::breakFrags()
-{
-    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
-        (*iter)->breakSelf();
-
-    }
-}
+//void
+//PolygonBody::breakFrags()
+//{
+//    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+//        (*iter)->breakSelf();
+//
+//    }
+//}
 
 
 b2Vec2*
@@ -385,6 +383,14 @@ PolygonBody::getVertex(int idx)
     return mPts[idx];
 }
 
+
+b2Vec2*
+PolygonBody::getVertices()
+{
+    return mVertice;
+}
+
+
 b2World*
 PolygonBody::getWorld()
 {
@@ -437,10 +443,7 @@ PolygonBody::setVertices(b2Vec2* vertices)
 
 void
 PolygonBody::delMbody()
-{
-    cout << "count: " << mWorld->GetBodyCount() << endl;
-    cout << "list: " << mWorld->GetBodyList() << endl;
-    
+{    
     mWorld->DestroyBody(mBody2);
     mWorld->DestroyBody(mBody);
     isThereMbodybool = false;
