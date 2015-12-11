@@ -26,6 +26,8 @@ protected:
     
     float   dupPosX;
     float   dupPosY;
+    
+    int     dupNum;
 
     
     unsigned long long  startTime;
@@ -45,6 +47,7 @@ public:
     // Get & Set
     void    setTimer(float time);
     void    setPbody(PolygonBody* pBody);
+    void    setDupNum(int num);
     
     float   getTimer();
     PolygonBody*    getTargetBody();

@@ -942,6 +942,12 @@ void testApp::keyPressed(int key){
             isTm = true;
             
             break;
+
+        case 'o':
+            cout << "o pressde" << endl;
+            tMan->setDupNum(1);
+            break;
+            
             
 	}
 }
@@ -959,7 +965,7 @@ void testApp::keyReleased(int key){
 void testApp::mouseMoved(int x, int y ){
     
 
-    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+//    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 

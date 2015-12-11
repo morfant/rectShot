@@ -14,6 +14,7 @@
 Tm::Tm(b2World* world, PolygonBody* pBody, float time)
 {
     
+    dupNum = 1;
     mWorld = world;
     
     startTime = ofGetElapsedTimeMillis();
@@ -43,6 +44,12 @@ Tm::setPbody(PolygonBody* pBody)
 {
     targetOrigin = pBody;
     
+}
+
+void
+Tm::setDupNum(int num)
+{
+    dupNum = num;
 }
 
 
@@ -114,12 +121,14 @@ Tm::update()
     curTime = ofGetElapsedTimeMillis();
 //    cout << "curTime: " << curTime << endl;
     
-    if ((curTime - startTime) > timeInterval){
+    if ((curTime - startTime) > timeInterval && dupNum != 0){
 //        cout << "time ellaplsed!" << endl;
 //        dupPbody(targetOrigin, dupPosX, dupPosY);
         
         startTime = curTime;
 //        cout << "startTime: " << startTime << endl;
+        
+        dupNum--;
         
         return dupPbody(targetOrigin, randXPos, dupPosY + marginY);
         
