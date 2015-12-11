@@ -6,6 +6,14 @@ void testApp::setup(){
     
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
+	receiver.setup(RECV_PORT);
+    
+    
+    shotBallMade = false;
+    isShot = false;
+    butPressed = false;
+    bodyHit = false;
+    
 
     ofSetWindowPosition(0, 0);
     
@@ -181,8 +189,41 @@ void testApp::update(){
 	}
     
     
+    if(shotBallMade){
+        delete aBall;
+        shotBallMade = false;
+    }
+    
     // OSC
-    sendBlobsOSC();
+    oscRecv();
+    
+    if (isShot){
+        for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            if ( (*iter)->isThereMBody() ){
+                if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    (*iter)->breakBody();
+                    cout << "hit!" << endl;
+                    bodyHit = true;
+                    break;
+                }
+            }
+        }
+        
+        if(!bodyHit){
+        
+            cout << "No hit!" << endl;
+            aBall = new Ball(iWorld, shot_X, shot_Y);
+            //                    balls.push_back(aBall);
+            shotBallMade = true;
+        }
+    }
+    
+    if (isShot){
+        isShot = false;
+        bodyHit = false;
+    }
+    
+//    sendBlobsOSC();
     
 }
 
@@ -538,6 +579,53 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
 
 // OSC
 //--------------------------------------------------------------
+void testApp::oscRecv()
+{
+    // check for waiting messages
+	while(receiver.hasWaitingMessages()){
+		// get the next message
+		ofxOscMessage m;
+		receiver.getNextMessage(&m);
+        
+		if(m.getAddress() == "/laserPos"){
+            isShot = true;
+			shot_X = m.getArgAsInt32(0);
+			shot_Y = m.getArgAsInt32(1);
+            
+            cout << shot_X << shot_Y << endl;
+            
+		}else if(m.getAddress() == "/button"){
+			butMsg = m.getArgAsInt32(0);
+            if (butMsg) butPressed = true;
+		}
+        
+        
+        else{
+			// unrecognized message: display on the bottom of the screen
+			string msg_string;
+			msg_string = m.getAddress();
+			msg_string += ": ";
+			for(int i = 0; i < m.getNumArgs(); i++){
+				// get the argument type
+				msg_string += m.getArgTypeName(i);
+				msg_string += ":";
+				// display the argument - make sure we get the right type
+				if(m.getArgType(i) == OFXOSC_TYPE_INT32){
+					msg_string += ofToString(m.getArgAsInt32(i));
+				}else if(m.getArgType(i) == OFXOSC_TYPE_FLOAT){
+					msg_string += ofToString(m.getArgAsFloat(i));
+				}else if(m.getArgType(i) == OFXOSC_TYPE_STRING){
+					msg_string += m.getArgAsString(i);
+				}else{
+					msg_string += "unknown";
+				}
+			}
+		}
+	}
+
+    
+}
+
 void testApp::oscSendMsg(string addr, float data)
 {
     ofxOscMessage m;
@@ -772,7 +860,7 @@ void testApp::keyPressed(int key){
                 
                 if (isSelected && (*iter)->isThereMBody()) {
                     b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-                    (*iter)->breakBody(pBodypos.x, pBodypos.y);
+                    (*iter)->breakBody();
                     
                     cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
                     
@@ -806,7 +894,7 @@ void testApp::keyReleased(int key){
 void testApp::mouseMoved(int x, int y ){
     
 
-//    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
+    printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
 
 }
 

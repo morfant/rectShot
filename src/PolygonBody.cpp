@@ -211,7 +211,7 @@ PolygonBody::IsInside(b2Vec2 p)
 
 
 void
-PolygonBody::breakBody(float x, float y)
+PolygonBody::breakBody()
 {
     
     if (isThereMbodybool) delMbody();

@@ -60,6 +60,7 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
         // OSC
+        void oscRecv();
         void oscSendMsg(string addr, float data);
         void oscSendMsg2(string addr, ofVec2f data);
     
@@ -119,7 +120,16 @@ class testApp : public ofBaseApp{
         bool                    touched;
     
         // OSC
+    bool                    bodyHit;
+    bool                    shotBallMade;
+    bool                    isShot;
+    int                     shot_X;
+    int                     shot_Y;
+    bool                    butPressed;
+    int                     butMsg;
         ofxOscSender            sender;
+        ofxOscReceiver          receiver;
+    
     
         // container
     ofPoint cvBlobPos;

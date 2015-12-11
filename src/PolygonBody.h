@@ -21,6 +21,7 @@
 
 #define HOST "localhost"
 #define PORT 57120
+#define RECV_PORT 20000
 
 
 
@@ -109,7 +110,7 @@ public:
     void    renderAtBodyPosition();
     void    renderFrags();
     void    getSection();
-    void    breakBody(float x, float y);
+    void    breakBody();
     void    breakFrags();
 
     
