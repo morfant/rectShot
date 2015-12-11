@@ -848,8 +848,9 @@ void testApp::mousePressed(int x, int y, int button){
     // Right click
     if (button == 2){
         
-        aBall = new Ball(iWorld, x, y);
-        balls.push_back(aBall);
+//        aBall = new Ball(iWorld, x, y);
+//        balls.push_back(aBall);
+        cout << pBodies[0]->IsInside( b2Vec2(x, y) ) << endl;
     }
     
 }
@@ -867,8 +868,8 @@ void testApp::mouseReleased(int x, int y, int button){
         boxes.clear();
         
     }else if(button == 2){
-        delete balls[0];
-        balls.clear();
+//        delete balls[0];
+//        balls.clear();
     }
     
 

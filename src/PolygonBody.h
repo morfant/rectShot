@@ -37,12 +37,15 @@ protected:
 	b2Body*		mBody;
     b2Body*     mBody2; //Small body tracking on outline.
     vector<Frag*>   mFrags;
+    b2Vec2      birthPos;
 
 
     b2Vec2 mPts[kMAX_VERTICES];
     b2Vec2 mPtsP[kMAX_VERTICES];
     b2Vec2 mVertice[kMAX_VERTICES];
     b2Vec2 mVerticeDiv[kMAX_VERTICES/kSAMPLING_INTV]; //For breaking
+    b2Vec2 tVertice[kMAX_VERTICES];
+    
     
     int     maxVertexCount; // maxVertexCount
     int     index;
@@ -117,7 +120,7 @@ public:
     float   perp_dot(ofVec2f a, ofVec2f b);
     float   perp_dot(b2Vec2 a, b2Vec2 b);
     
-    
+    bool    IsInside(b2Vec2 p);
 
     
     

@@ -130,6 +130,10 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 //    cout << "count: " <<mWorld->GetBodyCount() << endl;
 //    cout << "list: " << mWorld->GetBodyList() << endl;
 
+    birthPos = mBody->GetWorldCenter();
+    
+
+    
 	
 }
 
@@ -160,6 +164,49 @@ float
 PolygonBody::perp_dot(b2Vec2 a, b2Vec2 b)
 {
     return (-1.f) * a.y * b.x + a.x * b.y;
+}
+
+
+
+bool
+PolygonBody::IsInside(b2Vec2 p)
+{
+    /*determine whether a point is inside a polygon or not
+     *  polygon's vertices need to be sorted counterclockwise
+     *  source :
+     *      http://www.ecse.rpi.edu/~wrf/Research/Short_Notes/pnpoly.html
+     */
+    
+    
+    b2Vec2 pos = mBody->GetPosition();
+    
+    
+    float dx = _toPixelX(pos.x) - ofGetWidth()/2.f;
+//    cout << "dx: " << dx << endl;
+    float dy = _toPixelY(pos.y) - ofGetHeight()/2.f;
+//    cout << "dy: " << dy << endl;
+
+    
+    // Translate vertices
+    for (int i = 0; i < maxVertexCount; i++) {
+    
+        tVertice[i].x = (mVertice[i].x + dx);
+        tVertice[i].y = (mVertice[i].y + dy);
+//        cout << "tVertice: " << i << " : "<< tVertice[i].x << " / " << tVertice[i].y << endl;
+
+    }
+    
+    // Check point in polygon
+    bool ans = false;
+    for(size_t c = 0, d = kMAX_VERTICES - 1; c < kMAX_VERTICES; d = c++)
+    {
+        if(
+           ( (tVertice[c].y > p.y) != (tVertice[d].y > p.y) ) &&
+           (p.x < (tVertice[d].x - tVertice[c].x) * (p.y - tVertice[c].y) / (tVertice[d].y - tVertice[c].y) + tVertice[c].x) ){
+            ans = !ans;
+        }
+    }
+    return ans;
 }
 
 
@@ -434,10 +481,6 @@ PolygonBody::setVertices(b2Vec2* vertices)
 	myFixtureDef.density = 1.f;
     myFixtureDef.restitution = 0.5f;
     mBody->CreateFixture(&myFixtureDef);
-    
-    
-    
-
 }
 
 
@@ -497,12 +540,24 @@ PolygonBody::renderAtBodyPosition()
 
     //    mBody->SetTransform(pos2, pangle);
         b2Vec2 pos = mBody->GetPosition();
+//        cout << "pos: " << pos.x << pos.y <<endl;
         float32 angle = mBody->GetAngle();
         
     //    printf("pbody angle: %f\n", angle);
         
     //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
     //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
+//        
+
+        ofFill();
+        ofSetColor(255, 0, 0);
+        ofEllipse(tVertice[0].x, tVertice[0].y, 10, 10);
+        ofSetColor(255, 100, 0);
+        ofEllipse(tVertice[10].x, tVertice[10].y, 10, 10);
+        ofSetColor(255, 200, 0);
+        ofEllipse(tVertice[50].x, tVertice[50].y, 10, 10);
+//
+        
         
         ofPushStyle();
     //    ofSetColor(0, 200, 25); //Set Polygon body color
@@ -515,6 +570,12 @@ PolygonBody::renderAtBodyPosition()
 
         ofPushMatrix();
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
+        
+        
+        
+        
+        
+        
     //    ofSetColor(199, 199, 199);
     //    ofSetColor(0);
 //        ofEllipse(0, 0, 50, 50);
@@ -526,6 +587,7 @@ PolygonBody::renderAtBodyPosition()
         }
         
         ofEndShape();
+        
         ofPopMatrix();
         ofPopStyle();
     }else{
