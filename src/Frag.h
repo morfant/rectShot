@@ -41,6 +41,15 @@ protected:
     Frag * childFrag_0;
     Frag * childFrag_1;
     
+    
+    // aging
+    unsigned long long  lifeLong;
+    unsigned long long  age;
+    bool                isAlive;
+
+
+    
+    
 public:
     // Birth and Death
     Frag(b2World* world, float mx, float my, b2Vec2* vertices);
@@ -49,6 +58,8 @@ public:
     // Getter
     float   getX();
     float   getY();
+    unsigned long long    getLifeLong();
+    unsigned long long    getAge();
     
     
     b2World*    getWorld();
@@ -57,6 +68,8 @@ public:
     // Setter
     void    setX(float posX);
     void    setY(float posY);
+    void    setLifeLong(unsigned long long life);
+    void    setAge(unsigned long long age);
     void    makeb2Tri(b2Vec2 * vertices);
     float   perp_dot(ofVec2f a, ofVec2f b);
 
@@ -65,8 +78,10 @@ public:
     // Render
     void    render();
     
+    void    beOld();
+    
     // Update & draw
-    void    update();
+    bool    update();
     void    draw();
     
     

@@ -38,7 +38,6 @@ protected:
 	b2Body*		mBody;
     b2Body*     mBody2; //Small body tracking on outline.
     vector<Frag*>   mFrags;
-    b2Vec2      birthPos;
 
 
     b2Vec2 mPts[kMAX_VERTICES];
@@ -71,6 +70,9 @@ protected:
     // OSC
     ofxOscSender            sender;
     
+    // Aging
+    bool                    isAlive;
+    
     
     
     
@@ -94,6 +96,7 @@ public:
     
     bool    getSelectState();
     bool    isThereMBody();
+    bool    getIsAlive();
     
     vector<Frag*> *  getFrags();
     
@@ -113,6 +116,7 @@ public:
     void    getSection();
     void    breakBody();
     void    breakFrags();
+    
 
     
     // Update & draw

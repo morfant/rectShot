@@ -426,9 +426,18 @@ void testApp::drawPolygonBodies(){
 //    ofColor(0, 5, 0);
 //    ofFill();
     
-    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
-        (*iter)->update();
+    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+        bool pBodyIsAlive = (*iter)->getIsAlive();
+        
+        if (!pBodyIsAlive) {
+            delete (*iter);
+            iter = pBodies.erase(iter);
+            
+        }else{
+            (*iter)->renderAtBodyPosition();
+            (*iter)->update();
+            iter++;
+        }
     }
     
     

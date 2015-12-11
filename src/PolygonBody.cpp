@@ -14,6 +14,7 @@
 
 PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
 {
+    isAlive = true;
     isThereMbodybool = true;
 
 	// open an outgoing connection to HOST:PORT
@@ -129,9 +130,6 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
 //    cout << "count: " <<mWorld->GetBodyCount() << endl;
 //    cout << "list: " << mWorld->GetBodyList() << endl;
-
-    birthPos = mBody->GetWorldCenter();
-    
 
     
 	
@@ -329,6 +327,7 @@ PolygonBody::breakBody()
 //        endl;
 
         Frag * aFrag = new Frag(mWorld, movX, movY, vertices);
+        aFrag->setLifeLong(300); // Frag will die after n Frame. 0 means 'immortal'.
         mFrags.push_back(aFrag);
     
     }
@@ -375,6 +374,13 @@ PolygonBody::isThereMBody()
 {
     return isThereMbodybool;
 }
+
+bool
+PolygonBody::getIsAlive()
+{
+    return isAlive;
+}
+
 
 vector<Frag*> *
 PolygonBody::getFrags()
@@ -526,9 +532,19 @@ void
 PolygonBody::renderFrags()
 {
     if (!isThereMbodybool){
-        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
-//            (*iter)->breakSelf();
-            (*iter)->render();
+        
+        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end();) {
+            bool fragIsAlive = (*iter)->update();
+            
+            if (!fragIsAlive) {
+                delete (*iter);
+                iter = mFrags.erase(iter);
+                isAlive = false;
+                
+            }else{
+                (*iter)->render();
+                iter++;
+            }
         }
     }
     
@@ -600,6 +616,7 @@ PolygonBody::renderAtBodyPosition()
     }else{
     
         // Draw fragments
+        
         renderFrags();
     }
 }

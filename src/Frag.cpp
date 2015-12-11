@@ -14,6 +14,10 @@
 Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices)
 {
     
+    lifeLong = 0;
+    age = 0;
+    isAlive = true;
+    
     mWorld = aWorld;
     movX = mx;
     movY = my;
@@ -67,6 +71,21 @@ Frag::getY()
 
 }
 
+unsigned long long
+Frag::getLifeLong()
+{
+    return lifeLong;
+}
+
+
+unsigned long long
+Frag::getAge()
+{
+    return age;
+}
+
+
+
 
 b2World*
 Frag::getWorld()
@@ -92,6 +111,21 @@ Frag::setY(float _posY)
 {
     
 }
+
+
+void
+Frag::setLifeLong(unsigned long long life)
+{
+    lifeLong = life;
+}
+
+
+void
+Frag::setAge(unsigned long long _age)
+{
+    age = _age;
+}
+
 
 
 
@@ -245,18 +279,19 @@ Frag::render()
 
     b2Vec2 pos = mBody->GetPosition();
     float32 angle = mBody->GetAngle();
+    float alpha = (((float)lifeLong-(float)age)/(float)lifeLong) * 255.f;
 
 
 //    cout << pos.x << " / " << pos.y << endl;
 //    cout << _toPixelX(pos.x)<< " / " << _toPixelY(pos.y) << endl;
-    ofPushMatrix();
-    ofTranslate(movX, movY);
-    ofSetColor(244, 122, 0);
-//        ofEllipse(0, 0, 20, 20);
-    ofPopMatrix();
+//    ofPushMatrix();
+//    ofTranslate(movX, movY);
+//    ofSetColor(244, 122, 0);
+////        ofEllipse(0, 0, 20, 20);
+//    ofPopMatrix();
     
     ofPushStyle();
-    ofSetColor(0, 200, 255);
+    ofSetColor(0, 200, 255, alpha);
     ofFill();
     ofPushMatrix();
     
@@ -276,11 +311,26 @@ Frag::render()
 }
 
 
-// Update & draw
 void
+Frag::beOld()
+{
+    if (lifeLong){
+        age++;
+    }
+    
+    if (age > lifeLong){
+        isAlive = false;
+    }
+    
+}
+
+// Update & draw
+bool
 Frag::update()
 {
+    beOld();
     
+    return isAlive;
 }
 
 
