@@ -38,6 +38,14 @@ public:
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
     
     
+    // osc
+    void    oscSendII(string addr, int i, int j);
+    
+    void    oscSendIFF(string addr, int i, float a, float b);
+    void    oscSendIF(string addr, int i, float a);
+    void    oscSendIIFF(string addr, int i, int j, float a, float b);
+    
+    
     
 
     

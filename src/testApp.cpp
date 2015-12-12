@@ -206,7 +206,7 @@ void testApp::update(){
                     (*iter)->breakBody();
                     cout << "hit!" << endl;
                     bodyHit = true;
-                    break;
+//                    break;
                 }
             }
         }

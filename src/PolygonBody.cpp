@@ -267,6 +267,7 @@ PolygonBody::breakBody()
     }
     
 
+    int fragIdx = 0;
     for (int i = 0; i < fragNum - 1; i++){
         b2Vec2 vertices[3];
 //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
@@ -336,9 +337,10 @@ PolygonBody::breakBody()
 //        vertices[2].x << " / " << vertices[2].y << "\n" <<
 //        endl;
 
-        Frag * aFrag = new Frag(mWorld, movX, movY, vertices);
+        Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx);
         aFrag->setLifeLong(200); // Frag will die after n Frame. 0 means 'immortal'.
         mFrags.push_back(aFrag);
+        fragIdx++;
     
     }
     

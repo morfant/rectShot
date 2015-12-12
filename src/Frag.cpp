@@ -11,19 +11,26 @@
 
 // ----Birth & Death----
 
-Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices)
+Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int idx)
 {
+
+    // osc
+	sender.setup(HOST, PORT);
+
+    // Set Userdata
+    pBodyIndex = pbIdx;
+    index = idx;
+    fragUserData = (pBodyIndex * 10000) + (index * 100) + FRAG;
     
     lifeLong = 0;
     age = 0;
     isAlive = true;
     
     mWorld = aWorld;
-    movX = mx;
-    movY = my;
+    posX = mx;
+    posY = my;
     
-    // Set Userdata
-    fragUserData = FRAG;
+
     
     
     for (int i = 0; i < 3; i++){
@@ -54,6 +61,9 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices)
     mBody->SetUserData((void*)fragUserData);
     
     
+    
+    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
+
 	
 }
 
@@ -100,7 +110,7 @@ Frag::getWorld()
 }
 
 b2Body*
-Frag::getBody(int idx)
+Frag::getBody(int index)
 {
     return mBody;
     
@@ -196,7 +206,7 @@ Frag::setAge(unsigned long long _age)
 //    
 //    
 //    
-//    //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+//    //        b2Vec2 a = b2Vec2(_toWorldX(posX), _toWorldY(posY));
 //    b2Vec2 a = b2Vec2(_toWorldX(childVertice_0[0].x), _toWorldY(childVertice_0[0].y));
 //    b2Vec2 b = b2Vec2(_toWorldX(childVertice_0[1].x), _toWorldY(childVertice_0[1].y));
 //    b2Vec2 c = b2Vec2(_toWorldX(childVertice_0[2].x), _toWorldY(childVertice_0[2].y));
@@ -243,7 +253,7 @@ Frag::setAge(unsigned long long _age)
 //    
 //    
 //    for (int j = 0; j < 3; j++){
-//        //            vertices[0] = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+//        //            vertices[0] = b2Vec2(_toWorldX(posX), _toWorldY(posY));
 //        tVertices[0] = b2Vec2(_toWorldX(childVertice_0[0].x), _toWorldY(childVertice_0[0].y));
 //        tVertices[1] = b2Vec2(_toWorldX(childVertice_0[1].x), _toWorldY(childVertice_0[1].y));
 //        tVertices[2] = b2Vec2(_toWorldX(childVertice_0[2].x), _toWorldY(childVertice_0[2].y));
@@ -266,9 +276,9 @@ Frag::setAge(unsigned long long _age)
 ////    if (d < 0)
 //    
 //    cout <<
-//    "idx: " << 0 << " : " << _toPixelX(tVertices[0].x) << " / " << _toPixelY(tVertices[0].y) << "\n" <<
-//    "idx: " << 1 << " : " << _toPixelX(tVertices[1].x)<< " / " << _toPixelY(tVertices[1].y) << "\n" <<
-//    "idx: " << 2 << " : " << _toPixelX(tVertices[2].x) << " / " << _toPixelY(tVertices[2].y) << "\n" <<
+//    "index: " << 0 << " : " << _toPixelX(tVertices[0].x) << " / " << _toPixelY(tVertices[0].y) << "\n" <<
+//    "index: " << 1 << " : " << _toPixelX(tVertices[1].x)<< " / " << _toPixelY(tVertices[1].y) << "\n" <<
+//    "index: " << 2 << " : " << _toPixelX(tVertices[2].x) << " / " << _toPixelY(tVertices[2].y) << "\n" <<
 //    endl;
 //    
 //    
@@ -294,7 +304,7 @@ Frag::render()
 //    cout << pos.x << " / " << pos.y << endl;
 //    cout << _toPixelX(pos.x)<< " / " << _toPixelY(pos.y) << endl;
 //    ofPushMatrix();
-//    ofTranslate(movX, movY);
+//    ofTranslate(posX, posY);
 //    ofSetColor(244, 122, 0);
 ////        ofEllipse(0, 0, 20, 20);
 //    ofPopMatrix();
@@ -348,5 +358,48 @@ Frag::draw()
 {
     
     
+    
+}
+
+
+//osc
+
+void
+Frag::oscSendIFF(string addr, int i, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    
+    sender.sendMessage(m);
+    
+}
+
+
+void
+Frag::oscSendIF(string addr, int i, float a)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    
+    sender.sendMessage(m);
+    
+}
+
+void
+Frag::oscSendIIFF(string addr, int i, int j, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addIntArg(j);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    
+    sender.sendMessage(m);
     
 }

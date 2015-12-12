@@ -25,12 +25,13 @@
 class Frag{
 protected:
     
-    int     idx;
+    int     pBodyIndex;
+    int     index;
     void *     origin;
     
     // Position
-    float   movX;
-    float   movY;
+    float   posX;
+    float   posY;
     
     // Size
     float   size = 10.f;
@@ -48,6 +49,10 @@ protected:
     Frag * childFrag_1;
     
     
+    // OSC
+    ofxOscSender            sender;
+
+    
     // aging
     unsigned long long  lifeLong;
     unsigned long long  age;
@@ -58,7 +63,7 @@ protected:
     
 public:
     // Birth and Death
-    Frag(b2World* world, float mx, float my, b2Vec2* vertices);
+    Frag(b2World* world, float mx, float my, b2Vec2* vertices, int pBodyIdx, int idx);
     ~Frag();
     
     // Getter
@@ -90,7 +95,14 @@ public:
     bool    update();
     void    draw();
     
+    // osc
+    void    oscSendIFF(string addr, int i, float a, float b);
+    void    oscSendIF(string addr, int i, float a);
+    void    oscSendIIFF(string addr, int i, int j, float a, float b);
     
+    
+    
+
     
     
     

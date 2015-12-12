@@ -38,7 +38,7 @@ ContactListener::BeginContact(b2Contact* contact)
     
     if (userData_A) {
 
-        switch ((int)userData_A) {
+        switch ((int)userData_A%100) {
             case 1: // Ball
             {
 //                printf("A, Ball contact begin!\n");
@@ -131,6 +131,11 @@ ContactListener::BeginContact(b2Contact* contact)
             case FRAG:
             {
 //                printf("A, FRAG contact begin!\n");
+                
+                int pBodyIdx = (int)userData_A/10000;
+                int fragIdx = ((int)userData_A%10000)/100;
+                
+                oscSendII("/fgCont", pBodyIdx, fragIdx);
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();
@@ -274,6 +279,8 @@ ContactListener::BeginContact(b2Contact* contact)
             {
                 printf("B, FRAG contact begin!\n");
                 
+                
+                
                 b2Body* self = contact->GetFixtureB()->GetBody();
                 b2Body* other = contact->GetFixtureA()->GetBody();
                 int otherIs = (int)other->GetUserData();
@@ -323,5 +330,61 @@ void
 ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 {
     /* handle post-solve event */
+    
+}
+
+
+//osc
+
+void
+ContactListener::oscSendIFF(string addr, int i, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    
+    sender.sendMessage(m);
+    
+}
+
+
+void
+ContactListener::oscSendII(string addr, int i, int j)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addIntArg(j);
+    
+    sender.sendMessage(m);
+    
+}
+
+
+void
+ContactListener::oscSendIF(string addr, int i, float a)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    
+    sender.sendMessage(m);
+    
+}
+
+void
+ContactListener::oscSendIIFF(string addr, int i, int j, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addIntArg(j);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    
+    sender.sendMessage(m);
     
 }
