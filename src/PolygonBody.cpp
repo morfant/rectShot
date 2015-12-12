@@ -14,8 +14,10 @@
 
 PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
 {
+    
     isAlive = true;
     isThereMbodybool = true;
+    fragNum = kMAX_VERTICES/kSAMPLING_INTV;
 
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
@@ -39,6 +41,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     // outline tarcker
     rotSpd = 1.0f;
+    audioLen = 0.f;
     getSection();
     
     
@@ -142,18 +145,15 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 //    cout << "list: " << mWorld->GetBodyList() << endl;
 
     
+    oscSendIFF("/pbBorn", index, posX, posY);
+    
 	
 }
 
 PolygonBody::~PolygonBody()
 {
-    ofxOscMessage m;
-    m.setAddress("/fromOF_pBody");
-    m.addIntArg(index);    
-    m.addFloatArg(-1);
-    m.addFloatArg(-1);
     
-    sender.sendMessage(m);
+    oscSendIFF("/pbDest", index, -1, -1);
     
     if (isThereMbodybool){
         mWorld->DestroyBody(mBody2);
@@ -161,6 +161,8 @@ PolygonBody::~PolygonBody()
     }
 
 }
+
+
 
 float
 PolygonBody::perp_dot(ofVec2f a, ofVec2f b)
@@ -239,8 +241,6 @@ PolygonBody::breakBody()
     
     
     // get intervald virtices
-    // divNum = sampling interval
-    int sampledSize = kMAX_VERTICES/kSAMPLING_INTV;
     
     // Add first point of blob polygon shape.
     b2Vec2 first = b2Vec2(0, 0);
@@ -249,7 +249,7 @@ PolygonBody::breakBody()
     mVerticeDiv[0] = first;
     
     // Add middle points of blob polygon shape.
-    for (int i = 1; i < (sampledSize - 1); i++) {
+    for (int i = 1; i < (fragNum - 1); i++) {
         b2Vec2 temp = b2Vec2(0, 0);
         temp.x = mVertice[kSAMPLING_INTV * i].x + movX;
         temp.y = mVertice[kSAMPLING_INTV * i].y + movY;
@@ -260,14 +260,14 @@ PolygonBody::breakBody()
     b2Vec2 last = b2Vec2(0, 0);
     last.x = mVertice[kMAX_VERTICES - 1].x + movX;
     last.y = mVertice[kMAX_VERTICES - 1].y + movY;
-    mVerticeDiv[sampledSize - 1] = last;
+    mVerticeDiv[fragNum - 1] = last;
     
-    for (int i = 0; i < sampledSize; i++){
+    for (int i = 0; i < fragNum; i++){
 //        cout << i << ": " <<  mVerticeDiv[i].x << " / " << mVerticeDiv[i].y << endl;
     }
     
 
-    for (int i = 0; i < sampledSize - 1; i++){
+    for (int i = 0; i < fragNum - 1; i++){
         b2Vec2 vertices[3];
 //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
         b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
@@ -337,7 +337,7 @@ PolygonBody::breakBody()
 //        endl;
 
         Frag * aFrag = new Frag(mWorld, movX, movY, vertices);
-        aFrag->setLifeLong(0); // Frag will die after n Frame. 0 means 'immortal'.
+        aFrag->setLifeLong(200); // Frag will die after n Frame. 0 means 'immortal'.
         mFrags.push_back(aFrag);
     
     }
@@ -515,11 +515,38 @@ PolygonBody::setVertices(b2Vec2* vertices)
 
 
 void
+PolygonBody::setAudioLen(float len)
+{
+    audioLen = len;
+//    cout << "len: " << audioLen << endl;
+
+    float outlineLen = 0;
+    for (int i = 0; i < kMAX_VERTICES - 1; i++) {
+        outlineLen +=
+        ofDist(
+               mVertice[i].x, mVertice[i].y,
+               mVertice[i+1].x, mVertice[i+1].y);
+    }
+    cout << "OutlineLen: " << outlineLen << endl;
+    
+    // outlineLen/fps = sec
+    float sec = outlineLen/35.f;
+    cout << "sec: " << sec << endl;
+    
+    rotSpd = sec/audioLen;
+    cout << "rotSpd: " << rotSpd << endl;
+    
+}
+
+
+void
 PolygonBody::delMbody()
 {    
     mWorld->DestroyBody(mBody2);
     mWorld->DestroyBody(mBody);
     isThereMbodybool = false;
+    
+    oscSendIF("/pbBrek", index, fragNum);
 }
 
 
@@ -667,6 +694,7 @@ void
 PolygonBody::update()
 {
     if (isThereMbodybool){
+        
         b2Vec2 bodyPos = mBody->GetPosition();
     //    cout << "bodypos: x: " << bodyPos.x << " y: " << bodyPos.y << endl;
     //    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
@@ -740,4 +768,34 @@ PolygonBody::draw()
    
 
 
+}
+
+
+
+//osc
+
+void
+PolygonBody::oscSendIFF(string addr, int i, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    
+    sender.sendMessage(m);
+    
+}
+
+
+void
+PolygonBody::oscSendIF(string addr, int i, float a)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addFloatArg(a);
+    
+    sender.sendMessage(m);
+    
 }

@@ -22,6 +22,10 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices)
     movX = mx;
     movY = my;
     
+    // Set Userdata
+    fragUserData = FRAG;
+    
+    
     for (int i = 0; i < 3; i++){
         mVertice[i] = vertices[i];
 //        cout << "i : " << i << mVertice[i].x << " / " << mVertice[i].y << endl;
@@ -47,6 +51,8 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices)
 //    myFixtureDef.restitution = 0.01f;
 //    myFixtureDef.friction = 0.7f;
     mBody->CreateFixture(&myFixtureDef);
+    mBody->SetUserData((void*)fragUserData);
+    
     
 	
 }

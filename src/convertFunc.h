@@ -15,6 +15,7 @@ enum { //box2d Userdata
     SUPER_BALL = 11,
     POLYGON_BODY = 2,
     OT_BODY = 3,
+    FRAG = 4,
     TOP = 5,
     BOTTOM = 6,
     LEFT = 7,

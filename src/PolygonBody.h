@@ -19,9 +19,7 @@
 #include "Frag.h"
 #include "convertFunc.h"
 
-#define HOST "localhost"
-#define PORT 57120
-#define RECV_PORT 20000
+
 
 
 
@@ -40,6 +38,7 @@ protected:
     
     float mBody2_rad;
     float rotSpd;
+    float audioLen;
     
     vector<Frag*>   mFrags;
 
@@ -49,6 +48,8 @@ protected:
     b2Vec2 mVertice[kMAX_VERTICES];
     b2Vec2 mVerticeDiv[kMAX_VERTICES/kSAMPLING_INTV]; //For breaking
     b2Vec2 tVertice[kMAX_VERTICES];
+    
+    int     fragNum;
     
     
     int     maxVertexCount; // maxVertexCount
@@ -113,6 +114,7 @@ public:
     void    setX(float posX);
     void    setY(float posY);
     void    setVertices(b2Vec2* vertices);
+    void    setAudioLen(float len);
     void    delMbody();
     void    pushForce(float x, float y);
         
@@ -135,8 +137,11 @@ public:
     bool    IsInside(b2Vec2 p);
 
     
-    
-    
+
+    // OSC
+    void oscSendIF(string addr, int I, float F);    
+    void oscSendIFF(string addr, int I, float F, float F2);
+
     
     
     

@@ -104,6 +104,8 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
     
     // Duplicate pBody
     PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index);
+    
+    
     return aPbody;
 
     

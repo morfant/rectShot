@@ -3,6 +3,8 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    ofSetFrameRate(60.f);
+    
     //Tm
     isTm = false;
     
@@ -647,7 +649,15 @@ void testApp::oscRecv()
 		}else if(m.getAddress() == "/button"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg) butPressed = true;
-		}
+            
+		}else if(m.getAddress() == "/wavLen"){
+//            cout << "wavLen received" << endl;
+            int index = m.getArgAsInt32(0);
+            float len = m.getArgAsFloat(1);
+            pBodies[index]->setAudioLen(len);
+
+            
+        }
         
         
         else{

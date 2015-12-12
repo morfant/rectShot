@@ -85,7 +85,7 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             case 2: // Polygon body
             {
-//                printf("A, PB contact begin!\n");
+                printf("A, PB contact begin!\n");
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();
@@ -127,6 +127,30 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             }
                 break;
+
+            case FRAG:
+            {
+//                printf("A, FRAG contact begin!\n");
+                
+                b2Body* self = contact->GetFixtureA()->GetBody();
+                b2Body* other = contact->GetFixtureB()->GetBody();
+                int otherIs = (int)other->GetUserData();
+                
+                if (otherIs == LEFT) {
+//                                        printf("Touch LEFT end.\n");
+                }else if (otherIs == RIGHT){
+//                                        printf("Touch RIGHT end.\n");
+                }else if (otherIs == TOP){
+//                                        printf("Touch TOP end.\n");
+                }else if (otherIs == BOTTOM){
+//                                        printf("Touch BOTTOM end.\n");
+                }else if (otherIs == BALL){
+//                                        printf("A, FRAG meet ball.\n");
+                }
+                
+            }
+                break;
+                
                 
             case TOP:
 //                printf("A, touch TOP.\n");
@@ -204,6 +228,8 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             case 2: // Polygon body
             {
+//                printf("B, PB contact begin!\n");
+                
                 b2Body* self = contact->GetFixtureB()->GetBody();
                 b2Body* other = contact->GetFixtureA()->GetBody();
                 int otherIs = (int)other->GetUserData();
@@ -243,6 +269,30 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             }
                 break;
+                
+            case FRAG:
+            {
+                printf("B, FRAG contact begin!\n");
+                
+                b2Body* self = contact->GetFixtureB()->GetBody();
+                b2Body* other = contact->GetFixtureA()->GetBody();
+                int otherIs = (int)other->GetUserData();
+                
+                if (otherIs == LEFT) {
+//                    printf("Touch LEFT end.\n");
+                }else if (otherIs == RIGHT){
+//                    printf("Touch RIGHT end.\n");
+                }else if (otherIs == TOP){
+//                    printf("Touch TOP end.\n");
+                }else if (otherIs == BOTTOM){
+//                    printf("Touch BOTTOM end.\n");
+                }else if (otherIs == BALL){
+//                    printf("B, FRAG meet ball.\n");
+                }
+                
+            }
+                break;
+                
                 
             default:
                 
