@@ -36,7 +36,11 @@ protected:
 	// Box2D
     b2World*    mWorld;
 	b2Body*		mBody;
-    b2Body*     mBody2; //Small body tracking on outline.
+    b2Body*     mBody2; //Outline tracker.
+    
+    float mBody2_rad;
+    float rotSpd;
+    
     vector<Frag*>   mFrags;
 
 
@@ -60,6 +64,7 @@ protected:
     
     // Userdata
     int pBodyUserData;
+    int smallBodyUserData;
     
     // Polyliner
     int curSection;
@@ -93,6 +98,7 @@ public:
     
     b2World*    getWorld();
     b2Body*     getBody();
+    b2Body*     getSmallBody(); // outline tracking body
     
     bool    getSelectState();
     bool    isThereMBody();

@@ -32,15 +32,18 @@ protected:
 	b2Body*		mBody;
     b2World*    mWorld;
     
+    bool        superBall;
+    
     
 public:
     // Birth and Death
-    Ball(b2World* world, float x, float y);
+    Ball(b2World* world, float x, float y, bool isSuper);
     ~Ball();
     
     // Getter
     float   getX();
     float   getY();
+    bool    getIsSuper();
     
     // Userdata
     int     ballUserData;

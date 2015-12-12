@@ -277,10 +277,13 @@ void
 Frag::render()
 {
 
+    float alpha = 255.f;
     b2Vec2 pos = mBody->GetPosition();
     float32 angle = mBody->GetAngle();
-    float alpha = (((float)lifeLong-(float)age)/(float)lifeLong) * 255.f;
-
+    
+    if(lifeLong){
+        alpha = (((float)lifeLong-(float)age)/(float)lifeLong) * 255.f;
+    }
 
 //    cout << pos.x << " / " << pos.y << endl;
 //    cout << _toPixelX(pos.x)<< " / " << _toPixelY(pos.y) << endl;

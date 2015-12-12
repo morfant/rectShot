@@ -97,8 +97,6 @@ void testApp::setup(){
     // World
     aWorld = new World();
     iWorld = aWorld -> getWorld();
-    contactlistener = new ContactListener();
-    iWorld->SetContactListener(contactlistener);
 
     /*
     // Wall - edge body
@@ -214,7 +212,7 @@ void testApp::update(){
         if(!bodyHit){
         
             cout << "No hit!" << endl;
-            aBall = new Ball(iWorld, shot_X, shot_Y);
+            aBall = new Ball(iWorld, shot_X, shot_Y, true);
             //                    balls.push_back(aBall);
             shotBallMade = true;
         }
@@ -880,7 +878,7 @@ void testApp::keyPressed(int key){
         // Add ball
         case 'a':
             
-            aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY());
+            aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), false);
             balls.push_back(aBall);
             
             break;
@@ -973,7 +971,7 @@ void testApp::mouseMoved(int x, int y ){
 void testApp::mouseDragged(int x, int y, int button){
 
     // Add balls
-//    Ball * aBall = new Ball(iWorld, x, y);
+//    Ball * aBall = new Ball(iWorld, x, y, false);
 //    balls.push_back(aBall);
 
 
@@ -1007,7 +1005,7 @@ void testApp::mousePressed(int x, int y, int button){
     // Right click
     if (button == 2){
         
-//        aBall = new Ball(iWorld, x, y);
+//        aBall = new Ball(iWorld, x, y, true);
 //        balls.push_back(aBall);
         cout << pBodies[0]->IsInside( b2Vec2(x, y) ) << endl;
     }

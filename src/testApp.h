@@ -17,8 +17,7 @@
 #include "Wall.h"
 //#include "PolygonBody.h"
 #include "Box.h"
-#include "ofxOsc.h"
-#include "ContactListener.h"
+//#include "ofxOsc.h"
 #include "Tm.h"
 
 
@@ -116,13 +115,22 @@ class testApp : public ofBaseApp{
         ofVec2f                 tVec;
         Wall                    *left, *right, *floor, *ceil;
         Box*                    aBox;
-        ContactListener*        contactlistener;
     
         int                     pBodyIdx;
     
         bool                    touched;
     
-        // OSC
+    
+    //Target Manager
+    Tm*         tMan;
+    bool        isTm;
+    
+    //Osc
+    // OSC
+    ofxOscSender            sender;
+    ofxOscReceiver          receiver;
+    
+    
     bool                    bodyHit;
     bool                    shotBallMade;
     bool                    isShot;
@@ -130,13 +138,7 @@ class testApp : public ofBaseApp{
     int                     shot_Y;
     bool                    butPressed;
     int                     butMsg;
-        ofxOscSender            sender;
-        ofxOscReceiver          receiver;
-    
-    //Target Manager
-    Tm*         tMan;
-    bool        isTm;
-    
+
     
         // container
     ofPoint cvBlobPos;

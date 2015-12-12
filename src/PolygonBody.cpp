@@ -23,7 +23,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     index = idx;
     
     // Set Userdata
-    pBodyUserData = 2;
+    pBodyUserData = POLYGON_BODY;
+    smallBodyUserData = OT_BODY;
     
     curSection = 0;
     curPointofSection = 0;
@@ -35,6 +36,9 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 //        
 //        printf("vertice cp check to: %f, %f\n", mVertice[i].x, mVertice[i].y);
     }
+    
+    // outline tarcker
+    rotSpd = 1.0f;
     getSection();
     
     
@@ -113,20 +117,26 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     // sub body
 	b2BodyDef myBodyDef2;
-	myBodyDef2.type = b2_dynamicBody;
+//	myBodyDef2.type = b2_dynamicBody;
+	myBodyDef2.type = b2_staticBody;
+//	myBodyDef2.type = b2_kinematicBody;
     myBodyDef2.position.Set(0, 0);
 	mBody2 = mWorld -> CreateBody(&myBodyDef2);
     
-	b2CircleShape myCircleShape;
-	myCircleShape.m_p.Set(0, 0);
-	myCircleShape.m_radius = _toWorldScale(100.f/2.f);
-	
-//	b2FixtureDef myFixtureDef;
-	myFixtureDef.shape = &myCircleShape;
+    mBody2_rad = 5.f;
+    
+
+    // Circle
+    b2CircleShape myCircleShape;
+    myCircleShape.m_p.Set(0, 0);
+    myCircleShape.m_radius = _toWorldScale(mBody2_rad/2.f);
+    
+    myFixtureDef.shape = &myCircleShape;
 	myFixtureDef.density = 100.f;
     myFixtureDef.restitution = 1.01f;
     myFixtureDef.friction = 0.7f;
     mBody2->CreateFixture(&myFixtureDef);
+    mBody2->SetUserData((void*)smallBodyUserData);
     
 //    cout << "count: " <<mWorld->GetBodyCount() << endl;
 //    cout << "list: " << mWorld->GetBodyList() << endl;
@@ -327,7 +337,7 @@ PolygonBody::breakBody()
 //        endl;
 
         Frag * aFrag = new Frag(mWorld, movX, movY, vertices);
-        aFrag->setLifeLong(300); // Frag will die after n Frame. 0 means 'immortal'.
+        aFrag->setLifeLong(0); // Frag will die after n Frame. 0 means 'immortal'.
         mFrags.push_back(aFrag);
     
     }
@@ -462,6 +472,13 @@ PolygonBody::getBody()
 {
     return mBody;
 
+}
+
+b2Body*
+PolygonBody::getSmallBody()
+{
+    return mBody2;
+    
 }
 
 void
@@ -655,19 +672,19 @@ PolygonBody::update()
     //    cout << "bodypos: x: " << _toPixelX(bodyPos.x) << " y: " << _toPixelY(bodyPos.y) << endl;
         ofVec2f curPoint = ofVec2f(mVertice[curSection].x, mVertice[curSection].y);
         ofVec2f nextPoint = ofVec2f(
-                mVertice[curSection].x + (addDist[curSection].x * (curPointofSection + 1)),
-                mVertice[curSection].y + (addDist[curSection].y * (curPointofSection + 1)));
+                mVertice[curSection].x + (addDist[curSection].x * rotSpd * (curPointofSection + 1)),
+                mVertice[curSection].y + (addDist[curSection].y * rotSpd * (curPointofSection + 1)));
         
         float distBetweenPoint = ofDist(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
 
         if (distBetweenPoint < dists[curSection]){
             
-            ofxOscMessage m;
-            m.setAddress("/fromOF_pBody");
-            m.addIntArg(index);
-            m.addFloatArg(bodyPos.x * BOX2D_SCALE + nextPoint.x);
-            m.addFloatArg(bodyPos.y * BOX2D_SCALE + nextPoint.y);
-            sender.sendMessage(m);
+//            ofxOscMessage m;
+//            m.setAddress("/fromOF_pBody");
+//            m.addIntArg(index);
+//            m.addFloatArg(bodyPos.x * BOX2D_SCALE + nextPoint.x);
+//            m.addFloatArg(bodyPos.y * BOX2D_SCALE + nextPoint.y);
+//            sender.sendMessage(m);
             
             
             ofPushStyle();
@@ -676,15 +693,20 @@ PolygonBody::update()
             
             ofPushMatrix();
             ofTranslate(bodyPos.x * BOX2D_SCALE, bodyPos.y * BOX2D_SCALE * (-1));
-    //        ofTranslate(curPoint.x, curPoint.y);
-    //        ofLine(0, 0, nextPoint.x - curPoint.x, nextPoint.y - curPoint.y);
-    //        ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
-    //        ofCircle(curPoint.x, curPoint.y, 10.f);
-            //ofSetColor(200, 200, 150);
-            ofSetColor(200, 200, 150);
-            ofCircle(nextPoint.x, nextPoint.y, 30.f);
+            ofSetColor(20, 200, 150);
+            ofCircle(nextPoint.x, nextPoint.y, mBody2_rad);
+            
+            // Outline
+            vector<ofPoint> lines;
+            for (int i = 0; i < curSection + 1; i++){
+                ofPoint point = ofPoint(mVertice[i].x, mVertice[i].y);
+                lines.push_back(point);
+            }
+            
+            ofPolyline outline(lines);
+            ofSetLineWidth(2.f);
+            outline.draw();
             ofLine(curPoint.x, curPoint.y, nextPoint.x, nextPoint.y);
-            //    ofPoint(0, 0, 0);
             
             ofPopMatrix();
             ofPopStyle();

@@ -10,11 +10,15 @@
 #pragma once
 
 // ---- Macros ----
-enum { //For wall
+enum { //box2d Userdata
+    BALL = 1,
+    SUPER_BALL = 11,
+    POLYGON_BODY = 2,
+    OT_BODY = 3,
     TOP = 5,
-    BOTTOM,
-    LEFT,
-    RIGHT
+    BOTTOM = 6,
+    LEFT = 7,
+    RIGHT = 8
 };
 
 

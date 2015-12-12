@@ -12,11 +12,17 @@
 
 // ----Birth & Death----
 
-Ball::Ball(b2World* aWorld, float x, float y)
+Ball::Ball(b2World* aWorld, float x, float y, bool isSuper)
 {
     
+    superBall = isSuper;
+    
     // Set Userdata
-    ballUserData = 1;
+    if(superBall){
+        ballUserData = SUPER_BALL;
+    }else{
+        ballUserData = BALL;
+    }
     
     mWorld = aWorld;
     posX = x;
@@ -25,8 +31,13 @@ Ball::Ball(b2World* aWorld, float x, float y)
     radius = 30.f;
     
 	b2BodyDef myBodyDef;
-//	myBodyDef.type = b2_dynamicBody;
-	myBodyDef.type = b2_staticBody;
+    
+    if (superBall) {
+        myBodyDef.type = b2_staticBody;
+    }else{
+        myBodyDef.type = b2_dynamicBody;
+    }
+
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -41,15 +52,19 @@ Ball::Ball(b2World* aWorld, float x, float y)
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myCircleShape;	
 
-    // Normal ball
-//	myFixtureDef.density = 1.f;
-//    myFixtureDef.restitution = 1.01f;
-//    myFixtureDef.friction = 0.7f;
+    if (superBall){
+        
+        myFixtureDef.density = 100.f;
+        myFixtureDef.restitution = 0.01f;
+        myFixtureDef.friction = 0.7f;
+        
+    }else{
+        
+        myFixtureDef.density = 0.1f;
+        myFixtureDef.restitution = 0.1f;
+        myFixtureDef.friction = 0.7f;
+    }
 
-    // Pushing ball
-	myFixtureDef.density = 100.f;
-    myFixtureDef.restitution = 0.01f;
-    myFixtureDef.friction = 0.7f;
     
     mBody->CreateFixture(&myFixtureDef);
 
@@ -72,6 +87,12 @@ float
 Ball::getY()
 {
     return posY;
+}
+
+bool
+Ball::getIsSuper()
+{
+    return superBall;
 }
 
 
