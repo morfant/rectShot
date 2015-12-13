@@ -50,6 +50,8 @@ void testApp::setup(){
     movie[5].loadMovie("movies/ayaundsister.mov");
     movie[6].loadMovie("movies/test.mov");
     
+    movX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
+    movY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
     
     
     // Get movie Width / Height
@@ -181,14 +183,22 @@ void testApp::update(){
     
         grayImage.setFromColorImage(colorImg);
         grayImage.threshold(threshold[curMovie], inverting[curMovie]);
-        contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
         
+//        contourFinder.setAnchorPoint(contourFinder.getWidth()/2.f, contourFinder.getHeight()/2.f);
+        contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
+//        contourFinder.draw(movX, movY);
 
         blobsVec.clear(); //Init containers with clearing.
+//        blobsVec_C.clear();
         blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
         cvBlobNum = blobsVec.size();
+//        aBlob = contourFinder.blobs[0];
         
-	}
+        
+
+        
+        
+    }
     
     
     if(shotBallMade){
@@ -247,27 +257,37 @@ void testApp::draw(){
     // Draw movie.
     if (movPlay){
         if (curMovie == 0) {
-            vidGrabber.draw(0, 0);
+//            vidGrabber.draw(0, 0);
+            movX = (ofGetWidth()/2.f) - (vidGrabber.width/2.f);
+            movY = (ofGetHeight()/2.f) - (vidGrabber.height/2.f);
+            vidGrabber.draw(movX, movY);
+            
         }else{
-            movie[curMovie].draw(0, 0);
+            movX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
+            movY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
+            movie[curMovie].draw(movX, movY);
         }
     }
 
     
     // Draw gray image.
     if (grayPlay){
-        grayImage.draw(0,0);
+        grayImage.draw(movX, movY);
     }
 
     // Draw contourFinder
     if (drawBlob){
         ofPushStyle();
+//        ofPushMatrix();
+//        ofTranslate(movX, movY);
         ofSetLineWidth(1.0);
         
         for (int i = 0; i < contourFinder.nBlobs; i++){
     //        contourFinder.blobs[i].draw(360,540);
-            contourFinder.blobs[i].draw(0, 0);
+            contourFinder.blobs[i].draw(movX, movY);
+
         }
+//        ofPopMatrix();
         ofPopStyle();
     }
 
@@ -472,12 +492,28 @@ void testApp::makePolygonBody(int blobNum){
         // get vector<ofxCvBlob>
         blobsVec = contourFinder.blobs;
         
+//        for (vector<ofxCvBlob>::iterator iter = blobsVec.begin(); iter != blobsVec.end(); iter++){
+//            for (vector<ofPoint>::iterator jter = (*iter).pts.begin(); jter != (*iter).pts.end(); jter++) {
+//                (*jter).x = (*jter).x + movX;
+//                (*jter).y = (*jter).y + movY;
+//            }
+//            //            blobsVec_C.push_back((*iter));
+//        }
+        
         cvBlobNum = blobsVec.size();
         //blobsVec[0].pts = all points of 1st blob.
         
         if(cvBlobNum != 0){
             blobsPts = blobsVec[blobNum - 1].pts;
-            cvBlobPos = blobsVec[blobNum - 1].centroid;
+            
+            // Transform blobsPts
+            for (vector<ofPoint>::iterator iter = blobsPts.begin(); iter != blobsPts.end(); iter++) {
+                (*iter).x = (*iter).x + movX;
+                (*iter).y = (*iter).y + movY;
+            }
+            
+            cvBlobPos = blobsVec[blobNum - 1].centroid + ofPoint(movX, movY);
+//            cvBlobPos = blobsVec[blobNum - 1].centroid;
 //            faceCentroids.push_back(cvBlobPos); //Store centroid of pBody
         }
         
@@ -628,6 +664,7 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
     return(area < 0 ? -area : area);
     
 }
+
 
 // OSC
 //--------------------------------------------------------------
@@ -992,9 +1029,17 @@ void testApp::mousePressed(int x, int y, int button){
     
     if (button == 0){
         for (int i = 0; i < cvBlobNum; i++){
-            if (blobsVec[i].boundingRect.inside(x, y)){
+            
+            ofRectangle tBoundingRect;
+            tBoundingRect.x = blobsVec[i].boundingRect.x + movX;
+            tBoundingRect.y = blobsVec[i].boundingRect.y + movY;
+            tBoundingRect.width = blobsVec[i].boundingRect.width;
+            tBoundingRect.height = blobsVec[i].boundingRect.height;
+            
+            if (tBoundingRect.inside(x, y)){
                 selBlobRect = i + 1;
-    //            printf("Selected blob rect number: %d\n", selBlobRect);
+                printf("Selected blob rect number: %d\n", selBlobRect);
+                printf("centroid X: %f / Y: %f\n", cvBlobPos.x, cvBlobPos.y);
                 makePolygonBody(selBlobRect);
             }
         }

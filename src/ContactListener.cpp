@@ -85,7 +85,7 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             case 2: // Polygon body
             {
-                printf("A, PB contact begin!\n");
+//                printf("A, PB contact begin!\n");
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();

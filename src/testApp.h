@@ -95,6 +95,8 @@ class testApp : public ofBaseApp{
     
         bool                info;
     
+        float               movX, movY;
+    
     
         //blob
         ofxCvColorImage			colorImg;
@@ -149,6 +151,8 @@ class testApp : public ofBaseApp{
         vector<Box*>            boxes;
         vector<PolygonBody*>    pBodies;
         vector<ofxCvBlob>       blobsVec;
+        vector<ofxCvBlob>       blobsVec_C;
+        ofxCvBlob               aBlob;
         vector<ofPoint>         blobsPts;
         vector<ofVec2f>         blobCenterPos;
     
