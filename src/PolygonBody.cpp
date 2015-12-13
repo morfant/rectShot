@@ -112,12 +112,15 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     
     // Set default status
-    selected = false;
+    selected = true;
     //defaultColor = ofColor(0, 200, 25);
     defaultColor = ofColor(0, 200, 0);
     //selectedColor = ofColor(200, 10, 20);
     selectedColor = ofColor(0, 0, 20);
+
+    outliner_rad = 5.f;
     
+    /*
     // sub body
 	b2BodyDef myBodyDef2;
 //	myBodyDef2.type = b2_dynamicBody;
@@ -128,7 +131,6 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     
     mBody2_rad = 5.f;
     
-
     // Circle
     b2CircleShape myCircleShape;
     myCircleShape.m_p.Set(0, 0);
@@ -140,6 +142,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     myFixtureDef.friction = 0.7f;
     mBody2->CreateFixture(&myFixtureDef);
     mBody2->SetUserData((void*)smallBodyUserData);
+    */
     
 //    cout << "count: " <<mWorld->GetBodyCount() << endl;
 //    cout << "list: " << mWorld->GetBodyList() << endl;
@@ -156,7 +159,7 @@ PolygonBody::~PolygonBody()
     oscSendIFF("/pbDest", index, -1, -1);
     
     if (isThereMbodybool){
-        mWorld->DestroyBody(mBody2);
+//        mWorld->DestroyBody(mBody2);
         mWorld->DestroyBody(mBody);
     }
 
@@ -476,12 +479,12 @@ PolygonBody::getBody()
 
 }
 
-b2Body*
-PolygonBody::getSmallBody()
-{
-    return mBody2;
-    
-}
+//b2Body*
+//PolygonBody::getSmallBody()
+//{
+//    return mBody2;
+//    
+//}
 
 void
 PolygonBody::setX(float _posX)
@@ -544,7 +547,7 @@ PolygonBody::setAudioLen(float len)
 void
 PolygonBody::delMbody()
 {    
-    mWorld->DestroyBody(mBody2);
+//    mWorld->DestroyBody(mBody2);
     mWorld->DestroyBody(mBody);
     isThereMbodybool = false;
     
@@ -603,30 +606,15 @@ PolygonBody::renderAtBodyPosition()
     if (isThereMbodybool){
 
 
-    //    b2Vec2 pos2 = mBody2->GetPosition();
-    //    float32 pangle = mBody2->GetAngle();
-    //    cout << "x: " << (pos2.x * BOX2D_SCALE) << " / y: " << (pos2.y * BOX2D_SCALE * -1) << " / angle: " << pangle << endl;
 
-    //    mBody->SetTransform(pos2, pangle);
         b2Vec2 pos = mBody->GetPosition();
 //        cout << "pos: " << pos.x << pos.y <<endl;
         float32 angle = mBody->GetAngle();
         
     //    printf("pbody angle: %f\n", angle);
-        
     //    printf("pbody pos: %f, %f\n", pos.x, pos.y);
     //    printf("pbody pos TO PIXEL: %f, %f\n", _tovPixelX(pos.x), _tovPixelY(pos.y));
-//        
 
-        ofFill();
-        ofSetColor(255, 0, 0);
-        ofEllipse(tVertice[0].x, tVertice[0].y, 10, 10);
-        ofSetColor(255, 100, 0);
-        ofEllipse(tVertice[10].x, tVertice[10].y, 10, 10);
-        ofSetColor(255, 200, 0);
-        ofEllipse(tVertice[50].x, tVertice[50].y, 10, 10);
-//
-        
         
         ofPushStyle();
     //    ofSetColor(0, 200, 25); //Set Polygon body color
@@ -640,18 +628,11 @@ PolygonBody::renderAtBodyPosition()
         ofPushMatrix();
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.
         
-        
-        
-        
-        
-        
-    //    ofSetColor(199, 199, 199);
-    //    ofSetColor(0);
-//        ofEllipse(0, 0, 50, 50);
         ofRotate(_toDegree(angle));
+
+        // Draw polygon shape
         ofBeginShape();
         for (int i = 0; i < maxVertexCount; i++) {
-    //        ofVertex(_tovPixelX(mPts[i].x), _tovPixelY(mPts[i].y));
             ofVertex(mPts[i].x * BOX2D_SCALE, mPts[i].y * BOX2D_SCALE * (-1.f) );
         }
         
@@ -659,10 +640,9 @@ PolygonBody::renderAtBodyPosition()
         
         ofPopMatrix();
         ofPopStyle();
+
     }else{
-    
         // Draw fragments
-        
         renderFrags();
     }
 }
@@ -724,7 +704,7 @@ PolygonBody::update()
             ofPushMatrix();
             ofTranslate(bodyPos.x * BOX2D_SCALE, bodyPos.y * BOX2D_SCALE * (-1));
             ofSetColor(20, 200, 150);
-            ofCircle(nextPoint.x, nextPoint.y, mBody2_rad);
+            ofCircle(nextPoint.x, nextPoint.y, outliner_rad);
             
             // Outline
             vector<ofPoint> lines;
@@ -755,11 +735,6 @@ PolygonBody::update()
             curPointofSection = 0;
         }
         
-        mBody2->SetTransform(b2Vec2(nextPoint.x + (bodyPos.x * BOX2D_SCALE), nextPoint.y + (bodyPos.y * BOX2D_SCALE * (-1))), 0);
-        
-        b2Vec2 spos = mBody2->GetPosition();
-    //        cout << "spos: x: " << spos.x << " y: " << spos.y << endl;
-       
     }
 }
 

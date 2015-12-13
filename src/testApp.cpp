@@ -1050,10 +1050,10 @@ void testApp::mousePressed(int x, int y, int button){
         
         
         // For polygon body selection
-        if (boxes.size() == 0){
-            aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
-            boxes.push_back(aBox);
-        }
+//        if (boxes.size() == 0){
+//            aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
+//            boxes.push_back(aBox);
+//        }
     }
     
 
@@ -1076,8 +1076,8 @@ void testApp::mouseReleased(int x, int y, int button){
         touched = false;
         
         // Delete touch box(sensor object).
-        delete boxes[0];
-        boxes.clear();
+//        delete boxes[0];
+//        boxes.clear();
         
     }else if(button == 2){
 //        delete balls[0];

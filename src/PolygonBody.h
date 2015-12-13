@@ -36,7 +36,7 @@ protected:
 	b2Body*		mBody;
     b2Body*     mBody2; //Outline tracker.
     
-    float mBody2_rad;
+    float outliner_rad;
     float rotSpd;
     float audioLen;
     
@@ -99,7 +99,7 @@ public:
     
     b2World*    getWorld();
     b2Body*     getBody();
-    b2Body*     getSmallBody(); // outline tracking body
+//    b2Body*     getSmallBody(); // outline tracking body
     
     bool    getSelectState();
     bool    isThereMBody();
