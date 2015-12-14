@@ -4,12 +4,13 @@
 void testApp::setup(){
     
     ofSetFrameRate(60.f);
-    
+    title.loadImage("img/lonewolf_title.jpg");
+    inTitle = true;
+
     
 	// open an outgoing connection to HOST:PORT
 	sender.setup(HOST, PORT);
 	receiver.setup(RECV_PORT);
-    
     
     shotBallMade = false;
     isShot = false;
@@ -274,8 +275,19 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    
+  
+
+
     ofBackground(255);
+//    ofBackground(0);
+
+    if (inTitle){
+        movPlay = false;
+        drawBlob = false;
+        grayPlay = false;
+        title.draw(0, 0);
+    }
+    
     
     // Draw movie.
     if (movPlay){

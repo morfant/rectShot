@@ -124,8 +124,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         selected = true;
         //defaultColor = ofColor(0, 200, 25);
         defaultColor = ofColor(0, 200, 0);
-        //selectedColor = ofColor(200, 10, 20);
-        selectedColor = ofColor(0, 0, 20);
+        selectedColor = ofColor(0, 200, 25);
+//        selectedColor = ofColor(0, 0, 20);
 
         outliner_rad = 5.f;
         
@@ -155,8 +155,6 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         
     //    cout << "count: " <<mWorld->GetBodyCount() << endl;
     //    cout << "list: " << mWorld->GetBodyList() << endl;
-
-        cout << "hello???" << endl;
     }
 	
 }

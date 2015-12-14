@@ -129,13 +129,15 @@ class testApp : public ofBaseApp{
         bool                    touched;
     
     
-    //Target Manager
+    //Staging
     Tm*         tMan;
     bool        tmOpen;
     int         targetNum;
     int         curStage;
     unsigned long long stageStartTime;
-    
+    ofImage     title;
+    bool        inTitle;
+
     
     //Osc
     // OSC
