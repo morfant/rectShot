@@ -11,6 +11,12 @@
 
 
 // ----Birth & Death----
+PolygonBody::PolygonBody()
+{
+    cout << "Dummy Polygonbody initialized." << endl;
+    
+}
+
 
 PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
 {
@@ -20,7 +26,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     fragNum = kMAX_VERTICES/kSAMPLING_INTV;
 
 	// open an outgoing connection to HOST:PORT
-	sender.setup(HOST, PORT);
+    sender = new ofxOscSender();
+	sender->setup(HOST, PORT);
     
     index = idx;
     
@@ -147,7 +154,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 //    cout << "count: " <<mWorld->GetBodyCount() << endl;
 //    cout << "list: " << mWorld->GetBodyList() << endl;
 
-    
+    cout << "hello???" << endl;
     oscSendIFF("/pbBorn", index, posX, posY);
     
 	
@@ -157,6 +164,8 @@ PolygonBody::~PolygonBody()
 {
     
     oscSendIFF("/pbDest", index, -1, -1);
+    
+    del sender;
     
     if (isThereMbodybool){
 //        mWorld->DestroyBody(mBody2);
@@ -604,8 +613,6 @@ void
 PolygonBody::renderAtBodyPosition()
 {
     if (isThereMbodybool){
-
-
 
         b2Vec2 pos = mBody->GetPosition();
 //        cout << "pos: " << pos.x << pos.y <<endl;

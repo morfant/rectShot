@@ -25,14 +25,15 @@
 
 // ---- Macros ----
 enum {
-    MOVNUM = 7, //Num of movie files + cam
+    MOVNUM = 8, //Num of movie files + cam
     TH_CAM = 100,
     TH_1 = 100,
-    TH_2 = 100,
+    TH_2 = 153,
     TH_3 = 100,
-    TH_4 = 100,
+    TH_4 = 153,
     TH_5 = 100,
-    TH_6 = 100,
+    TH_6 = 110,
+    TH_7 = 144,
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
     kBLOBNUM = 4,
@@ -125,7 +126,10 @@ class testApp : public ofBaseApp{
     
     //Target Manager
     Tm*         tMan;
-    bool        isTm;
+    bool        tmOpen;
+    int         targetNum;
+    int         curStage;
+    
     
     //Osc
     // OSC
@@ -150,19 +154,13 @@ class testApp : public ofBaseApp{
         vector<Ball*>           balls;
         vector<Box*>            boxes;
         vector<PolygonBody*>    pBodies;
+        vector<PolygonBody>     pBodiesOriginalCopy;
         vector<ofxCvBlob>       blobsVec;
-        vector<ofxCvBlob>       blobsVec_C;
-        ofxCvBlob               aBlob;
         vector<ofPoint>         blobsPts;
         vector<ofVec2f>         blobCenterPos;
     
         vector<b2Vec2>          blobsPtsDiv;
     
-        vector<ofPoint>          faceCentroids;
-    
-        vector< vector<b2Vec2> >  faceVertices;
-    
-
         float                   divNum;
         float                   aforce;
 

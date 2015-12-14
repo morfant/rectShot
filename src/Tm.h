@@ -35,6 +35,8 @@ protected:
     float   timeInterval;
     PolygonBody *   targetOrigin;
     
+    bool    enable;
+    
 
     
     
@@ -48,6 +50,7 @@ public:
     void    setTimer(float time);
     void    setPbody(PolygonBody* pBody);
     void    setDupNum(int num);
+    void    start();
     
     float   getTimer();
     PolygonBody*    getTargetBody();
@@ -56,10 +59,9 @@ public:
     PolygonBody* dupPbody(PolygonBody* pbody, float x, float y);
         
 
-    
-    
     // Update & draw
     PolygonBody*    update();
+    bool            isEnd();
     void    draw();
     
     

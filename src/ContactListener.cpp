@@ -277,7 +277,7 @@ ContactListener::BeginContact(b2Contact* contact)
                 
             case FRAG:
             {
-                printf("B, FRAG contact begin!\n");
+//                printf("B, FRAG contact begin!\n");
                 
                 
                 

@@ -28,6 +28,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Release">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "679EDE751C1E600C0029C2DE"
+               BuildableName = "cvBody_chainShape Tests.xctest"
+               BlueprintName = "cvBody_chainShape Tests"
+               ReferencedContainer = "container:cvBody_chainShape.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

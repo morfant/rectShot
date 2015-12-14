@@ -74,7 +74,7 @@ protected:
     vector<ofVec2f>         addDist;
     
     // OSC
-    ofxOscSender            sender;
+    ofxOscSender *           sender;
     
     // Aging
     bool                    isAlive;
@@ -84,6 +84,7 @@ protected:
     
 public:
     // Birth and Death
+    PolygonBody();
     PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx);
     
     ~PolygonBody();

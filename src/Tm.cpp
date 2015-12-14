@@ -13,7 +13,7 @@
 
 Tm::Tm(b2World* world, PolygonBody* pBody, float time)
 {
-    
+    enable = false;
     dupNum = 1;
     mWorld = world;
     
@@ -52,6 +52,12 @@ Tm::setDupNum(int num)
     dupNum = num;
 }
 
+void
+Tm::start()
+{
+    enable = true;
+}
+
 
 
 float
@@ -69,25 +75,27 @@ Tm::getTargetBody()
 }
 
 
+
+
 // Duplicate Target
 PolygonBody*
 Tm::dupPbody(PolygonBody* pbody, float x, float y)
 {
+    
     // Get index
     int index = pbody->getIndex();
+//    cout << "index: " << index << endl;
+    
     
     // GET Centroid
     float pbx = pbody->getX();
     float pby = pbody->getY();
-    
-    dupPosX = pbx;
-    dupPosY = pby;
-    //    cout << "pbx: " << pbx << " / " << " pby: " << pby << endl;
+//    cout << "x: " << x << " / " << " y: " << y << endl;
     
     
     float dx = x - pbx;
     float dy = y - pby;
-    //    cout << "dx: " << dx << " / " << " dy: " << dy << endl;
+//    cout << "dx: " << dx << " / " << " dy: " << dy << endl;
     
     b2Vec2* pVertice;
     pVertice = pbody->getVertices();
@@ -105,7 +113,6 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
     // Duplicate pBody
     PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index);
     
-    
     return aPbody;
 
     
@@ -116,30 +123,46 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 PolygonBody*
 Tm::update()
 {
-    float marginX = 200;
-    float marginY = 100;
-    float randXPos = ofRandom(marginX, ofGetWidth() - marginX);
+        
+        float marginX = 150;
+        float marginY = 200;
+        float randXPos = ofRandom(marginX, ofGetWidth() - marginX);
     
-    curTime = ofGetElapsedTimeMillis();
-//    cout << "curTime: " << curTime << endl;
+        dupPosX = randXPos;
+        dupPosY = marginY;
     
-    if ((curTime - startTime) > timeInterval && dupNum != 0){
-//        cout << "time ellaplsed!" << endl;
-//        dupPbody(targetOrigin, dupPosX, dupPosY);
-        
-        startTime = curTime;
-//        cout << "startTime: " << startTime << endl;
-        
-        dupNum--;
-        
-        return dupPbody(targetOrigin, randXPos, dupPosY + marginY);
-        
-        
-    }else{
-        return NULL;
-    }
     
+        curTime = ofGetElapsedTimeMillis();
+    //    cout << "curTime: " << curTime << endl;
+        
+        if ((curTime - startTime) > timeInterval && dupNum != 0){
+    //        cout << "time ellaplsed!" << endl;
+    //        dupPbody(targetOrigin, dupPosX, dupPosY);
+            
+            startTime = curTime;
+    //        cout << "startTime: " << startTime << endl;
+            
+            dupNum--;
+            
+            return dupPbody(targetOrigin, dupPosX, dupPosY);
+        }else{
+            
+            return NULL; //Nothing is happened.
+        }
+
 }
+
+
+bool
+Tm::isEnd()
+{
+    if(dupNum < 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 
 
 void
