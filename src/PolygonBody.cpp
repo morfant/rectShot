@@ -18,157 +18,157 @@ PolygonBody::PolygonBody()
 }
 
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx)
+PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal)
 {
     
-    isAlive = true;
-    isThereMbodybool = true;
-    fragNum = kMAX_VERTICES/kSAMPLING_INTV;
 
-	// open an outgoing connection to HOST:PORT
-    sender = new ofxOscSender();
-	sender->setup(HOST, PORT);
-    
-    index = idx;
-    
-    // Set Userdata
-    pBodyUserData = POLYGON_BODY;
-    smallBodyUserData = OT_BODY;
-    
-    curSection = 0;
-    curPointofSection = 0;
-
-    // Store for later use
     for (int i = 0; i < kMAX_VERTICES; i++) {
         mVertice[i] = vertices[i];
-//        printf("vertice cp check from: %f, %f\n", vertices[i].x, vertices[i].y);
-//        
-//        printf("vertice cp check to: %f, %f\n", mVertice[i].x, mVertice[i].y);
     }
-    
-    // outline tarcker
-    rotSpd = 1.0f;
-    audioLen = 0.f;
-    getSection();
-    
     
     mWorld = aWorld;
     posX = xx;
     posY = yy;
     maxVertexCount = maxVCount;
+    index = idx;
+
     
-    // vec direction check - CCw
-//    for (int i = 0; i < 4; i++){
-//        printf("vec[%d] x: %f, y: %f\n", i, vertices[i].x, vertices[i].y);
-//    }
-    
-    for (int i = 0; i < maxVertexCount; i++) {
-        mPts[i].x = _toWorldX(vertices[i].x);
-        mPts[i].y = _toWorldY(vertices[i].y);
+    if (isReal){
+        
+        isAlive = true;
+        isThereMbodybool = true;
+        fragNum = kMAX_VERTICES/kSAMPLING_INTV;
+
+    //	// open an outgoing connection to HOST:PORT
+    //    sender = new ofxOscSender();
+    //	sender->setup(HOST, PORT);
+        
+        
+        // Set Userdata
+        pBodyUserData = POLYGON_BODY;
+        smallBodyUserData = OT_BODY;
+        
+        curSection = 0;
+        curPointofSection = 0;
+
+        
+        // outline tarcker
+        rotSpd = 1.0f;
+        audioLen = 0.f;
+        getSection();
+        
+        
+        
+        // vec direction check - CCw
+    //    for (int i = 0; i < 4; i++){
+    //        printf("vec[%d] x: %f, y: %f\n", i, vertices[i].x, vertices[i].y);
+    //    }
+        
+        for (int i = 0; i < maxVertexCount; i++) {
+            mPts[i].x = _toWorldX(vertices[i].x);
+            mPts[i].y = _toWorldY(vertices[i].y);
+        }
+        
+        
+        b2BodyDef myBodyDef;
+        myBodyDef.type = b2_dynamicBody;
+        myBodyDef.position.Set(0, 0);
+    //    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+    //    myBodyDef.linearVelocity.Set(4.0f, 0);
+        mBody = mWorld -> CreateBody(&myBodyDef);
+    //    mBody2 = mWorld -> CreateBody(&myBodyDef);
+        
+        
+    #ifdef POLYGON_BODY
+        // Polygon body
+        b2PolygonShape myPolygonShape;
+        for (int i = 0; i < kMAX_VERTICES - 1; i++) {
+            mPtsP[i].x = mPts[i].x * 1.0;
+            mPtsP[i].y = mPts[i].y * 1.0;
+        }
+        
+        myPolygonShape.Set(mPtsP, maxVertexCount);
+    #else
+        // Chain loop body
+        b2ChainShape chain;
+        chain.CreateLoop(mPts, maxVertexCount);
+    #endif
+        
+        
+        
+        b2FixtureDef myFixtureDef;
+    //	b2FixtureDef myFixtureDef2;
+        
+    #ifdef POLYGON_BODY
+    //	myFixtureDef2.shape = &myPolygonShape;
+        myFixtureDef.shape = &myPolygonShape;
+    #else
+        myFixtureDef.shape = &chain;
+
+    #endif
+        
+        myFixtureDef.density = 1.f;
+        myFixtureDef.restitution = 0.8f;
+        mBody->CreateFixture(&myFixtureDef);
+        mBody->SetUserData((void*)pBodyUserData);
+    //    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
+
+        
+    //	myFixtureDef2.density = 1.f;
+    //    myFixtureDef2.restitution = 0.8f;
+    //    mBody2->CreateFixture(&myFixtureDef2);
+    //    mBody2->SetUserData((void*)pBodyUserData);
+        
+        
+        // Set default status
+        selected = true;
+        //defaultColor = ofColor(0, 200, 25);
+        defaultColor = ofColor(0, 200, 0);
+        //selectedColor = ofColor(200, 10, 20);
+        selectedColor = ofColor(0, 0, 20);
+
+        outliner_rad = 5.f;
+        
+        /*
+        // sub body
+        b2BodyDef myBodyDef2;
+    //	myBodyDef2.type = b2_dynamicBody;
+        myBodyDef2.type = b2_staticBody;
+    //	myBodyDef2.type = b2_kinematicBody;
+        myBodyDef2.position.Set(0, 0);
+        mBody2 = mWorld -> CreateBody(&myBodyDef2);
+        
+        mBody2_rad = 5.f;
+        
+        // Circle
+        b2CircleShape myCircleShape;
+        myCircleShape.m_p.Set(0, 0);
+        myCircleShape.m_radius = _toWorldScale(mBody2_rad/2.f);
+        
+        myFixtureDef.shape = &myCircleShape;
+        myFixtureDef.density = 100.f;
+        myFixtureDef.restitution = 1.01f;
+        myFixtureDef.friction = 0.7f;
+        mBody2->CreateFixture(&myFixtureDef);
+        mBody2->SetUserData((void*)smallBodyUserData);
+        */
+        
+    //    cout << "count: " <<mWorld->GetBodyCount() << endl;
+    //    cout << "list: " << mWorld->GetBodyList() << endl;
+
+        cout << "hello???" << endl;
     }
-    
-    
-	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_dynamicBody;
-    myBodyDef.position.Set(0, 0);
-//    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
-//    myBodyDef.linearVelocity.Set(4.0f, 0);
-	mBody = mWorld -> CreateBody(&myBodyDef);
-//    mBody2 = mWorld -> CreateBody(&myBodyDef);
-    
-    
-#ifdef POLYGON_BODY
-    // Polygon body
-	b2PolygonShape myPolygonShape;
-    for (int i = 0; i < kMAX_VERTICES - 1; i++) {
-        mPtsP[i].x = mPts[i].x * 1.0;
-        mPtsP[i].y = mPts[i].y * 1.0;
-    }
-    
-    myPolygonShape.Set(mPtsP, maxVertexCount);
-#else
-    // Chain loop body
-    b2ChainShape chain;
-    chain.CreateLoop(mPts, maxVertexCount);
-#endif
-    
-    
-    
-	b2FixtureDef myFixtureDef;
-//	b2FixtureDef myFixtureDef2;
-    
-#ifdef POLYGON_BODY
-//	myFixtureDef2.shape = &myPolygonShape;
-	myFixtureDef.shape = &myPolygonShape;
-#else
-	myFixtureDef.shape = &chain;
-
-#endif
-    
-	myFixtureDef.density = 1.f;
-    myFixtureDef.restitution = 0.8f;
-    mBody->CreateFixture(&myFixtureDef);
-    mBody->SetUserData((void*)pBodyUserData);
-//    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
-
-    
-//	myFixtureDef2.density = 1.f;
-//    myFixtureDef2.restitution = 0.8f;
-//    mBody2->CreateFixture(&myFixtureDef2);
-//    mBody2->SetUserData((void*)pBodyUserData);
-    
-    
-    // Set default status
-    selected = true;
-    //defaultColor = ofColor(0, 200, 25);
-    defaultColor = ofColor(0, 200, 0);
-    //selectedColor = ofColor(200, 10, 20);
-    selectedColor = ofColor(0, 0, 20);
-
-    outliner_rad = 5.f;
-    
-    /*
-    // sub body
-	b2BodyDef myBodyDef2;
-//	myBodyDef2.type = b2_dynamicBody;
-	myBodyDef2.type = b2_staticBody;
-//	myBodyDef2.type = b2_kinematicBody;
-    myBodyDef2.position.Set(0, 0);
-	mBody2 = mWorld -> CreateBody(&myBodyDef2);
-    
-    mBody2_rad = 5.f;
-    
-    // Circle
-    b2CircleShape myCircleShape;
-    myCircleShape.m_p.Set(0, 0);
-    myCircleShape.m_radius = _toWorldScale(mBody2_rad/2.f);
-    
-    myFixtureDef.shape = &myCircleShape;
-	myFixtureDef.density = 100.f;
-    myFixtureDef.restitution = 1.01f;
-    myFixtureDef.friction = 0.7f;
-    mBody2->CreateFixture(&myFixtureDef);
-    mBody2->SetUserData((void*)smallBodyUserData);
-    */
-    
-//    cout << "count: " <<mWorld->GetBodyCount() << endl;
-//    cout << "list: " << mWorld->GetBodyList() << endl;
-
-    cout << "hello???" << endl;
-    oscSendIFF("/pbBorn", index, posX, posY);
-    
 	
 }
 
 PolygonBody::~PolygonBody()
 {
     
-    oscSendIFF("/pbDest", index, -1, -1);
-    
-    del sender;
+//    oscSendIFF("/pbDest", index, -1, -1);
     
     if (isThereMbodybool){
 //        mWorld->DestroyBody(mBody2);
+        cout << "pb dest" << endl;
         mWorld->DestroyBody(mBody);
     }
 
@@ -560,7 +560,7 @@ PolygonBody::delMbody()
     mWorld->DestroyBody(mBody);
     isThereMbodybool = false;
     
-    oscSendIF("/pbBrek", index, fragNum);
+//    oscSendIF("/pbBrek", index, fragNum);
 }
 
 
@@ -752,34 +752,4 @@ PolygonBody::draw()
    
 
 
-}
-
-
-
-//osc
-
-void
-PolygonBody::oscSendIFF(string addr, int i, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
-    
-    sender.sendMessage(m);
-    
-}
-
-
-void
-PolygonBody::oscSendIF(string addr, int i, float a)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    
-    sender.sendMessage(m);
-    
 }

@@ -15,7 +15,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 {
 
     // osc
-	sender.setup(HOST, PORT);
+//	sender.setup(HOST, PORT);
 
     // Set Userdata
     pBodyIndex = pbIdx;
@@ -60,9 +60,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
     mBody->CreateFixture(&myFixtureDef);
     mBody->SetUserData((void*)fragUserData);
     
-    
-    
-    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
+//    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
 
 	
 }
@@ -374,7 +372,7 @@ Frag::oscSendIFF(string addr, int i, float a, float b)
     m.addFloatArg(a);
     m.addFloatArg(b);
     
-    sender.sendMessage(m);
+//    sender.sendMessage(m);
     
 }
 
@@ -387,7 +385,7 @@ Frag::oscSendIF(string addr, int i, float a)
     m.addIntArg(i);
     m.addFloatArg(a);
     
-    sender.sendMessage(m);
+//    sender.sendMessage(m);
     
 }
 
@@ -401,6 +399,6 @@ Frag::oscSendIIFF(string addr, int i, int j, float a, float b)
     m.addFloatArg(a);
     m.addFloatArg(b);
     
-    sender.sendMessage(m);
+//    sender.sendMessage(m);
     
 }

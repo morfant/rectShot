@@ -50,7 +50,7 @@ protected:
     
     
     // OSC
-    ofxOscSender            sender;
+//    ofxOscSender            sender;
 
     
     // aging

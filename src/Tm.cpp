@@ -111,7 +111,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 
     
     // Duplicate pBody
-    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index);
+    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true);
     
     return aPbody;
 
@@ -156,7 +156,8 @@ Tm::update()
 bool
 Tm::isEnd()
 {
-    if(dupNum < 0){
+    cout << dupNum << endl;
+    if(dupNum == 0){
         return true;
     }else{
         return false;

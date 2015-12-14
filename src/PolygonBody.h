@@ -72,10 +72,7 @@ protected:
     int curPointofSection;
     vector<float>           dists;
     vector<ofVec2f>         addDist;
-    
-    // OSC
-    ofxOscSender *           sender;
-    
+        
     // Aging
     bool                    isAlive;
     
@@ -85,7 +82,7 @@ protected:
 public:
     // Birth and Death
     PolygonBody();
-    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx);
+    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal);
     
     ~PolygonBody();
     
@@ -136,14 +133,6 @@ public:
     float   perp_dot(b2Vec2 a, b2Vec2 b);
     
     bool    IsInside(b2Vec2 p);
-
-    
-
-    // OSC
-    void oscSendIF(string addr, int I, float F);    
-    void oscSendIFF(string addr, int I, float F, float F2);
-
-    
     
     
     

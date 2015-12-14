@@ -25,6 +25,8 @@
 
 // ---- Macros ----
 enum {
+    GUNTIME = 10000,
+    STAGE_NUM = 7,
     MOVNUM = 8, //Num of movie files + cam
     TH_CAM = 100,
     TH_1 = 100,
@@ -64,6 +66,9 @@ class testApp : public ofBaseApp{
         void oscRecv();
         void oscSendMsg(string addr, float data);
         void oscSendMsg2(string addr, ofVec2f data);
+    
+        // Staging
+        void nextStage(unsigned long long time, bool enable);
     
         // CV
         void sendBlobsOSC();
@@ -129,12 +134,18 @@ class testApp : public ofBaseApp{
     bool        tmOpen;
     int         targetNum;
     int         curStage;
+    unsigned long long stageStartTime;
     
     
     //Osc
     // OSC
     ofxOscSender            sender;
     ofxOscReceiver          receiver;
+    
+    void oscSendIFF(string addr, int i, float a, float b);
+    void oscSendIF(string addr, int i, float a);
+    void oscSendI(string addr, int i);    
+    
     
     
     bool                    bodyHit;
