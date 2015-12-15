@@ -28,6 +28,7 @@ protected:
     
 //    bool    pBODYcontactBOTTOM;
 //    int     curContactPbodyIdx;
+    int     fragIdxInContact;
     
 public:
     // Birth and Death
@@ -43,6 +44,8 @@ public:
     // Get
 //    bool    getPBODYcontactBOTTOM();
 //    int     getCurContactPbodyIdx();
+    int     getfragIdxInContact();
+    
     
     // osc
     void    oscSendII(string addr, int i, int j);

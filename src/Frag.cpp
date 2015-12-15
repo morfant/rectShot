@@ -30,6 +30,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
     posX = mx;
     posY = my;
     
+    outlineDraw = false;
     outlineColor = outlineCol;
     
 
@@ -74,6 +75,23 @@ Frag::~Frag()
     
 }
 
+
+bool
+Frag::isContactSelf()
+{
+    for(b2Contact* c = mWorld->GetContactList(); c; c = c->GetNext()){
+        if (c->GetFixtureA()->GetBody() == mBody){
+//            cout << "A is me" << endl;
+            return true;
+        }else if(c->GetFixtureB()->GetBody() == mBody){
+//            cout << "B is me" << endl;
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+}
 
 // getter & setter
 float
@@ -344,16 +362,18 @@ Frag::render()
     }
     ofEndShape();
     
-    ofNoFill();
-    ofSetColor(outlineColor);
+    if(outlineDraw){
+        ofNoFill();
+        ofSetColor(outlineColor);
 
-    // Draw outline
-    ofSetLineWidth(1.f);
-    ofBeginShape();
-    for (int i = 0; i < 3; i++) {
-        ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );
+        // Draw outline
+        ofSetLineWidth(3.f);
+        ofBeginShape();
+        for (int i = 0; i < 3; i++) {
+            ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );
+        }
+        ofEndShape();
     }
-    ofEndShape();
     
     
     ofPopMatrix();
@@ -378,6 +398,12 @@ Frag::beOld()
 bool
 Frag::update()
 {
+    if(isContactSelf()){
+        outlineDraw = true;
+    }else{
+        outlineDraw = false;
+    }
+    
     beOld();
     
     return isAlive;

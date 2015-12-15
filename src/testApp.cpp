@@ -367,9 +367,7 @@ void testApp::draw(){
     right->renderAtBodyPosition();
     floor->renderAtBodyPosition();
     ceil->renderAtBodyPosition();
-
-    
-    
+        
     
     // Draw body at cv pos
     if(pBodies.size()) drawPolygonBodies();
