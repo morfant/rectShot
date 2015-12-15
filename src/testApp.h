@@ -33,7 +33,7 @@ enum {
     MOVNUM = 10, //Num of movie files + cam
     TH_CAM = 100, //curMov = 0
     TH_1 = 78, //curMov = 1
-    TH_2 = 153,
+    TH_2 = 103,
     TH_3 = 100,
     TH_4 = 153,
     TH_5 = 100,
@@ -141,6 +141,7 @@ class testApp : public ofBaseApp{
     //Staging
     
 //    ofColor     originColor[STAGE_NUM];
+    ofColor     pBodyOutlineColor[STAGE_NUM];    
     
     Tm*         tMan;
     bool        tmOpen;

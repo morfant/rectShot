@@ -11,7 +11,7 @@
 
 // ----Birth & Death----
 
-Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int idx)
+Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int idx, ofColor outlineCol)
 {
 
     // osc
@@ -29,6 +29,8 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
     mWorld = aWorld;
     posX = mx;
     posY = my;
+    
+    outlineColor = outlineCol;
     
 
     
@@ -327,6 +329,7 @@ Frag::render()
     
     ofPushStyle();
 //    ofSetColor(0, 200, 255, alpha);
+    
     ofSetColor(0, 0, 0, alpha);
     ofFill();
     ofPushMatrix();
@@ -334,13 +337,24 @@ Frag::render()
     //Must use for image moving.
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
     ofRotate(_toDegree(angle));
+
     ofBeginShape();
-    
     for (int i = 0; i < 3; i++) {
         ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );
     }
-    
     ofEndShape();
+    
+    ofNoFill();
+    ofSetColor(outlineColor);
+
+    // Draw outline
+    ofSetLineWidth(1.f);
+    ofBeginShape();
+    for (int i = 0; i < 3; i++) {
+        ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );
+    }
+    ofEndShape();
+    
     
     ofPopMatrix();
     ofPopStyle();

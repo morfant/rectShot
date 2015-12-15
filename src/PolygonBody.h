@@ -59,6 +59,7 @@ protected:
     // Color
     ofColor     contactedColor;
     ofColor     normalColor;
+    ofColor     fragOutlineColor;
     
     // Select interface
     bool        selected;
@@ -82,6 +83,7 @@ protected:
     bool                    isAlive;
     bool                    isThereMbodybool;
     bool                    isOriginal;
+    int                     ageOfFrag;
     
     
     
@@ -113,6 +115,7 @@ public:
     bool    getIsAlive();
     bool    getIsOriginal();
     bool    getIsNewBorn();
+    ofColor getFragOutlineColor();
     
     vector<Frag*> *  getFrags();
     
@@ -128,6 +131,7 @@ public:
     void    setContactColor(ofColor color);
     void    setIsNewBorn(bool born);
     void    setIsBreaked(bool isBreak);
+    void    setFragOutlineColor(ofColor foc);
     void    delMbody();
     void    pushForce(float x, float y);
         

@@ -45,8 +45,9 @@ protected:
     b2Body*     mBody;
     b2Vec2 mVertice[3];
     
-    Frag * childFrag_0;
-    Frag * childFrag_1;
+    // Color
+    ofColor     outlineColor;
+    
     
     
     // OSC
@@ -64,7 +65,7 @@ protected:
     
 public:
     // Birth and Death
-    Frag(b2World* world, float mx, float my, b2Vec2* vertices, int pBodyIdx, int idx);
+    Frag(b2World* world, float mx, float my, b2Vec2* vertices, int pBodyIdx, int idx, ofColor outlineCol);
     ~Frag();
     
     // Getter

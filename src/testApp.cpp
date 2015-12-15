@@ -12,6 +12,7 @@ void testApp::setup(){
 	sender.setup(HOST, PORT);
 	receiver.setup(RECV_PORT);
     
+    
     shotBallMade = false;
     isShot = false;
     butPressed = false;
@@ -42,7 +43,8 @@ void testApp::setup(){
     
     curMovie = 1; // 0 means using vidGrabber.
     
-    movie[1].loadMovie("movies/aya.mov");
+//    movie[1].loadMovie("movies/aya.mov");
+    movie[1].loadMovie("movies/park.mov");
     movie[2].loadMovie("movies/aya2.mov");
     movie[3].loadMovie("movies/aya3.mov");
     movie[4].loadMovie("movies/ayaVater.mov");
@@ -135,7 +137,7 @@ void testApp::setup(){
     
     //Tm
     tmOpen = false;
-    targetNum = 2;
+    targetNum = 3;
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
 //    targetTimer = 0;
@@ -154,8 +156,16 @@ void testApp::setup(){
 //    originColor[6] = ofColor(240, 200, 250);
 //    originColor[7] = ofColor(10, 20, 100);
     
+    pBodyOutlineColor[0] = ofColor(10, 200, 100);
+    pBodyOutlineColor[1] = ofColor(250, 0, 170);
+    pBodyOutlineColor[2] = ofColor(200, 250, 10);
+    pBodyOutlineColor[3] = ofColor(100, 250, 200);
+    pBodyOutlineColor[4] = ofColor(0, 200, 10);
+    
     
     // OSC
+    //to play title music
+    oscSendI("/title", 1);
     
 }
 
@@ -534,7 +544,7 @@ void testApp::drawPolygonBodies(){
                     
                     if(fragIsBorn){
                         int fragIdx = (*jter)->getIndex();
-                        cout << "fragidx: " << fragIdx << endl;
+//                        cout << "fragidx: " << fragIdx << endl;
                         oscSendII("/fgBorn", pidx, fragIdx);
                         (*jter)->setIsNewBorn(false);
                     }
@@ -653,10 +663,12 @@ void testApp::makeBodyAtCvPosition(){ //Make original
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
         PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
 //        aPbody->setContactColor(originColor[curStage]);
+        aPbody->setFragOutlineColor(pBodyOutlineColor[curStage]);
+        
         
         PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false, COPY_DUP_IDX);
 //        aPbodyCopy->setContactColor(originColor[curStage]);
-        
+        aPbodyCopy->setFragOutlineColor(pBodyOutlineColor[curStage]);
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
         oscSendIIFF("/pbBorn", pBodyIdx, ORIGINAL_DUP_IDX, cvBlobPos.x, cvBlobPos.y);
@@ -1202,11 +1214,11 @@ void testApp::keyPressed(int key){
             break;
 
         case 'o':
-            if(OriginDestroyed){
-                tmEnable(5); // int target num
+//            if(OriginDestroyed){
+                tmEnable(targetNum); // int target num
                 OriginDestroyed = false;
 //                nextStageReady = true;
-            }
+//            }
             
             break;
             

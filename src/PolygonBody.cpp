@@ -34,7 +34,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     dupIndex = dupIdx;
     isOriginal = isOrigin;
     isBreaked = false;
-
+    ageOfFrag = 10000; // 0 means immortal
     
     if (isReal){
         
@@ -136,6 +136,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         normalColor = ofColor(0, 0, 20);
 
         outliner_rad = 5.f;
+        
+        fragOutlineColor = ofColor(255);
         
         /*
         // sub body
@@ -357,10 +359,13 @@ PolygonBody::breakBody()
 //        vertices[2].x << " / " << vertices[2].y << "\n" <<
 //        endl;
 
-        Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx);
-        aFrag->setLifeLong(200); // Frag will die after n Frame. 0 means 'immortal'.
-        mFrags.push_back(aFrag);
-        fragIdx++;
+        // If the area did not have minus value.
+        if(getArea(&vertices[0], 3) > 0){
+            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            aFrag->setLifeLong(ageOfFrag); // Frag will die after n Frame. 0 means 'immortal'.
+            mFrags.push_back(aFrag);
+            fragIdx++;
+        }
     
     }
     
@@ -430,6 +435,13 @@ bool
 PolygonBody::getIsNewBorn()
 {
     return isNewBorn;
+}
+
+
+ofColor
+PolygonBody::getFragOutlineColor()
+{
+    return fragOutlineColor;
 }
 
 
@@ -611,6 +623,13 @@ PolygonBody::setIsBreaked(bool isBreak)
 {
     isBreaked = isBreak;
 }
+
+void
+PolygonBody::setFragOutlineColor(ofColor foc)
+{
+    fragOutlineColor = foc;
+}
+
 
 
 void
