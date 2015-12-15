@@ -56,12 +56,14 @@ protected:
     int     index;
     
     // Color
-    ofColor     defaultColor;
-    ofColor     selectedColor;
+    ofColor     contactedColor;
+    ofColor     normalColor;
     
     // Select interface
     bool        selected;
-    bool        isThereMbodybool;
+    bool        isContacted;
+    
+    
     
     // Userdata
     int pBodyUserData;
@@ -75,6 +77,8 @@ protected:
         
     // Aging
     bool                    isAlive;
+    bool                    isThereMbodybool;
+    bool                    isOriginal;
     
     
     
@@ -82,7 +86,7 @@ protected:
 public:
     // Birth and Death
     PolygonBody();
-    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal);
+    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin);
     
     ~PolygonBody();
     
@@ -100,19 +104,22 @@ public:
 //    b2Body*     getSmallBody(); // outline tracking body
     
     bool    getSelectState();
-    bool    isThereMBody();
+    bool    getIsThereMBody();
     bool    getIsAlive();
+    bool    getIsOriginal();
     
     vector<Frag*> *  getFrags();
     
     void    clearFrags();
     
     // Setter
+    void    setContact(bool cont);
     void    setSelectState(bool isSelect);
     void    setX(float posX);
     void    setY(float posY);
     void    setVertices(b2Vec2* vertices);
     void    setAudioLen(float len);
+    void    setContactColor(ofColor color);
     void    delMbody();
     void    pushForce(float x, float y);
         

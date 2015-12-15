@@ -64,7 +64,7 @@ void testApp::setup(){
         movie[i].setVolume(0.0f); // Mute sound of movie.
     }
 
-    movie[curMovie].play();
+//    movie[curMovie].play();
     
     
     // OPEN CV
@@ -90,7 +90,9 @@ void testApp::setup(){
     threshold[4] = TH_4;
     threshold[5] = TH_5;
     threshold[6] = TH_6;
-
+    threshold[7] = TH_7;
+    threshold[8] = TH_8;
+    threshold[9] = TH_9;
     
     // Box2D
     aforce = 0.3f;
@@ -113,7 +115,7 @@ void testApp::setup(){
     
 
     // Wall - box
-    int thickness = 10.f;
+    int thickness = 20.f;
     left = new Wall(iWorld, 0, ofGetHeight()/2, thickness, ofGetHeight());
     right = new Wall(iWorld, ofGetWidth(), ofGetHeight()/2, thickness, ofGetHeight());
     floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight(), ofGetWidth(), thickness);
@@ -136,9 +138,21 @@ void testApp::setup(){
     targetNum = 2;
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
+//    targetTimer = 0;
+    OriginDestroyed = true;
+    nextStageReady = false;
     
     PolygonBody* initDumy = new PolygonBody();
     tMan = new Tm(iWorld, initDumy, 1000); //1000 = 1 sec
+    
+//    originColor[0] = ofColor(100, 250, 100);
+//    originColor[1] = ofColor(200, 100, 200);
+//    originColor[2] = ofColor(100, 20, 100);
+//    originColor[3] = ofColor(10, 200, 10);
+//    originColor[4] = ofColor(100, 200, 100);
+//    originColor[5] = ofColor(10, 200, 100);
+//    originColor[6] = ofColor(240, 200, 250);
+//    originColor[7] = ofColor(10, 20, 100);
     
     
     // OSC
@@ -148,135 +162,134 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
     
-    // Box2D world update
-	float32 timeStep = 1.0f / 60.0f;
-	int32 velocityIterations = 6;
-	int32 positionIterations = 2;
-    iWorld->Step(timeStep, velocityIterations, positionIterations);
-    
-    // Polygon bodies update
-    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-//        (*iter)->getBody()->SetLinearVelocity(b2Vec2(1.f, 0));
-    }
-    
-    
-    // opencv update
-	ofBackground(200, 200, 200);
-    bool bNewFrame = false;
-
-
-
-    //cam
-    if (curMovie == 0) {
-        vidGrabber.update();
-        bNewFrame = vidGrabber.isFrameNew();
-    }else{
-        //movie
-        movie[curMovie].update();
-        bNewFrame = movie[curMovie].isFrameNew();
-    }
-
-    
-
-	if (bNewFrame){
-
-        // Resize allocated images.
-        colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
-        grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
-    
-        if (curMovie == 0){// For vidGrabber
-            vidGrabber.update();
-            colorImg.setFromPixels(vidGrabber.getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-        }else{// For vidPlayer
-            movie[curMovie].update();
-            colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-        }
-    
-        grayImage.setFromColorImage(colorImg);
-        grayImage.threshold(threshold[curMovie], inverting[curMovie]);
+    if(!inTitle){
+        // Box2D world update
+        float32 timeStep = 1.0f / 60.0f;
+        int32 velocityIterations = 6;
+        int32 positionIterations = 2;
+        iWorld->Step(timeStep, velocityIterations, positionIterations);
         
-        contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
-
-        blobsVec.clear(); //Init containers with clearing.
-        blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
-        cvBlobNum = blobsVec.size();
-        
-        
-
-        
-        
-    }
-    
-    
-    if(shotBallMade){
-        delete aBall;
-        shotBallMade = false;
-    }
-    
-    // OSC
-    oscRecv();
-    
-    if (isShot){
+        // Polygon bodies update
         for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-            if ( (*iter)->isThereMBody() ){
-                if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                    (*iter)->breakBody();
-                    cout << "hit!" << endl;
-                    bodyHit = true;
-//                    break;
+    //        (*iter)->getBody()->SetLinearVelocity(b2Vec2(1.f, 0));
+        }
+        
+        
+        // opencv update
+        ofBackground(200, 200, 200);
+        bool bNewFrame = false;
+
+
+
+        //cam
+        if (curMovie == 0) {
+            vidGrabber.update();
+            bNewFrame = vidGrabber.isFrameNew();
+        }else{
+            //movie
+            movie[curMovie].update();
+            bNewFrame = movie[curMovie].isFrameNew();
+        }
+
+        
+
+        if (bNewFrame){
+
+            // Resize allocated images.
+            colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
+            grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
+        
+            if (curMovie == 0){// For vidGrabber
+                vidGrabber.update();
+                colorImg.setFromPixels(vidGrabber.getPixels(), movRes[curMovie].x, movRes[curMovie].y);
+            }else{// For vidPlayer
+                movie[curMovie].update();
+                colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
+            }
+        
+            grayImage.setFromColorImage(colorImg);
+            grayImage.threshold(threshold[curMovie], inverting[curMovie]);
+            
+            contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
+
+            blobsVec.clear(); //Init containers with clearing.
+            blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
+            cvBlobNum = blobsVec.size();
+        }
+        
+        
+        if(shotBallMade){
+            delete aBall;
+            shotBallMade = false;
+        }
+        
+        // OSC
+        oscRecv();
+        
+        if (isShot){
+            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                if ( (*iter)->getIsThereMBody() ){
+                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                        (*iter)->breakBody();
+                        cout << "hit!" << endl;
+                        bodyHit = true;
+    //                    break;
+                    }
                 }
+            }
+            
+            if(!bodyHit){
+            
+                cout << "No hit!" << endl;
+                aBall = new Ball(iWorld, shot_X, shot_Y, true);
+                //                    balls.push_back(aBall);
+                shotBallMade = true;
             }
         }
         
-        if(!bodyHit){
-        
-            cout << "No hit!" << endl;
-            aBall = new Ball(iWorld, shot_X, shot_Y, true);
-            //                    balls.push_back(aBall);
-            shotBallMade = true;
+        if (isShot){
+            isShot = false;
+            bodyHit = false;
         }
-    }
-    
-    if (isShot){
-        isShot = false;
-        bodyHit = false;
-    }
-    
-    if (butPressed && curStage < STAGE_NUM){
-        nextStage(2000, true);
-
-    }
-    
-//    sendBlobsOSC();
-    
-    //Tm
-    if (tmOpen){
-    
-        PolygonBody* tBody = tMan->update();
         
-        if (tBody != NULL){
-            pBodies.push_back(tBody);
-            cout << "Pbody duplicated." << endl;
-        }else{
+        if (butPressed && curStage < STAGE_NUM){
+            nextStage(2000, true);
 
         }
         
-        if(tMan->isEnd()){
-//            cout << "stage end" << endl;
-//            nextStage(GUNTIME, true);
+    //    sendBlobsOSC();
+        
+        //Tm
+        if (tmOpen){
+        
+            PolygonBody* tBody = tMan->update();
             
+            if (tBody != NULL){
+                pBodies.push_back(tBody);
+                cout << "Pbody duplicated." << endl;
+            }else{
+
+            }
+
+            if(tMan->isEnd()){
+                cout << "Next stage ready" << endl;
+                nextStageReady = true;
+    //            cout << "stage end" << endl;
+    //            nextStage(GUNTIME, true);
+                
+            }
         }
     }
     
+
+
+
+
 }
-
-
-
 
 //--------------------------------------------------------------
 void testApp::draw(){
   
-
 
     ofBackground(255);
 //    ofBackground(0);
@@ -419,7 +432,7 @@ void testApp::draw(){
         ofPushStyle();
         ofSetHexColor(0x00ffaa);
         stringstream reportStr;
-        reportStr << "Mov : " << curMovie+1 << endl
+        reportStr << "Mov : " << curMovie << endl
         << "threshold " << threshold[curMovie] << " (press: +/-)" << endl
         << "press ' ' to invert" << endl
         << "num blobs found " << contourFinder.nBlobs << endl
@@ -463,26 +476,46 @@ void testApp::drawPolygonBodies(){
     
 //    cout << "num of pbodies: " << pBodies.size() << endl;
     
+    
     for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+        
+//        int contIdx = aWorld->getContactListener()->getCurContactPbodyIdx();
         bool pBodyIsAlive = (*iter)->getIsAlive();
         int pidx = (*iter)->getIndex();
+        bool pBodyIsOriginal = (*iter)->getIsOriginal();
         
 //        cout << "idx: " << pidx << " pBodyIsAlive: " << pBodyIsAlive << endl;
         
         if (!pBodyIsAlive) {
+
+            if(pBodyIsOriginal){
+                videoEnd(); // Tm enable after 300 frame
+                OriginDestroyed = true;
+            }
+            
             delete (*iter);
             oscSendIFF("/pbDest", pidx, -1, -1);
-            
             iter = pBodies.erase(iter);
-            cout << "pbodies size: " << pBodies.size() << endl;
-            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
+//            cout << "pbodies size: " << pBodies.size() << endl;
+//            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
             
         }else{
+            
+//            if (contIdx > -1){
+//                if (contIdx == (*iter)->getDupIdx()) {
+//                    (*iter)->setContact(true);
+//                }
+//            }else{
+//                (*iter)->setContact(false);
+//            }
+            
             (*iter)->renderAtBodyPosition();
             (*iter)->update();
-            if ( !(*iter)->isThereMBody()){
+            if ( !(*iter)->getIsThereMBody()){
                 oscSendI("/pbBrek", pidx);
             }
+            
+            
             iter++;
         }
     }
@@ -588,9 +621,12 @@ void testApp::makePolygonBody(int blobNum){
 void testApp::makeBodyAtCvPosition(){ //Make original
 
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
+//        aPbody->setContactColor(originColor[curStage]);
         
-        PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false);
+        PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false);
+//        aPbodyCopy->setContactColor(originColor[curStage]);
+        
         
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
@@ -598,11 +634,11 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 
         
         pBodies.push_back(aPbody);
-        cout << aPbody << endl;
-        cout << "pBody push_back" << endl;
+//        cout << aPbody << endl;
+//        cout << "pBody push_back" << endl;
         pBodiesOriginalCopy.push_back(*aPbodyCopy); // Make copy
-        cout << &aPbodyCopy << endl;
-        cout << "pBodyOriginalCopy push_back" << endl;        
+//        cout << &aPbodyCopy << endl;
+//        cout << "pBodyOriginalCopy push_back" << endl;
         pBodyIdx++;
     }
     
@@ -618,7 +654,7 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -628,7 +664,7 @@ void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
 void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -787,6 +823,27 @@ testApp::oscSendI(string addr, int i)
 
 
 //--------------------------------------------------------------
+
+void testApp::nextStage()
+{
+    cout << "NEXT stage" << endl;
+    tmOpen = false;
+    //            resetPolygonBody();
+    
+    if (curMovie < MOVNUM - 1){
+        curMovie++;
+        movie[curMovie].play();
+    }
+
+    if (curStage < STAGE_NUM){
+        curStage++;
+    }
+
+    movPlay = true;
+    drawBlob = true;
+}
+
+
 void testApp::nextStage(unsigned long long time, bool enable)
 {
     if (enable){
@@ -811,6 +868,28 @@ void testApp::nextStage(unsigned long long time, bool enable)
     }
 }
 
+
+
+void testApp::videoEnd()
+{
+    
+        movPlay = false;
+        drawBlob = false;
+        
+        if (curMovie != 0) movie[curMovie].stop();
+            
+}
+
+void testApp::tmEnable(int tNum)
+{
+    cout << "target enabled, curStage: " << curStage << endl;
+    tMan->setPbody(&pBodiesOriginalCopy[curStage]);
+    tMan->setDupNum(tNum);
+//    tMan->start();
+    tmOpen = true;
+}
+
+
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 
@@ -823,6 +902,8 @@ void testApp::keyPressed(int key){
 			break;
             
 		case '1':
+            inTitle = false;
+            movPlay = true;
             if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 1;
             movie[curMovie].play();
@@ -1031,7 +1112,7 @@ void testApp::keyPressed(int key){
             for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 bool isSelected = (*iter)->getSelectState();
                 
-                if (isSelected && (*iter)->isThereMBody()) {
+                if (isSelected && (*iter)->getIsThereMBody()) {
                     b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                     (*iter)->breakBody();
                     
@@ -1067,36 +1148,21 @@ void testApp::keyPressed(int key){
             break;
 
         case 'o':
-            cout << "o pressed(Original is killed)" << endl;
-
-            movPlay = false;
-            drawBlob = false;
-
-            if (curMovie != 0) movie[curMovie].stop();
+            if(OriginDestroyed){
+                tmEnable(5); // int target num
+                OriginDestroyed = false;
+//                nextStageReady = true;
+            }
             
-            tMan->setPbody(&pBodiesOriginalCopy[curStage]);
-            tMan->setDupNum(targetNum);
-            tMan->start();
-            tmOpen = true;
             break;
             
         case 'n': //next stage
-            cout << "NEXT stage" << endl;
-            
-//            delete &pBodiesOriginalCopy.be
-//            pBodiesOriginalCopy.erase(pBodiesOriginalCopy.begin());
-
-            tmOpen = false;
-            
-//            resetPolygonBody();
-
-            curMovie++;
-            movie[curMovie].play();
-            
-            curStage++;
-            
-            movPlay = true;
-            drawBlob = false;
+            if(nextStageReady){
+                nextStage();
+                nextStageReady = false;
+            }else{
+                cout << "When the shooting time end up, you can go next stage." << endl;
+            }
             
             break;
             
@@ -1149,6 +1215,7 @@ void testApp::mousePressed(int x, int y, int button){
                 printf("centroid X: %f / Y: %f\n",
                        blobsVec[i].centroid.x, blobsVec[i].centroid.y);
                 makePolygonBody(selBlobRect);
+                break;
             }
         }
         
@@ -1206,6 +1273,6 @@ void testApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){ 
+void testApp::dragEvent(ofDragInfo dragInfo){
 
 }

@@ -18,7 +18,7 @@ PolygonBody::PolygonBody()
 }
 
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal)
+PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin)
 {
     
 
@@ -31,6 +31,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     posY = yy;
     maxVertexCount = maxVCount;
     index = idx;
+    isOriginal = isOrigin;
 
     
     if (isReal){
@@ -45,6 +46,11 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         
         
         // Set Userdata
+//        if (isOriginal){
+//            pBodyUserData = (index * 100) + POLYGON_BODY;
+//        }else{
+//            pBodyUserData = (index * 10000) + (dupIndex * 100) + POLYGON_BODY;
+//        }
         pBodyUserData = POLYGON_BODY;
         smallBodyUserData = OT_BODY;
         
@@ -122,10 +128,10 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         
         // Set default status
         selected = true;
-        //defaultColor = ofColor(0, 200, 25);
-        defaultColor = ofColor(0, 200, 0);
-        selectedColor = ofColor(0, 200, 25);
-//        selectedColor = ofColor(0, 0, 20);
+        //contactedColor = ofColor(0, 200, 25);
+        contactedColor = ofColor(0, 200, 0);
+//        normalColor = ofColor(0, 200, 25);
+        normalColor = ofColor(0, 0, 20);
 
         outliner_rad = 5.f;
         
@@ -379,6 +385,12 @@ PolygonBody::getBreakArray()
 
 
 void
+PolygonBody::setContact(bool cont)
+{
+    isContacted = cont;
+}
+
+void
 PolygonBody::setSelectState(bool isSelected)
 {
     selected = isSelected;
@@ -392,7 +404,7 @@ PolygonBody::getSelectState()
 }
 
 bool
-PolygonBody::isThereMBody()
+PolygonBody::getIsThereMBody()
 {
     return isThereMbodybool;
 }
@@ -401,6 +413,12 @@ bool
 PolygonBody::getIsAlive()
 {
     return isAlive;
+}
+
+bool
+PolygonBody::getIsOriginal()
+{
+    return isOriginal;
 }
 
 
@@ -552,6 +570,13 @@ PolygonBody::setAudioLen(float len)
 
 
 void
+PolygonBody::setContactColor(ofColor color)
+{
+    contactedColor = color;
+}
+
+
+void
 PolygonBody::delMbody()
 {    
 //    mWorld->DestroyBody(mBody2);
@@ -624,11 +649,11 @@ PolygonBody::renderAtBodyPosition()
         ofPushStyle();
     //    ofSetColor(0, 200, 25); //Set Polygon body color
 
-        if (selected) {
-            ofSetColor(selectedColor);
-        }else{
-            ofSetColor(defaultColor);
-        }
+//        if (!isContacted) {
+            ofSetColor(normalColor);
+//        }else{
+//            ofSetColor(contactedColor);
+//        }
 
         ofPushMatrix();
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y)); //Must use for image moving.

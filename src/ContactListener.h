@@ -26,6 +26,8 @@ protected:
     // Pushing force of virtual bullet
 
     
+//    bool    pBODYcontactBOTTOM;
+//    int     curContactPbodyIdx;
     
 public:
     // Birth and Death
@@ -37,6 +39,10 @@ public:
     void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
     
+    
+    // Get
+//    bool    getPBODYcontactBOTTOM();
+//    int     getCurContactPbodyIdx();
     
     // osc
     void    oscSendII(string addr, int i, int j);

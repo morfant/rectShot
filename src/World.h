@@ -28,7 +28,7 @@ public:
     
     World();
     ~World();
-    
+        
     b2World*        getWorld();
 
 };

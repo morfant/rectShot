@@ -111,7 +111,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 
     
     // Duplicate pBody
-    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true);
+    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false);
     
     return aPbody;
 
@@ -146,7 +146,7 @@ Tm::update()
             
             return dupPbody(targetOrigin, dupPosX, dupPosY);
         }else{
-            
+            cout << "nn" << endl;
             return NULL; //Nothing is happened.
         }
 
@@ -156,7 +156,7 @@ Tm::update()
 bool
 Tm::isEnd()
 {
-    cout << dupNum << endl;
+//    cout << dupNum << endl;
     if(dupNum == 0){
         return true;
     }else{

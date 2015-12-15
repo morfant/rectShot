@@ -27,15 +27,17 @@
 enum {
     GUNTIME = 10000,
     STAGE_NUM = 7,
-    MOVNUM = 8, //Num of movie files + cam
-    TH_CAM = 100,
-    TH_1 = 100,
+    MOVNUM = 10, //Num of movie files + cam
+    TH_CAM = 100, //curMov = 0
+    TH_1 = 78, //curMov = 1
     TH_2 = 153,
     TH_3 = 100,
     TH_4 = 153,
     TH_5 = 100,
     TH_6 = 110,
     TH_7 = 144,
+    TH_8 = 110,
+    TH_9 = 104,
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
     kBLOBNUM = 4,
@@ -68,7 +70,11 @@ class testApp : public ofBaseApp{
         void oscSendMsg2(string addr, ofVec2f data);
     
         // Staging
+        void nextStage();
         void nextStage(unsigned long long time, bool enable);
+        void videoEnd();
+        void tmEnable(int tNum);
+        int targetTimer;
     
         // CV
         void sendBlobsOSC();
@@ -130,6 +136,9 @@ class testApp : public ofBaseApp{
     
     
     //Staging
+    
+//    ofColor     originColor[STAGE_NUM];
+    
     Tm*         tMan;
     bool        tmOpen;
     int         targetNum;
@@ -137,6 +146,8 @@ class testApp : public ofBaseApp{
     unsigned long long stageStartTime;
     ofImage     title;
     bool        inTitle;
+    bool        OriginDestroyed;
+    bool        nextStageReady;
 
     
     //Osc

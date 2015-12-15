@@ -83,8 +83,14 @@ ContactListener::BeginContact(b2Contact* contact)
                 break;
                 
                 
-            case 2: // Polygon body
+            case POLYGON_BODY: // Polygon body
             {
+                
+                int pBodyIdx = (int)userData_A/10000;
+                int dupIdx = ((int)userData_A%10000)/100;
+                
+//                curContactPbodyIdx = dupIdx;
+                
 //                printf("A, PB contact begin!\n");
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
@@ -98,7 +104,7 @@ ContactListener::BeginContact(b2Contact* contact)
                 }else if (otherIs == TOP){
                     //                    printf("Touch TOP end.\n");
                 }else if (otherIs == BOTTOM){
-                    //                    printf("Touch BOTTOM end.\n");
+//                    pBODYcontactBOTTOM = true;
                 }
                 
             }
@@ -231,7 +237,7 @@ ContactListener::BeginContact(b2Contact* contact)
             }
                 break;
                 
-            case 2: // Polygon body
+            case POLYGON_BODY: // Polygon body
             {
 //                printf("B, PB contact begin!\n");
                 
@@ -313,9 +319,6 @@ ContactListener::BeginContact(b2Contact* contact)
 void
 ContactListener::EndContact(b2Contact* contact)
 {
-    /* handle end event */
-//    printf("contact end!\n");
-    
     
 }
 
@@ -332,6 +335,18 @@ ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
     /* handle post-solve event */
     
 }
+
+//int
+//ContactListener::getCurContactPbodyIdx()
+//{
+//    return curContactPbodyIdx;
+//}
+//
+//bool
+//ContactListener::getPBODYcontactBOTTOM()
+//{
+//    return pBODYcontactBOTTOM;
+//}
 
 
 //osc
