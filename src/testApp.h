@@ -25,6 +25,9 @@
 
 // ---- Macros ----
 enum {
+    
+    ORIGINAL_DUP_IDX = 0,
+    COPY_DUP_IDX = 0,
     GUNTIME = 10000,
     STAGE_NUM = 7,
     MOVNUM = 10, //Num of movie files + cam
@@ -154,9 +157,11 @@ class testApp : public ofBaseApp{
     // OSC
     ofxOscSender            sender;
     ofxOscReceiver          receiver;
-    
+
+    void oscSendIIFF(string addr, int i, int j, float a, float b);
     void oscSendIFF(string addr, int i, float a, float b);
     void oscSendIF(string addr, int i, float a);
+    void oscSendII(string addr, int i, int j);
     void oscSendI(string addr, int i);    
     
     

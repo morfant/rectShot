@@ -54,6 +54,7 @@ protected:
     
     int     maxVertexCount; // maxVertexCount
     int     index;
+    int     dupIndex;
     
     // Color
     ofColor     contactedColor;
@@ -62,6 +63,7 @@ protected:
     // Select interface
     bool        selected;
     bool        isNewBorn;
+    bool        isBreaked;
     bool        isContacted;
     
     
@@ -87,7 +89,7 @@ protected:
 public:
     // Birth and Death
     PolygonBody();
-    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin);
+    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin, int dupIdx);
     
     ~PolygonBody();
     
@@ -96,6 +98,8 @@ public:
     float   getX();
     float   getY();
     int     getIndex();
+    int     getDupIndex();
+    bool    getIsBreaked();
     b2Vec2   getVertex(int i);
     b2Vec2*  getVertices();
     b2Vec2* getBreakArray();
@@ -123,6 +127,7 @@ public:
     void    setAudioLen(float len);
     void    setContactColor(ofColor color);
     void    setIsNewBorn(bool born);
+    void    setIsBreaked(bool isBreak);
     void    delMbody();
     void    pushForce(float x, float y);
         

@@ -18,7 +18,7 @@ PolygonBody::PolygonBody()
 }
 
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin)
+PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin, int dupIdx)
 {
     
 
@@ -31,7 +31,9 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     posY = yy;
     maxVertexCount = maxVCount;
     index = idx;
+    dupIndex = dupIdx;
     isOriginal = isOrigin;
+    isBreaked = false;
 
     
     if (isReal){
@@ -485,6 +487,19 @@ PolygonBody::getIndex()
 }
 
 
+int
+PolygonBody::getDupIndex()
+{
+    return dupIndex;
+}
+
+bool
+PolygonBody::getIsBreaked()
+{
+    return isBreaked;
+}
+
+
 
 b2Vec2
 PolygonBody::getVertex(int idx)
@@ -588,6 +603,13 @@ void
 PolygonBody::setIsNewBorn(bool born)
 {
     isNewBorn = born;
+}
+
+
+void
+PolygonBody::setIsBreaked(bool isBreak)
+{
+    isBreaked = isBreak;
 }
 
 

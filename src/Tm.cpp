@@ -84,7 +84,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
     
     // Get index
     int index = pbody->getIndex();
-//    cout << "index: " << index << endl;
+    cout << "in Tm dupPbody index: " << index << endl;
     
     
     // GET Centroid
@@ -111,7 +111,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 
     
     // Duplicate pBody
-    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false);
+    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false, dupNum);
     
     return aPbody;
 

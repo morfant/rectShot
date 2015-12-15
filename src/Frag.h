@@ -57,6 +57,7 @@ protected:
     unsigned long long  lifeLong;
     unsigned long long  age;
     bool                isAlive;
+    bool                isNewBorn;
 
 
     
@@ -71,6 +72,8 @@ public:
     float   getY();
     unsigned long long    getLifeLong();
     unsigned long long    getAge();
+    bool    getIsNewBorn();
+    int     getIndex();
     
     
     b2World*    getWorld();
@@ -81,6 +84,7 @@ public:
     void    setY(float posY);
     void    setLifeLong(unsigned long long life);
     void    setAge(unsigned long long age);
+    void    setIsNewBorn(bool born);
     void    makeb2Tri(b2Vec2 * vertices);
     float   perp_dot(ofVec2f a, ofVec2f b);
 

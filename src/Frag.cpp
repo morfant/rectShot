@@ -63,6 +63,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 //    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
 
 	
+    isNewBorn = true;
 }
 
 Frag::~Frag()
@@ -98,6 +99,19 @@ Frag::getAge()
     return age;
 }
 
+
+bool
+Frag::getIsNewBorn()
+{
+    return isNewBorn;
+}
+
+
+int
+Frag::getIndex()
+{
+    return index;
+}
 
 
 
@@ -141,7 +155,11 @@ Frag::setAge(unsigned long long _age)
 }
 
 
-
+void
+Frag::setIsNewBorn(bool born)
+{
+    isNewBorn = born;
+}
 
 //void
 //Frag::makeb2Tri(b2Vec2* vertices)

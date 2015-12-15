@@ -482,6 +482,7 @@ void testApp::drawPolygonBodies(){
 //        int contIdx = aWorld->getContactListener()->getCurContactPbodyIdx();
         bool pBodyIsAlive = (*iter)->getIsAlive();
         int pidx = (*iter)->getIndex();
+        int dupIdx = (*iter)->getDupIndex();
         bool pBodyIsOriginal = (*iter)->getIsOriginal();
         
 //        cout << "idx: " << pidx << " pBodyIsAlive: " << pBodyIsAlive << endl;
@@ -494,7 +495,7 @@ void testApp::drawPolygonBodies(){
             }
             
             delete (*iter);
-            oscSendIFF("/pbDest", pidx, -1, -1);
+            oscSendII("/pbDest", pidx, dupIdx);
             iter = pBodies.erase(iter);
 //            cout << "pbodies size: " << pBodies.size() << endl;
 //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
@@ -511,16 +512,37 @@ void testApp::drawPolygonBodies(){
             if(!pBodyIsOriginal){
                 bool pbIsBorn = (*iter)->getIsNewBorn();
                 if(pbIsBorn){
-                    oscSendIFF("/pbBorn", pBodyIdx, cvBlobPos.x, cvBlobPos.y);
+                    oscSendIIFF("/pbBorn", pidx, dupIdx, cvBlobPos.x, cvBlobPos.y);
                     (*iter)->setIsNewBorn(false);
                 }
             }
 
             (*iter)->renderAtBodyPosition();
             (*iter)->update();
-            if ( !(*iter)->getIsThereMBody()){
-                cout << "pidx: " << pidx << "breaked" << endl;
-                oscSendI("/pbBrek", pidx);
+            if ( !(*iter)->getIsThereMBody() && !(*iter)->getIsBreaked()){
+//                cout << "pidx: " << pidx << " dupIdx: "<< dupIdx << " is breaked and disappearing" << endl;
+                oscSendII("/pbBrek", pidx, dupIdx);
+                (*iter)->setIsBreaked(true);
+                
+                vector<Frag*>frags = *(*iter)->getFrags();
+//                cout << "frags size: " << frags.size() << endl;
+                
+                
+                for (vector<Frag*>::iterator jter = frags.begin(); jter != frags.end(); jter++){
+                    
+                    bool fragIsBorn = (*jter)->getIsNewBorn();
+                    
+                    if(fragIsBorn){
+                        int fragIdx = (*jter)->getIndex();
+                        cout << "fragidx: " << fragIdx << endl;
+                        oscSendII("/fgBorn", pidx, fragIdx);
+                        (*jter)->setIsNewBorn(false);
+                    }
+                
+                }
+                
+                
+                
             }
             
             
@@ -629,15 +651,15 @@ void testApp::makePolygonBody(int blobNum){
 void testApp::makeBodyAtCvPosition(){ //Make original
 
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
 //        aPbody->setContactColor(originColor[curStage]);
         
-        PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false);
+        PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false, COPY_DUP_IDX);
 //        aPbodyCopy->setContactColor(originColor[curStage]);
         
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
-        oscSendIFF("/pbBorn", pBodyIdx, cvBlobPos.x, cvBlobPos.y);
+        oscSendIIFF("/pbBorn", pBodyIdx, ORIGINAL_DUP_IDX, cvBlobPos.x, cvBlobPos.y);
 
         
         pBodies.push_back(aPbody);
@@ -661,7 +683,7 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -671,7 +693,7 @@ void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
 void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true);
+        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -798,6 +820,19 @@ void testApp::oscRecv()
 }
 
 void
+testApp::oscSendIIFF(string addr, int i, int j, float a, float b)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addIntArg(j);
+    m.addFloatArg(a);
+    m.addFloatArg(b);
+    sender.sendMessage(m);
+}
+
+
+void
 testApp::oscSendIFF(string addr, int i, float a, float b)
 {
     ofxOscMessage m;
@@ -818,6 +853,18 @@ testApp::oscSendIF(string addr, int i, float a)
     m.addFloatArg(a);
     sender.sendMessage(m);
 }
+
+
+void
+testApp::oscSendII(string addr, int i, int j)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addIntArg(i);
+    m.addIntArg(j);
+    sender.sendMessage(m);
+}
+
 
 void
 testApp::oscSendI(string addr, int i)
