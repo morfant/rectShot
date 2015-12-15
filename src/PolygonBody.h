@@ -61,6 +61,7 @@ protected:
     
     // Select interface
     bool        selected;
+    bool        isNewBorn;
     bool        isContacted;
     
     
@@ -107,6 +108,7 @@ public:
     bool    getIsThereMBody();
     bool    getIsAlive();
     bool    getIsOriginal();
+    bool    getIsNewBorn();
     
     vector<Frag*> *  getFrags();
     
@@ -120,6 +122,7 @@ public:
     void    setVertices(b2Vec2* vertices);
     void    setAudioLen(float len);
     void    setContactColor(ofColor color);
+    void    setIsNewBorn(bool born);
     void    delMbody();
     void    pushForce(float x, float y);
         

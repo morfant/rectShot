@@ -146,7 +146,7 @@ Tm::update()
             
             return dupPbody(targetOrigin, dupPosX, dupPosY);
         }else{
-            cout << "nn" << endl;
+//            cout << "nn" << endl;
             return NULL; //Nothing is happened.
         }
 

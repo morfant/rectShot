@@ -486,7 +486,7 @@ void testApp::drawPolygonBodies(){
         
 //        cout << "idx: " << pidx << " pBodyIsAlive: " << pBodyIsAlive << endl;
         
-        if (!pBodyIsAlive) {
+        if (!pBodyIsAlive) { // When dying
 
             if(pBodyIsOriginal){
                 videoEnd(); // Tm enable after 300 frame
@@ -499,7 +499,7 @@ void testApp::drawPolygonBodies(){
 //            cout << "pbodies size: " << pBodies.size() << endl;
 //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
             
-        }else{
+        }else{ // When living
             
 //            if (contIdx > -1){
 //                if (contIdx == (*iter)->getDupIdx()) {
@@ -508,10 +508,18 @@ void testApp::drawPolygonBodies(){
 //            }else{
 //                (*iter)->setContact(false);
 //            }
-            
+            if(!pBodyIsOriginal){
+                bool pbIsBorn = (*iter)->getIsNewBorn();
+                if(pbIsBorn){
+                    oscSendIFF("/pbBorn", pBodyIdx, cvBlobPos.x, cvBlobPos.y);
+                    (*iter)->setIsNewBorn(false);
+                }
+            }
+
             (*iter)->renderAtBodyPosition();
             (*iter)->update();
             if ( !(*iter)->getIsThereMBody()){
+                cout << "pidx: " << pidx << "breaked" << endl;
                 oscSendI("/pbBrek", pidx);
             }
             
@@ -626,7 +634,6 @@ void testApp::makeBodyAtCvPosition(){ //Make original
         
         PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false);
 //        aPbodyCopy->setContactColor(originColor[curStage]);
-        
         
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         

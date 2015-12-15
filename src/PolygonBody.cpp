@@ -161,6 +161,8 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         
     //    cout << "count: " <<mWorld->GetBodyCount() << endl;
     //    cout << "list: " << mWorld->GetBodyList() << endl;
+        
+        isNewBorn = true;
     }
 	
 }
@@ -422,6 +424,13 @@ PolygonBody::getIsOriginal()
 }
 
 
+bool
+PolygonBody::getIsNewBorn()
+{
+    return isNewBorn;
+}
+
+
 vector<Frag*> *
 PolygonBody::getFrags()
 {
@@ -573,6 +582,12 @@ void
 PolygonBody::setContactColor(ofColor color)
 {
     contactedColor = color;
+}
+
+void
+PolygonBody::setIsNewBorn(bool born)
+{
+    isNewBorn = born;
 }
 
 
