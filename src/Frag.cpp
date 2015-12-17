@@ -401,7 +401,6 @@ Frag::update()
 {
     if(isContactSelf()){
         outlineDraw = true;
-//        beOld();
         
     }else{
         outlineDraw = false;

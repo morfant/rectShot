@@ -142,7 +142,7 @@ void testApp::setup(){
     
     //Tm
     tmOpen = false;
-    targetNum = 30;
+    targetNum = 10;
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
 //    targetTimer = 0;
@@ -256,27 +256,24 @@ void testApp::update(){
         oscRecv();
         
         if (isShot){
-
-            if (!firstShotCheck(curStage)){
             
-                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                    if ( (*iter)->getIsThereMBody() ){
-                        if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                            (*iter)->breakBody();
-                            cout << "hit!" << endl;
-                            bodyHit = true;
-        //                    break;
-                        }
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                if ( (*iter)->getIsThereMBody() ){
+                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                        (*iter)->breakBody();
+                        cout << "hit!" << endl;
+                        bodyHit = true;
+    //                    break;
                     }
                 }
-                
-                if(!bodyHit){
-                
-                    cout << "No hit!" << endl;
-                    aBall = new Ball(iWorld, shot_X, shot_Y, true);
-                    //                    balls.push_back(aBall);
-                    shotBallMade = true;
-                }
+            }
+            
+            if(!bodyHit){
+            
+                cout << "No hit!" << endl;
+                aBall = new Ball(iWorld, shot_X, shot_Y, true);
+                //                    balls.push_back(aBall);
+                shotBallMade = true;
             }
         }
         
@@ -536,8 +533,7 @@ void testApp::drawPolygonBodies(){
         if (!pBodyIsAlive) { // When dying
 
             if(pBodyIsOriginal){
-                
-                videoEnd(); // Tm enable after 300 frame
+                videoEnd();
                 OriginDestroyed = true;
                 
             }
@@ -626,19 +622,21 @@ void testApp::makeFaceAt(float x, float y)
 }
 
 
-bool testApp::firstShotCheck(int curStage)
+void testApp::firstShotCheck(int curStage)
 {
-    if (isFirstShot[curStage] == false){
+    if (isFirstShot[curStage]) {
         cout << "first shot! of " << curStage << " !!" << endl;
 
+        movie[curMovie].setVolume(0.0f); // Mute sound of movie.
+        
+                
         shot_X = bornPoint[curStage].x;
         shot_Y = bornPoint[curStage].y;
         
         makeFaceAt(shot_X, shot_Y);
-        isFirstShot[curStage] = true;
-        return true;
+        
+        
     }
-    
 }
 
 void testApp::sendBlobsOSC()
@@ -894,7 +892,14 @@ void testApp::oscRecv()
             
             
             
-		}else if(m.getAddress() == "/button"){
+		}else if(m.getAddress() == "/firstShot"){
+            
+            if (!isFirstShot[curStage]){
+                isFirstShot[curStage] = true;
+                firstShotCheck(curStage);
+            }
+
+        }else if(m.getAddress() == "/button"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg) butPressed = true;
             
@@ -1045,7 +1050,6 @@ void testApp::videoEnd()
     movPlay = false;
     drawBlob = true;
     
-    movie[curMovie].setVolume(0.0f); // Mute sound of movie.
     
     if (!curMoviePlaying){
         curMoviePlaying = true;

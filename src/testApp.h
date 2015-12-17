@@ -81,7 +81,7 @@ class testApp : public ofBaseApp{
         // CV
         void sendBlobsOSC();
         void makeFaceAt(float x, float y);
-        bool firstShotCheck(int curStage);
+        void firstShotCheck(int curStage);
     
         //Box2d
         void makeFaces(int blobNum);
