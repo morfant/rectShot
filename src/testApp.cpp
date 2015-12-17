@@ -328,7 +328,8 @@ void testApp::draw(){
         movPlay = false;
         drawBlob = false;
         grayPlay = false;
-        title.draw(0, 0);
+        
+        title.draw(ofGetWidth()/2.f - title.width/2.f, ofGetHeight()/2.f-title.height/2.f);
     }
     
     
