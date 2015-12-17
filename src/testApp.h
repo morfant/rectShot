@@ -9,6 +9,8 @@
 // ---- Preprocessor command ----
 #pragma once
 
+#define REALTIME 1
+
 // ---- Headers ----
 #include <iostream>
 #include <fstream>
@@ -35,10 +37,10 @@ enum {
     MOVNUM = 6, //Num of movie files + cam
     TH_CAM = 100, //curMov = 0
     TH_1 = 94, //aya
-    TH_2 = 103,
-    TH_3 = 100,
-    TH_4 = 113,
-    TH_5 = 111,
+    TH_2 = 103, //han
+    TH_3 = 100, //sewol
+    TH_4 = 113, //park
+    TH_5 = 111, //me
 
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
@@ -65,23 +67,10 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-
-        // OSC
-        void oscRecv();
-        void oscSendMsg(string addr, float data);
-        void oscSendMsg2(string addr, ofVec2f data);
-    
-        // Staging
-        void nextStage();
-        void nextStage(unsigned long long time, bool enable);
-        void videoEnd();
-        void tmEnable(int tNum);
-        int targetTimer;
     
         // CV
         void sendBlobsOSC();
         void makeFaceAt(float x, float y);
-        void firstShotCheck(int curStage);
     
         //Box2d
         void makeFaces(int blobNum);
@@ -91,118 +80,113 @@ class testApp : public ofBaseApp{
         void makeBodyAtCvPosition(b2Vec2* vertices);
         void makeBodyAtCvPosition(vector<b2Vec2> vertices);
     
-    void dupPbody(Faces* pb, float x, float y);
-    
+        //UTIL
         float getArea(b2Vec2* vertices, int maxVCount);    
     
-        //cam
-        ofVideoGrabber 		vidGrabber;
     
-        //video
+        // OSC
+        void oscRecv();
+        void oscSendIIFF(string addr, int i, int j, float a, float b);
+        void oscSendIFF(string addr, int i, float a, float b);
+        void oscSendIF(string addr, int i, float a);
+        void oscSendII(string addr, int i, int j);
+        void oscSendI(string addr, int i);
+    
+    
+        // Staging
+        void nextStage();
+        void nextStage(unsigned long long time, bool enable);
+        void videoEnd();
+        void tmEnable(int tNum);
+        void firstShotCheck(int curStage);
+    
+        // UI
+        void touchingCheck();
+    
+    
+    
+    
+        /*--------------------VARIABLE--------------------*/
+        //MOVIE, VIDEO
+        ofVideoGrabber 		vidGrabber;
         ofVideoPlayer 		movie[MOVNUM];
         ofVec2f             movRes[MOVNUM];
-        bool                camUse;
         int                 curMovie;
-        int                 preMovie;
-        bool                frameByframe;
-        bool                movPlay;
-        bool                grayPlay;
-        bool                movPlaySmall;
+        float               movDrawPosX, movDrawPosY;
+        bool                movShow, grayShow, blobShow;
         bool                curMoviePlaying;
         bool                info;
-    
-        float               movX, movY;
-    
-    
-        //blob
-        ofxCvColorImage			colorImg;
-        ofxCvGrayscaleImage 	grayImage;
-		ofxCvGrayscaleImage 	grayBg;
-		ofxCvGrayscaleImage 	grayDiff;
-        ofxCvContourFinder      contourFinder;
 
+    
+        //CV
+        ofxCvColorImage			colorImg;
+        ofxCvGrayscaleImage 	grayImage, grayBg, grayDiff;
+        ofxCvContourFinder      contourFinder;
 		int                     threshold[MOVNUM];
         bool                    inverting[MOVNUM];
-        bool                    drawBlob;
+        ofPoint                 cvBlobPos;
+        ofRectangle             cvBlobRect;
+        int                     cvBlobNum;
+        int                     selBlobRect;
+    
     
     
         //Box2d
         World*                  aWorld;
         b2World*                iWorld; //aWorld -> getWorld()
-        Ball*                   aBall;
-        ofVec2f                 tVec;
         Wall                    *left, *right, *floor, *ceil;
         Box*                    aBox;
-    
+        Ball*                   aBall;
         int                     pBodyIdx;
-    
         bool                    touched;
-        bool    isFirstShot[STAGE_NUM];
-        ofPoint bornPoint[STAGE_NUM];
     
     
-    //Staging
+        //TARGET MAKER
+        ofColor     pBodyOutlineColor[STAGE_NUM];
+        Tm*         tMan;
+        bool        tmOpen;
+        int         targetNum;
+        int         curStage;
+        unsigned long long stageStartTime;
+        ofImage     title;
+        bool        inTitle;
+        bool        OriginDestroyed;
+        bool        nextStageReady;
+        bool                    bodyHit;
+        bool                    shotBallMade;
+        bool                    isShot;
+        float                   shot_X;
+        float                   shot_Y;
+        bool                    butPressed;
+        int                     butMsg;
     
-//    ofColor     originColor[STAGE_NUM];
-    ofColor     pBodyOutlineColor[STAGE_NUM];    
-    
-    Tm*         tMan;
-    bool        tmOpen;
-    int         targetNum;
-    int         curStage;
-    unsigned long long stageStartTime;
-    ofImage     title;
-    bool        inPreparing;
-    bool        inTitle;
-    bool        OriginDestroyed;
-    bool        nextStageReady;
-
-    
-    //Osc
-    // OSC
-    ofxOscSender            sender;
-    ofxOscReceiver          receiver;
-
-    void oscSendIIFF(string addr, int i, int j, float a, float b);
-    void oscSendIFF(string addr, int i, float a, float b);
-    void oscSendIF(string addr, int i, float a);
-    void oscSendII(string addr, int i, int j);
-    void oscSendI(string addr, int i);    
+        //STAGING
+        bool        isFirstShot[STAGE_NUM];
+        ofPoint     bornPoint[STAGE_NUM];
+        bool        shotPointTest;
     
     
     
-    bool                    bodyHit;
-    bool                    shotBallMade;
-    bool                    isShot;
-    float                     shot_X;
-    float                     shot_Y;
-    bool                    butPressed;
-    int                     butMsg;
+        //OSC
+        ofxOscSender            sender;
+        ofxOscReceiver          receiver;
 
     
         // container
-    ofPoint cvBlobPos;
-    ofRectangle cvBlobRect;
-    int cvBlobNum;
-    int selBlobRect;
+        Faces       pBodiesOriginalCopy[STAGE_NUM];
         vector<Ball*>           balls;
         vector<Box*>            boxes;
-        vector<Faces*>    pBodies;
-        Faces       pBodiesOriginalCopy[STAGE_NUM];
-//        vector<Faces>     pBodiesOriginalCopy;
-    
+        vector<Faces*>          pBodies;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;
         vector<ofVec2f>         blobCenterPos;
-    
         vector<b2Vec2>          blobsPtsDiv;
     
         float                   divNum;
         float                   aforce;
 
     
-    // Tracking
-    bool        shotPointTest;
+    
     
 };
 
