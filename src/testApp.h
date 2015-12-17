@@ -10,6 +10,8 @@
 #pragma once
 
 // ---- Headers ----
+#include <iostream>
+#include <fstream>
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "World.h"
@@ -29,22 +31,19 @@ enum {
     ORIGINAL_DUP_IDX = 0,
     COPY_DUP_IDX = 0,
     GUNTIME = 10000,
-    STAGE_NUM = 7,
-    MOVNUM = 10, //Num of movie files + cam
+    STAGE_NUM = 6,
+    MOVNUM = 6, //Num of movie files + cam
     TH_CAM = 100, //curMov = 0
-    TH_1 = 78, //curMov = 1
+    TH_1 = 94, //aya
     TH_2 = 103,
     TH_3 = 100,
-    TH_4 = 153,
-    TH_5 = 100,
-    TH_6 = 110,
-    TH_7 = 144,
-    TH_8 = 110,
-    TH_9 = 104,
+    TH_4 = 113,
+    TH_5 = 111,
+
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
     kBLOBNUM = 4,
-    kMIN_BLOBAREA = 100
+    kMIN_BLOBAREA = 150
 };
 
 
@@ -81,6 +80,8 @@ class testApp : public ofBaseApp{
     
         // CV
         void sendBlobsOSC();
+        void makeFaceAt(float x, float y);
+        bool firstShotCheck(int curStage);
     
         //Box2d
         void makeFaces(int blobNum);
@@ -107,7 +108,7 @@ class testApp : public ofBaseApp{
         bool                movPlay;
         bool                grayPlay;
         bool                movPlaySmall;
-    
+        bool                curMoviePlaying;
         bool                info;
     
         float               movX, movY;
@@ -136,6 +137,8 @@ class testApp : public ofBaseApp{
         int                     pBodyIdx;
     
         bool                    touched;
+        bool    isFirstShot[STAGE_NUM];
+        ofPoint bornPoint[STAGE_NUM];
     
     
     //Staging
@@ -149,6 +152,7 @@ class testApp : public ofBaseApp{
     int         curStage;
     unsigned long long stageStartTime;
     ofImage     title;
+    bool        inPreparing;
     bool        inTitle;
     bool        OriginDestroyed;
     bool        nextStageReady;
@@ -184,7 +188,9 @@ class testApp : public ofBaseApp{
         vector<Ball*>           balls;
         vector<Box*>            boxes;
         vector<Faces*>    pBodies;
-        vector<Faces>     pBodiesOriginalCopy;
+        Faces       pBodiesOriginalCopy[STAGE_NUM];
+//        vector<Faces>     pBodiesOriginalCopy;
+    
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;
         vector<ofVec2f>         blobCenterPos;
@@ -197,6 +203,6 @@ class testApp : public ofBaseApp{
     
     // Tracking
     bool        shotPointTest;
-
+    
 };
 

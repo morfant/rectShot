@@ -3,8 +3,12 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    
+    
+    
     ofSetFrameRate(60.f);
     title.loadImage("img/lonewolf_title.jpg");
+    inPreparing = true;
     inTitle = true;
 
     
@@ -23,10 +27,11 @@ void testApp::setup(){
     
     camUse = false;
 	frameByframe = false;
-    movPlay = false;
-    movPlaySmall = false;
+    curMoviePlaying = true;
     info = true;
-    grayPlay = true;
+    
+    movPlay = true;
+    grayPlay = false;
     drawBlob = true;
     
     pBodyIdx = 0;
@@ -44,13 +49,13 @@ void testApp::setup(){
     curMovie = 1; // 0 means using vidGrabber.
     
 //    movie[1].loadMovie("movies/aya.mov");
-    movie[1].loadMovie("movies/park.mov");
-    movie[2].loadMovie("movies/aya2.mov");
-    movie[3].loadMovie("movies/aya3.mov");
-    movie[4].loadMovie("movies/ayaVater.mov");
-    movie[5].loadMovie("movies/ayaundsister.mov");
-    movie[6].loadMovie("movies/test.mov");
-    movie[7].loadMovie("movies/pp.mov");
+    movie[1].loadMovie("movies/ayaSum.mov");
+    movie[2].loadMovie("movies/han480.mov");
+    movie[3].loadMovie("movies/sewol2.mov");
+    movie[4].loadMovie("movies/pp480.mov");
+    movie[5].loadMovie("movies/i.mov");
+//    movie[6].loadMovie("movies/test.mov");
+//    movie[7].loadMovie("movies/pp.mov");
     
     
     movX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
@@ -63,10 +68,10 @@ void testApp::setup(){
     for (int i = 1; i < MOVNUM; i++){
         movRes[i].x = movie[i].getWidth();
         movRes[i].y = movie[i].getHeight();
-        movie[i].setVolume(0.0f); // Mute sound of movie.
+//        movie[i].setVolume(0.0f); // Mute sound of movie.
     }
 
-//    movie[curMovie].play();
+    movie[curMovie].stop();
     
     
     // OPEN CV
@@ -91,10 +96,10 @@ void testApp::setup(){
     threshold[3] = TH_3;
     threshold[4] = TH_4;
     threshold[5] = TH_5;
-    threshold[6] = TH_6;
-    threshold[7] = TH_7;
-    threshold[8] = TH_8;
-    threshold[9] = TH_9;
+//    threshold[6] = TH_6;
+//    threshold[7] = TH_7;
+//    threshold[8] = TH_8;
+//    threshold[9] = TH_9;
     
     // Box2D
     aforce = 0.3f;
@@ -161,6 +166,20 @@ void testApp::setup(){
     pBodyOutlineColor[2] = ofColor(200, 250, 10);
     pBodyOutlineColor[3] = ofColor(100, 250, 200);
     pBodyOutlineColor[4] = ofColor(0, 200, 10);
+    
+    isFirstShot[0] = false;
+    isFirstShot[1] = false;
+    isFirstShot[2] = false;
+    isFirstShot[3] = false;
+    isFirstShot[4] = false;
+    isFirstShot[5] = false;
+    
+    bornPoint[0] = ofPoint(630, 397);
+    bornPoint[1] = ofPoint(580, 431);
+    bornPoint[2] = ofPoint(554, 449);
+    bornPoint[3] = ofPoint(472, 552);
+    bornPoint[4] = ofPoint(629, 348);
+    bornPoint[5] = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
     
     
     // OSC
@@ -237,23 +256,27 @@ void testApp::update(){
         oscRecv();
         
         if (isShot){
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                if ( (*iter)->getIsThereMBody() ){
-                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                        (*iter)->breakBody();
-                        cout << "hit!" << endl;
-                        bodyHit = true;
-    //                    break;
+
+            if (!firstShotCheck(curStage)){
+            
+                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                    if ( (*iter)->getIsThereMBody() ){
+                        if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                            (*iter)->breakBody();
+                            cout << "hit!" << endl;
+                            bodyHit = true;
+        //                    break;
+                        }
                     }
                 }
-            }
-            
-            if(!bodyHit){
-            
-                cout << "No hit!" << endl;
-                aBall = new Ball(iWorld, shot_X, shot_Y, true);
-                //                    balls.push_back(aBall);
-                shotBallMade = true;
+                
+                if(!bodyHit){
+                
+                    cout << "No hit!" << endl;
+                    aBall = new Ball(iWorld, shot_X, shot_Y, true);
+                    //                    balls.push_back(aBall);
+                    shotBallMade = true;
+                }
             }
         }
         
@@ -442,7 +465,7 @@ void testApp::draw(){
         ofSetColor(255, 0, 0);
         ofFill();
         ofPushMatrix();
-        ofTranslate((shot_X/640.f)*ofGetWidth(), (shot_Y/480.f)*ofGetHeight());
+        ofTranslate(shot_X, shot_Y);
         ofEllipse(0, 0, 50, 50);
         ofPopMatrix();
         ofPopStyle();
@@ -513,8 +536,10 @@ void testApp::drawPolygonBodies(){
         if (!pBodyIsAlive) { // When dying
 
             if(pBodyIsOriginal){
+                
                 videoEnd(); // Tm enable after 300 frame
                 OriginDestroyed = true;
+                
             }
             
             delete (*iter);
@@ -574,6 +599,45 @@ void testApp::drawPolygonBodies(){
     }
 
     
+    
+}
+
+
+void testApp::makeFaceAt(float x, float y)
+{
+    for (int i = 0; i < cvBlobNum; i++){
+        
+        // Translate real boundingrect not just drawing.
+        ofRectangle tBoundingRect;
+        tBoundingRect.x = blobsVec[i].boundingRect.x + movX;
+        tBoundingRect.y = blobsVec[i].boundingRect.y + movY;
+        tBoundingRect.width = blobsVec[i].boundingRect.width;
+        tBoundingRect.height = blobsVec[i].boundingRect.height;
+        
+        if (tBoundingRect.inside(x, y)){
+            selBlobRect = i + 1;
+            printf("Selected blob rect number: %d\n", selBlobRect);
+            printf("centroid X: %f / Y: %f\n",
+                   blobsVec[i].centroid.x, blobsVec[i].centroid.y);
+            makeFaces(selBlobRect);
+            break;
+        }
+    }
+}
+
+
+bool testApp::firstShotCheck(int curStage)
+{
+    if (isFirstShot[curStage] == false){
+        cout << "first shot! of " << curStage << " !!" << endl;
+
+        shot_X = bornPoint[curStage].x;
+        shot_Y = bornPoint[curStage].y;
+        
+        makeFaceAt(shot_X, shot_Y);
+        isFirstShot[curStage] = true;
+        return true;
+    }
     
 }
 
@@ -688,9 +752,27 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 
         
         pBodies.push_back(aPbody);
+        
+        
 //        cout << aPbody << endl;
 //        cout << "pBody push_back" << endl;
-        pBodiesOriginalCopy.push_back(*aPbodyCopy); // Make copy
+//        pBodiesOriginalCopy.push_back(*aPbodyCopy); // Make copy
+//        pBodiesOriginalCopy.insert(pBodiesOriginalCopy.begin()+curStage, *aPbodyCopy); //Make copy
+
+//        for (vector<Faces>::iterator iter = pBodiesOriginalCopy.begin(); iter != pBodiesOriginalCopy.end(); iter++) {
+//            cout << (*iter).getX() << " / " << (*iter).getY() << endl;
+//        }
+        
+        pBodiesOriginalCopy[curStage] = *aPbodyCopy;
+        
+        for (int i = 0; i < STAGE_NUM; i++) {
+         cout << pBodiesOriginalCopy[i].getX() << " / " << pBodiesOriginalCopy[i].getY() << endl;
+        }
+
+
+
+        
+        
 //        cout << &aPbodyCopy << endl;
 //        cout << "pBodyOriginalCopy push_back" << endl;
         pBodyIdx++;
@@ -801,6 +883,9 @@ void testApp::oscRecv()
             isShot = true;
 			shot_X = m.getArgAsInt32(0);
 			shot_Y = m.getArgAsInt32(1);
+            
+            shot_X = (shot_X/640.f)*ofGetWidth();
+            shot_Y = (shot_Y/480.f)*ofGetHeight();
             
             cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
             
@@ -957,10 +1042,14 @@ void testApp::nextStage(unsigned long long time, bool enable)
 void testApp::videoEnd()
 {
     
-        movPlay = false;
-        drawBlob = false;
-        
-        if (curMovie != 0) movie[curMovie].stop();
+    movPlay = false;
+    drawBlob = true;
+    
+    movie[curMovie].setVolume(0.0f); // Mute sound of movie.
+    
+    if (!curMoviePlaying){
+        curMoviePlaying = true;
+    }
             
 }
 
@@ -987,8 +1076,9 @@ void testApp::keyPressed(int key){
             
 		case '1':
             inTitle = false;
-            grayPlay = true;
-            movPlay = false;
+            grayPlay = false;
+            movPlay = true;
+            
             if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 1;
             movie[curMovie].play();
@@ -1192,6 +1282,34 @@ void testApp::keyPressed(int key){
         case OF_KEY_DOWN:
             aforce = aforce - 0.05f;
             break;
+
+        case OF_KEY_LEFT:
+            if (curStage > 0) {
+                curStage--;
+                cout << "curStage: " << curStage << endl;
+            }
+            
+            if (curMovie > 0) {
+                curMovie--;
+                cout << "curMovie: " << curMovie << endl;
+            }
+            
+            break;
+
+        case OF_KEY_RIGHT:
+            if (curStage < STAGE_NUM) {
+                curStage++;
+                cout << "curStage: " << curStage << endl;
+            }
+            
+            if (curMovie < STAGE_NUM) {
+                curMovie++;
+                cout << "curMovie: " << curMovie << endl;
+            }
+            
+            break;
+            
+            
             
         case 'h': //simulaton 'h'itting body
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
@@ -1209,10 +1327,10 @@ void testApp::keyPressed(int key){
             
             break;
             
-        case OF_KEY_LEFT:
-            cout << "count: " << iWorld->GetBodyCount() << endl;
-            cout << "list: " << iWorld->GetBodyList() << endl;
-            break;
+//        case OF_KEY_LEFT:
+//            cout << "count: " << iWorld->GetBodyCount() << endl;
+//            cout << "list: " << iWorld->GetBodyList() << endl;
+//            break;
 
         case 'd':
 //            cout << "d pressde" << endl;
@@ -1250,6 +1368,25 @@ void testApp::keyPressed(int key){
             }
             
             break;
+
+        case 's': //video stop
+            if (curMoviePlaying){
+                movie[curMovie].stop();
+                curMoviePlaying = false;
+            }else{
+                movie[curMovie].play();
+                curMoviePlaying = true;
+            }
+            break;
+            
+        case 'z':
+
+            for (int i = 0; i < STAGE_NUM; i++) {
+                cout << pBodiesOriginalCopy[i].getX() << " / " << pBodiesOriginalCopy[i].getY() << "current frame: " << movie[i].getCurrentFrame() << endl;
+                
+            }
+            break;
+
             
 	}
 }
@@ -1285,27 +1422,12 @@ void testApp::mouseDragged(int x, int y, int button){
 void testApp::mousePressed(int x, int y, int button){
     
     if (button == 0){
-        for (int i = 0; i < cvBlobNum; i++){
-            
-            // Translate real boundingrect not just drawing.
-            ofRectangle tBoundingRect;
-            tBoundingRect.x = blobsVec[i].boundingRect.x + movX;
-            tBoundingRect.y = blobsVec[i].boundingRect.y + movY;
-            tBoundingRect.width = blobsVec[i].boundingRect.width;
-            tBoundingRect.height = blobsVec[i].boundingRect.height;
-            
-            if (tBoundingRect.inside(x, y)){
-                selBlobRect = i + 1;
-                printf("Selected blob rect number: %d\n", selBlobRect);
-                printf("centroid X: %f / Y: %f\n",
-                       blobsVec[i].centroid.x, blobsVec[i].centroid.y);
-                makeFaces(selBlobRect);
-                break;
-            }
-        }
-        
+        makeFaceAt(x, y);
+        cout << "makefaceat x: " << x << " / y: " << y << endl;
         selBlobRect = 0;
+    }
         
+    
     //    printf("Num of pbodies: %lu\n", pBodies.size());
         
         
@@ -1314,7 +1436,6 @@ void testApp::mousePressed(int x, int y, int button){
 //            aBox = new Box(iWorld, ofGetMouseX(), ofGetMouseY());
 //            boxes.push_back(aBox);
 //        }
-    }
     
 
     // Right click
