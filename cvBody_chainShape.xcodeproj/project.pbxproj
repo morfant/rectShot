@@ -77,7 +77,7 @@
 		6758AA5917D386670078FA56 /* Box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6758AA5717D386670078FA56 /* Box.cpp */; };
 		6768AA041BDA689A00BEA93C /* ContactListener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6768AA021BDA689A00BEA93C /* ContactListener.cpp */; };
 		6771F1B81C115A120005B432 /* Frag.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6771F1B61C115A120005B432 /* Frag.cpp */; };
-		6780BE0517D36759006095C4 /* PolygonBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6780BE0317D36759006095C4 /* PolygonBody.cpp */; };
+		6780BE0517D36759006095C4 /* Faces.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6780BE0317D36759006095C4 /* Faces.cpp */; };
 		679EDE791C1E600D0029C2DE /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 679EDE781C1E600D0029C2DE /* XCTest.framework */; };
 		679EDE7F1C1E600D0029C2DE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 679EDE7D1C1E600D0029C2DE /* InfoPlist.strings */; };
 		679EDE811C1E600D0029C2DE /* cvBody_chainShape_Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 679EDE801C1E600D0029C2DE /* cvBody_chainShape_Tests.m */; };
@@ -313,8 +313,8 @@
 		6768AA031BDA689A00BEA93C /* ContactListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContactListener.h; sourceTree = "<group>"; };
 		6771F1B61C115A120005B432 /* Frag.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Frag.cpp; sourceTree = "<group>"; };
 		6771F1B71C115A120005B432 /* Frag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frag.h; sourceTree = "<group>"; };
-		6780BE0317D36759006095C4 /* PolygonBody.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolygonBody.cpp; sourceTree = "<group>"; };
-		6780BE0417D36759006095C4 /* PolygonBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolygonBody.h; sourceTree = "<group>"; };
+		6780BE0317D36759006095C4 /* Faces.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Faces.cpp; sourceTree = "<group>"; };
+		6780BE0417D36759006095C4 /* Faces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Faces.h; sourceTree = "<group>"; };
 		679EDE761C1E600C0029C2DE /* cvBody_chainShape Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "cvBody_chainShape Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		679EDE781C1E600D0029C2DE /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		679EDE7C1C1E600D0029C2DE /* cvBody_chainShape Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "cvBody_chainShape Tests-Info.plist"; sourceTree = "<group>"; };
@@ -891,8 +891,8 @@
 			children = (
 				6758AA5817D386670078FA56 /* Box.h */,
 				6758AA5717D386670078FA56 /* Box.cpp */,
-				6780BE0417D36759006095C4 /* PolygonBody.h */,
-				6780BE0317D36759006095C4 /* PolygonBody.cpp */,
+				6780BE0417D36759006095C4 /* Faces.h */,
+				6780BE0317D36759006095C4 /* Faces.cpp */,
 				67347D7D17D171A00023B9AE /* World.h */,
 				67347D7C17D171A00023B9AE /* World.cpp */,
 				67E8112017D321A70094D376 /* Wall.h */,
@@ -1336,7 +1336,7 @@
 				67347D8117D171A00023B9AE /* World.cpp in Sources */,
 				67E8112117D321A70094D376 /* Wall.cpp in Sources */,
 				672068FD1BDBB50500D435E1 /* OscTypes.cpp in Sources */,
-				6780BE0517D36759006095C4 /* PolygonBody.cpp in Sources */,
+				6780BE0517D36759006095C4 /* Faces.cpp in Sources */,
 				6758AA5917D386670078FA56 /* Box.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

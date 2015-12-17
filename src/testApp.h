@@ -15,7 +15,7 @@
 #include "World.h"
 #include "Ball.h"
 #include "Wall.h"
-//#include "PolygonBody.h"
+//#include "Faces.h"
 #include "Box.h"
 //#include "ofxOsc.h"
 #include "Tm.h"
@@ -83,14 +83,14 @@ class testApp : public ofBaseApp{
         void sendBlobsOSC();
     
         //Box2d
-        void makePolygonBody(int blobNum);
+        void makeFaces(int blobNum);
         void drawPolygonBodies();
-        void resetPolygonBody();
+        void resetFaces();
         void makeBodyAtCvPosition();
         void makeBodyAtCvPosition(b2Vec2* vertices);
         void makeBodyAtCvPosition(vector<b2Vec2> vertices);
     
-    void dupPbody(PolygonBody* pb, float x, float y);
+    void dupPbody(Faces* pb, float x, float y);
     
         float getArea(b2Vec2* vertices, int maxVCount);    
     
@@ -170,8 +170,8 @@ class testApp : public ofBaseApp{
     bool                    bodyHit;
     bool                    shotBallMade;
     bool                    isShot;
-    int                     shot_X;
-    int                     shot_Y;
+    float                     shot_X;
+    float                     shot_Y;
     bool                    butPressed;
     int                     butMsg;
 
@@ -183,8 +183,8 @@ class testApp : public ofBaseApp{
     int selBlobRect;
         vector<Ball*>           balls;
         vector<Box*>            boxes;
-        vector<PolygonBody*>    pBodies;
-        vector<PolygonBody>     pBodiesOriginalCopy;
+        vector<Faces*>    pBodies;
+        vector<Faces>     pBodiesOriginalCopy;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;
         vector<ofVec2f>         blobCenterPos;
@@ -193,6 +193,10 @@ class testApp : public ofBaseApp{
     
         float                   divNum;
         float                   aforce;
+
+    
+    // Tracking
+    bool        shotPointTest;
 
 };
 

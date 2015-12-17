@@ -23,10 +23,10 @@ void testApp::setup(){
     
     camUse = false;
 	frameByframe = false;
-    movPlay = true;
+    movPlay = false;
     movPlaySmall = false;
     info = true;
-    grayPlay = false;
+    grayPlay = true;
     drawBlob = true;
     
     pBodyIdx = 0;
@@ -137,14 +137,14 @@ void testApp::setup(){
     
     //Tm
     tmOpen = false;
-    targetNum = 3;
+    targetNum = 30;
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
 //    targetTimer = 0;
     OriginDestroyed = true;
     nextStageReady = false;
     
-    PolygonBody* initDumy = new PolygonBody();
+    Faces* initDumy = new Faces();
     tMan = new Tm(iWorld, initDumy, 1000); //1000 = 1 sec
     
 //    originColor[0] = ofColor(100, 250, 100);
@@ -180,7 +180,7 @@ void testApp::update(){
         iWorld->Step(timeStep, velocityIterations, positionIterations);
         
         // Polygon bodies update
-        for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+        for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
     //        (*iter)->getBody()->SetLinearVelocity(b2Vec2(1.f, 0));
         }
         
@@ -237,7 +237,7 @@ void testApp::update(){
         oscRecv();
         
         if (isShot){
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
                     if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                         (*iter)->breakBody();
@@ -272,7 +272,7 @@ void testApp::update(){
         //Tm
         if (tmOpen){
         
-            PolygonBody* tBody = tMan->update();
+            Faces* tBody = tMan->update();
             
             if (tBody != NULL){
                 pBodies.push_back(tBody);
@@ -301,8 +301,8 @@ void testApp::update(){
 void testApp::draw(){
   
 
-    ofBackground(255);
-//    ofBackground(0);
+//    ofBackground(255);
+    ofBackground(0);
 
     if (inTitle){
         movPlay = false;
@@ -385,7 +385,7 @@ void testApp::draw(){
     /*
     // Breakbody test
     for (int i = 0; i < kSAMPLING_INTV; i++) {
-        for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+        for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
             
             bool isSelect = (*iter)->getSelectState();
             
@@ -435,6 +435,21 @@ void testApp::draw(){
         }
     }
 */
+    
+    // LaserPointTracking test
+    if (shotPointTest){
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        ofFill();
+        ofPushMatrix();
+        ofTranslate((shot_X/640.f)*ofGetWidth(), (shot_Y/480.f)*ofGetHeight());
+        ofEllipse(0, 0, 50, 50);
+        ofPopMatrix();
+        ofPopStyle();
+    }
+    
+    shotPointTest = false;
+    
 	// finally, a report
     if (info){
         ofPushStyle();
@@ -459,7 +474,7 @@ void testApp::draw(){
         if (contact) {
             b2Body* other = aBox->getBody()->GetContactList()->other;
             
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ((*iter)->isThereMBody()){
 
                     bool isSelect = (*iter)->getSelectState();
@@ -485,7 +500,7 @@ void testApp::drawPolygonBodies(){
 //    cout << "num of pbodies: " << pBodies.size() << endl;
     
     
-    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+    for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
         
 //        int contIdx = aWorld->getContactListener()->getCurContactPbodyIdx();
         bool pBodyIsAlive = (*iter)->getIsAlive();
@@ -579,7 +594,7 @@ void testApp::sendBlobsOSC()
 }
 
 
-void testApp::makePolygonBody(int blobNum){
+void testApp::makeFaces(int blobNum){
     
     if (blobNum != 0){ // blobNum 0 means "Nothing selected".
         //clear containers
@@ -643,7 +658,7 @@ void testApp::makePolygonBody(int blobNum){
             
             
             // Reset Box2d polygon bodies
-//            if(pBodies.size() != 0) resetPolygonBody();
+//            if(pBodies.size() != 0) resetFaces();
             
             // Make new Box2d polygon bodies
 //            if(pBodies.size() == 0)
@@ -659,12 +674,12 @@ void testApp::makePolygonBody(int blobNum){
 void testApp::makeBodyAtCvPosition(){ //Make original
 
     if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
+        Faces * aPbody = new Faces(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
 //        aPbody->setContactColor(originColor[curStage]);
         aPbody->setFragOutlineColor(pBodyOutlineColor[curStage]);
         
         
-        PolygonBody * aPbodyCopy = new PolygonBody(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false, COPY_DUP_IDX);
+        Faces * aPbodyCopy = new Faces(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false, COPY_DUP_IDX);
 //        aPbodyCopy->setContactColor(originColor[curStage]);
         aPbodyCopy->setFragOutlineColor(pBodyOutlineColor[curStage]);
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
@@ -693,7 +708,7 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
+        Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -703,7 +718,7 @@ void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
 void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
     
     if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        PolygonBody * aPbody = new PolygonBody(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
+        Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
         
         pBodies.push_back(aPbody);
         pBodyIdx++;
@@ -711,7 +726,7 @@ void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
 }
 
 void
-testApp::dupPbody(PolygonBody* pbody, float x, float y)
+testApp::dupPbody(Faces* pbody, float x, float y)
 {
     // GET Centroid
     float pbx = pbody->getX();
@@ -740,9 +755,9 @@ testApp::dupPbody(PolygonBody* pbody, float x, float y)
     
 }
 
-void testApp::resetPolygonBody(){
+void testApp::resetFaces(){
 
-    for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+    for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
         
         (*iter)->clearFrags();
         delete (*iter);
@@ -787,7 +802,12 @@ void testApp::oscRecv()
 			shot_X = m.getArgAsInt32(0);
 			shot_Y = m.getArgAsInt32(1);
             
-            cout << shot_X << shot_Y << endl;
+            cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
+            
+            
+            shotPointTest = true;
+            
+            
             
 		}else if(m.getAddress() == "/button"){
 			butMsg = m.getArgAsInt32(0);
@@ -892,7 +912,7 @@ void testApp::nextStage()
 {
     cout << "NEXT stage" << endl;
     tmOpen = false;
-    //            resetPolygonBody();
+    //            resetFaces();
     
     if (curMovie < MOVNUM - 1){
         curMovie++;
@@ -920,7 +940,7 @@ void testApp::nextStage(unsigned long long time, bool enable)
             
             cout << "NEXT stage" << endl;
             tmOpen = false;
-            //            resetPolygonBody();
+            //            resetFaces();
             curMovie++;
             movie[curMovie].play();
             curStage++;
@@ -967,7 +987,8 @@ void testApp::keyPressed(int key){
             
 		case '1':
             inTitle = false;
-            movPlay = true;
+            grayPlay = true;
+            movPlay = false;
             if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 1;
             movie[curMovie].play();
@@ -1086,7 +1107,7 @@ void testApp::keyPressed(int key){
             
         // Delete selected pbodies.
 		case 'x':
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected) {
@@ -1102,7 +1123,7 @@ void testApp::keyPressed(int key){
 
         // Delete all polygon bodies
 		case 'X':
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
                 
                     (*iter)->clearFrags();
                     delete (*iter);
@@ -1115,7 +1136,7 @@ void testApp::keyPressed(int key){
 
         // Apply force to pBodies.
         case 't':
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected) {
@@ -1130,7 +1151,7 @@ void testApp::keyPressed(int key){
 
             
         case 'T':
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 
                 b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                 //                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
@@ -1173,7 +1194,7 @@ void testApp::keyPressed(int key){
             break;
             
         case 'h': //simulaton 'h'itting body
-            for (vector<PolygonBody*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected && (*iter)->getIsThereMBody()) {
@@ -1278,7 +1299,7 @@ void testApp::mousePressed(int x, int y, int button){
                 printf("Selected blob rect number: %d\n", selBlobRect);
                 printf("centroid X: %f / Y: %f\n",
                        blobsVec[i].centroid.x, blobsVec[i].centroid.y);
-                makePolygonBody(selBlobRect);
+                makeFaces(selBlobRect);
                 break;
             }
         }
@@ -1301,7 +1322,7 @@ void testApp::mousePressed(int x, int y, int button){
         
 //        aBall = new Ball(iWorld, x, y, true);
 //        balls.push_back(aBall);
-        cout << pBodies[0]->IsInside( b2Vec2(x, y) ) << endl;
+//        cout << pBodies[0]->IsInside( b2Vec2(x, y) ) << endl;
     }
     
 }

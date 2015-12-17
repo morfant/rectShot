@@ -11,7 +11,7 @@
 
 // ----Birth & Death----
 
-Tm::Tm(b2World* world, PolygonBody* pBody, float time)
+Tm::Tm(b2World* world, Faces* pBody, float time)
 {
     enable = false;
     dupNum = 1;
@@ -40,7 +40,7 @@ Tm::setTimer(float time){
 
 
 void
-Tm::setPbody(PolygonBody* pBody)
+Tm::setPbody(Faces* pBody)
 {
     targetOrigin = pBody;
     
@@ -68,7 +68,7 @@ Tm::getTimer()
 }
 
 
-PolygonBody*
+Faces*
 Tm::getTargetBody()
 {
     return targetOrigin;
@@ -78,8 +78,8 @@ Tm::getTargetBody()
 
 
 // Duplicate Target
-PolygonBody*
-Tm::dupPbody(PolygonBody* pbody, float x, float y)
+Faces*
+Tm::dupPbody(Faces* pbody, float x, float y)
 {
     
     // Get index
@@ -111,7 +111,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 
     
     // Duplicate pBody
-    PolygonBody * aPbody = new PolygonBody(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false, dupNum);
+    Faces * aPbody = new Faces(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false, dupNum);
     aPbody->setFragOutlineColor(pbody->getFragOutlineColor());
 
     
@@ -122,7 +122,7 @@ Tm::dupPbody(PolygonBody* pbody, float x, float y)
 
 
 // Update & draw
-PolygonBody*
+Faces*
 Tm::update()
 {
         

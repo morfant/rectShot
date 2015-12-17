@@ -347,8 +347,9 @@ Frag::render()
     
     ofPushStyle();
 //    ofSetColor(0, 200, 255, alpha);
-    
-    ofSetColor(0, 0, 0, alpha);
+
+    ofSetColor(0, 50, 120, alpha);
+//    ofSetColor(0, 0, 0, alpha);
     ofFill();
     ofPushMatrix();
     

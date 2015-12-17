@@ -13,7 +13,7 @@
 #include <iostream>
 #include "ofMain.h"
 #include "Box2D.h"
-#include "PolygonBody.h"
+#include "Faces.h"
 #include "convertFunc.h"
 
 
@@ -33,7 +33,7 @@ protected:
     unsigned long long  startTime;
     unsigned long long  curTime;
     float   timeInterval;
-    PolygonBody *   targetOrigin;
+    Faces *   targetOrigin;
     
     bool    enable;
     
@@ -42,25 +42,25 @@ protected:
     
 public:
     // Birth and Death
-    Tm(b2World* world, PolygonBody* pBody, float timeInterval);
+    Tm(b2World* world, Faces* pBody, float timeInterval);
     ~Tm();
     
 
     // Get & Set
     void    setTimer(float time);
-    void    setPbody(PolygonBody* pBody);
+    void    setPbody(Faces* pBody);
     void    setDupNum(int num);
     void    start();
     
     float   getTimer();
-    PolygonBody*    getTargetBody();
+    Faces*    getTargetBody();
     
     // Duplicate Target
-    PolygonBody* dupPbody(PolygonBody* pbody, float x, float y);
+    Faces* dupPbody(Faces* pbody, float x, float y);
         
 
     // Update & draw
-    PolygonBody*    update();
+    Faces*    update();
     bool            isEnd();
     void    draw();
     
@@ -69,7 +69,7 @@ public:
 
 
     // container
-    vector<PolygonBody*>    pBodies;
+    vector<Faces*>    pBodies;
     
     
     

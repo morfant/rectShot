@@ -1,5 +1,5 @@
 //
-//  PolygonBody.cpp
+//  Faces.cpp
 //  emptyExample
 //
 //  Created by Gangil Yi on 8/13/13.
@@ -7,18 +7,18 @@
 //
 
 // ----Headers----
-#include "PolygonBody.h"
+#include "Faces.h"
 
 
 // ----Birth & Death----
-PolygonBody::PolygonBody()
+Faces::Faces()
 {
-    cout << "Dummy Polygonbody initialized." << endl;
+    cout << "Dummy Faces initialized." << endl;
     
 }
 
 
-PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin, int dupIdx)
+Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin, int dupIdx)
 {
     
 
@@ -34,7 +34,10 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
     dupIndex = dupIdx;
     isOriginal = isOrigin;
     isBreaked = false;
-    ageOfFrag = 10000; // 0 means immortal
+    
+    fragLifeTimeBySec = 20.0f;
+    fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
+    
     
     if (isReal){
         
@@ -133,7 +136,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
         //contactedColor = ofColor(0, 200, 25);
         contactedColor = ofColor(0, 200, 0);
 //        normalColor = ofColor(0, 200, 25);
-        normalColor = ofColor(0, 0, 20);
+        normalColor = ofColor(0, 50, 120);
 
         outliner_rad = 5.f;
         
@@ -171,7 +174,7 @@ PolygonBody::PolygonBody(b2World* aWorld, b2Vec2* vertices, int maxVCount, float
 	
 }
 
-PolygonBody::~PolygonBody()
+Faces::~Faces()
 {
     
 //    oscSendIFF("/pbDest", index, -1, -1);
@@ -187,13 +190,13 @@ PolygonBody::~PolygonBody()
 
 
 float
-PolygonBody::perp_dot(ofVec2f a, ofVec2f b)
+Faces::perp_dot(ofVec2f a, ofVec2f b)
 {
     return (-1.f) * a.y * b.x + a.x * b.y;
 }
 
 float
-PolygonBody::perp_dot(b2Vec2 a, b2Vec2 b)
+Faces::perp_dot(b2Vec2 a, b2Vec2 b)
 {
     return (-1.f) * a.y * b.x + a.x * b.y;
 }
@@ -201,7 +204,7 @@ PolygonBody::perp_dot(b2Vec2 a, b2Vec2 b)
 
 
 bool
-PolygonBody::IsInside(b2Vec2 p)
+Faces::IsInside(b2Vec2 p)
 {
     /*determine whether a point is inside a polygon or not
      *  polygon's vertices need to be sorted counterclockwise
@@ -243,7 +246,7 @@ PolygonBody::IsInside(b2Vec2 p)
 
 
 void
-PolygonBody::breakBody()
+Faces::breakBody()
 {
     
     if (isThereMbodybool) delMbody();
@@ -362,7 +365,7 @@ PolygonBody::breakBody()
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
             Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
-            aFrag->setLifeLong(ageOfFrag); // Frag will die after n Frame. 0 means 'immortal'.
+            aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;
         }
@@ -377,7 +380,7 @@ PolygonBody::breakBody()
 
 
 //void
-//PolygonBody::breakFrags()
+//Faces::breakFrags()
 //{
 //    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
 //        (*iter)->breakSelf();
@@ -387,72 +390,72 @@ PolygonBody::breakBody()
 
 
 b2Vec2*
-PolygonBody::getBreakArray()
+Faces::getBreakArray()
 {
     return mVerticeDiv;
 }
 
 
 void
-PolygonBody::setContact(bool cont)
+Faces::setContact(bool cont)
 {
     isContacted = cont;
 }
 
 void
-PolygonBody::setSelectState(bool isSelected)
+Faces::setSelectState(bool isSelected)
 {
     selected = isSelected;
 }
 
 
 bool
-PolygonBody::getSelectState()
+Faces::getSelectState()
 {
     return selected;
 }
 
 bool
-PolygonBody::getIsThereMBody()
+Faces::getIsThereMBody()
 {
     return isThereMbodybool;
 }
 
 bool
-PolygonBody::getIsAlive()
+Faces::getIsAlive()
 {
     return isAlive;
 }
 
 bool
-PolygonBody::getIsOriginal()
+Faces::getIsOriginal()
 {
     return isOriginal;
 }
 
 
 bool
-PolygonBody::getIsNewBorn()
+Faces::getIsNewBorn()
 {
     return isNewBorn;
 }
 
 
 ofColor
-PolygonBody::getFragOutlineColor()
+Faces::getFragOutlineColor()
 {
     return fragOutlineColor;
 }
 
 
 vector<Frag*> *
-PolygonBody::getFrags()
+Faces::getFrags()
 {
     return &mFrags;
 }
 
 void
-PolygonBody::clearFrags()
+Faces::clearFrags()
 {
     for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
         delete (*iter);
@@ -461,7 +464,7 @@ PolygonBody::clearFrags()
 
 // getter & setter
 float
-PolygonBody::getArea(b2Vec2* vertices, int maxVCount)
+Faces::getArea(b2Vec2* vertices, int maxVCount)
 {
         int i,j;
         double area = 0;
@@ -477,7 +480,7 @@ PolygonBody::getArea(b2Vec2* vertices, int maxVCount)
 }
 
 float
-PolygonBody::getX()
+Faces::getX()
 {
 //    return _toPixelX(mBody->GetPosition().x);
 //    return (mBody->GetPosition().x);
@@ -485,7 +488,7 @@ PolygonBody::getX()
 }
 
 float
-PolygonBody::getY()
+Faces::getY()
 {
 //    return _toPixelY(mBody->GetPosition().y);
 //    return (mBody->GetPosition().y);
@@ -493,20 +496,20 @@ PolygonBody::getY()
 }
 
 int
-PolygonBody::getIndex()
+Faces::getIndex()
 {
     return index;
 }
 
 
 int
-PolygonBody::getDupIndex()
+Faces::getDupIndex()
 {
     return dupIndex;
 }
 
 bool
-PolygonBody::getIsBreaked()
+Faces::getIsBreaked()
 {
     return isBreaked;
 }
@@ -514,54 +517,54 @@ PolygonBody::getIsBreaked()
 
 
 b2Vec2
-PolygonBody::getVertex(int idx)
+Faces::getVertex(int idx)
 {
     return mPts[idx];
 }
 
 
 b2Vec2*
-PolygonBody::getVertices()
+Faces::getVertices()
 {
     return mVertice;
 }
 
 
 b2World*
-PolygonBody::getWorld()
+Faces::getWorld()
 {
     return mWorld;
 }
 
 b2Body*
-PolygonBody::getBody()
+Faces::getBody()
 {
     return mBody;
 
 }
 
 //b2Body*
-//PolygonBody::getSmallBody()
+//Faces::getSmallBody()
 //{
 //    return mBody2;
 //    
 //}
 
 void
-PolygonBody::setX(float _posX)
+Faces::setX(float _posX)
 {
     
 }
 
 void
-PolygonBody::setY(float _posY)
+Faces::setY(float _posY)
 {
 
 }
 
 
 void
-PolygonBody::setVertices(b2Vec2* vertices)
+Faces::setVertices(b2Vec2* vertices)
 {
     for (int i = 0; i < maxVertexCount; i++) {
         mPts[i].x = _toWorldX(vertices[i].x);
@@ -581,7 +584,7 @@ PolygonBody::setVertices(b2Vec2* vertices)
 
 
 void
-PolygonBody::setAudioLen(float len)
+Faces::setAudioLen(float len)
 {
     audioLen = len;
 //    cout << "len: " << audioLen << endl;
@@ -606,26 +609,26 @@ PolygonBody::setAudioLen(float len)
 
 
 void
-PolygonBody::setContactColor(ofColor color)
+Faces::setContactColor(ofColor color)
 {
     contactedColor = color;
 }
 
 void
-PolygonBody::setIsNewBorn(bool born)
+Faces::setIsNewBorn(bool born)
 {
     isNewBorn = born;
 }
 
 
 void
-PolygonBody::setIsBreaked(bool isBreak)
+Faces::setIsBreaked(bool isBreak)
 {
     isBreaked = isBreak;
 }
 
 void
-PolygonBody::setFragOutlineColor(ofColor foc)
+Faces::setFragOutlineColor(ofColor foc)
 {
     fragOutlineColor = foc;
 }
@@ -633,7 +636,7 @@ PolygonBody::setFragOutlineColor(ofColor foc)
 
 
 void
-PolygonBody::delMbody()
+Faces::delMbody()
 {    
 //    mWorld->DestroyBody(mBody2);
     mWorld->DestroyBody(mBody);
@@ -644,7 +647,7 @@ PolygonBody::delMbody()
 
 
 void
-PolygonBody::pushForce(float x, float y)
+Faces::pushForce(float x, float y)
 {
     
 //    cout << "cx: " << x << " / " << "cy: " << y << endl;
@@ -666,7 +669,7 @@ PolygonBody::pushForce(float x, float y)
 
 
 void
-PolygonBody::renderFrags()
+Faces::renderFrags()
 {
     if (!isThereMbodybool){
         
@@ -689,7 +692,7 @@ PolygonBody::renderFrags()
 
 
 void
-PolygonBody::renderAtBodyPosition()
+Faces::renderAtBodyPosition()
 {
     if (isThereMbodybool){
 
@@ -734,7 +737,7 @@ PolygonBody::renderAtBodyPosition()
 }
 
 
-void PolygonBody::getSection()
+void Faces::getSection()
 {
     if (isThereMbodybool){
         // Get each distance from current point to next point.
@@ -759,7 +762,7 @@ void PolygonBody::getSection()
 
 // Update & draw
 void
-PolygonBody::update()
+Faces::update()
 {
     if (isThereMbodybool){
         
@@ -826,7 +829,7 @@ PolygonBody::update()
 
 
 void
-PolygonBody::draw()
+Faces::draw()
 {
    
 

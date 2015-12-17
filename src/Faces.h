@@ -1,5 +1,5 @@
 //
-//  PolygonBody.h
+//  Faces.h
 //  emptyExample
 //
 //  Created by Gangil Yi on 8/13/13.
@@ -24,7 +24,7 @@
 
 
 // ----Class definition----
-class PolygonBody{
+class Faces{
 protected:
     
     // Position
@@ -83,17 +83,17 @@ protected:
     bool                    isAlive;
     bool                    isThereMbodybool;
     bool                    isOriginal;
-    int                     ageOfFrag;
-    
+    float       fragLifeTimeBySec;
+    float       fragLifeTime;
     
     
     
 public:
     // Birth and Death
-    PolygonBody();
-    PolygonBody(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin, int dupIdx);
+    Faces();
+    Faces(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin, int dupIdx);
     
-    ~PolygonBody();
+    ~Faces();
     
     // Getter
     float   getArea(b2Vec2* vertices, int maxVCount);
