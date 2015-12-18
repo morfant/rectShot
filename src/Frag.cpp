@@ -52,8 +52,19 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 //    mVertice[0].Set(0.0f, 0.0f);
 //    mVertice[1].Set(1.0f, 0.0f);
 //    mVertice[2].Set(0.0f, 1.0f);
+
+    if(getArea(&vertices[0], 3) > 0){
+        triangle.Set(mVertice, 3);
+    }else{
+        cout << "safe tri made!!!" << endl;
+        safeTriangle[0].Set(0.f, 0.f);
+        safeTriangle[1].Set(1.f, 1.f);
+        safeTriangle[2].Set(0.f, 1.f);
+        triangle.Set(safeTriangle, 3);
+        isSafeTri = true;
+    }
     
-	triangle.Set(mVertice, 3);
+
 	
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &triangle;
@@ -348,7 +359,11 @@ Frag::render()
     ofPushStyle();
 //    ofSetColor(0, 200, 255, alpha);
 
+    
     ofSetColor(0, 50, 120, alpha);
+    
+//    if (isSafeTri) ofSetColor(255, 0, 0);
+    
 //    ofSetColor(0, 0, 0, alpha);
     ofFill();
     ofPushMatrix();
@@ -461,4 +476,22 @@ Frag::oscSendIIFF(string addr, int i, int j, float a, float b)
     
 //    sender.sendMessage(m);
     
+}
+
+
+
+float
+Frag::getArea(b2Vec2* vertices, int maxVCount)
+{
+    int i, j;
+    double area = 0;
+    
+    for (i = 0; i < maxVCount; i++) {
+        j = (i + 1) % maxVCount;
+        area += vertices[i].x * vertices[j].y;
+        area -= vertices[i].y * vertices[j].x;
+    }
+    
+    area /= 2;
+    return(area < 0 ? -area : area);
 }

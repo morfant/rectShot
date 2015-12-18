@@ -217,11 +217,11 @@ void testApp::update(){
             
             if (tBody != NULL){
                 pBodies.push_back(tBody);
-                cout << "Pbody duplicated." << endl;
+//                cout << "Pbody duplicated." << endl;
             }
             
             if(tMan->isEnd()){
-                cout << "Next stage ready" << endl;
+//                cout << "Next stage ready" << endl;
                 nextStageReady = true;
             }
         }
@@ -653,8 +653,8 @@ void testApp::oscRecv()
         
 		if(m.getAddress() == "/laserPos"){
             isShot = true;
-			shot_X = m.getArgAsInt32(0);
-			shot_Y = m.getArgAsInt32(1);
+			shot_X = m.getArgAsFloat(0);
+			shot_Y = m.getArgAsFloat(1);
             
             shot_X = (shot_X/640.f)*ofGetWidth();
             shot_Y = (shot_Y/480.f)*ofGetHeight();

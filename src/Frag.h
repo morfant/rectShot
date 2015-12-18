@@ -44,6 +44,7 @@ protected:
     b2World*    mWorld;
     b2Body*     mBody;
     b2Vec2 mVertice[3];
+    b2Vec2 safeTriangle[3];
     
     // Color
     bool        outlineDraw;
@@ -60,6 +61,8 @@ protected:
     unsigned long long  age;
     bool                isAlive;
     bool                isNewBorn;
+    
+    bool                isSafeTri;
 
 
     
@@ -110,6 +113,8 @@ public:
     
     
     
+    float getArea(b2Vec2* vertices, int maxVCount);
+
 
     
     
