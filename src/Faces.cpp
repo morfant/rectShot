@@ -14,11 +14,14 @@
 Faces::Faces()
 {
     cout << "Dummy Faces initialized." << endl;
+
+    isReal = false;
+    isOriginal = true;
     
 }
 
 
-Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool isReal, bool isOrigin, int dupIdx)
+Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool _isReal, bool isOrigin, int dupIdx)
 {
     
 
@@ -34,6 +37,7 @@ Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float y
     dupIndex = dupIdx;
     isOriginal = isOrigin;
     isBreaked = false;
+    isReal = _isReal;
     
     fragLifeTimeBySec = 6.0f;
     fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
@@ -433,6 +437,11 @@ Faces::getIsOriginal()
     return isOriginal;
 }
 
+bool
+Faces::getIsReal()
+{
+    return isReal;
+}
 
 bool
 Faces::getIsNewBorn()
@@ -457,8 +466,10 @@ Faces::getFrags()
 void
 Faces::clearFrags()
 {
-    for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
-        delete (*iter);
+    if(!isThereMbodybool){
+        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
+            delete (*iter);
+        }
     }
 }
 

@@ -99,6 +99,7 @@ class testApp : public ofBaseApp{
         void videoEnd();
         void tmEnable(int tNum);
         void firstShotCheck(int curStage);
+        bool isOriginalCopyed();
     
         // UI
         void touchingCheck();
@@ -150,6 +151,7 @@ class testApp : public ofBaseApp{
         unsigned long long stageStartTime;
         ofImage     title;
         bool        inTitle;
+        bool        blackout;
         bool        OriginDestroyed;
         bool        nextStageReady;
         bool                    bodyHit;

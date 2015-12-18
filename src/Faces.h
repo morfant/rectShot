@@ -86,7 +86,7 @@ protected:
     float       fragLifeTimeBySec;
     float       fragLifeTime;
     
-    
+    bool                    isReal;
     
 public:
     // Birth and Death
@@ -114,6 +114,7 @@ public:
     bool    getIsThereMBody();
     bool    getIsAlive();
     bool    getIsOriginal();
+    bool    getIsReal();
     bool    getIsNewBorn();
     ofColor getFragOutlineColor();
     

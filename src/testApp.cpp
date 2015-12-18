@@ -3,13 +3,25 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    int pjW = 1440;
+    int pjH = 900;
+    
+    float winPosX = (pjW - ofGetWidth())/2.f;
+    float winPosY = (pjH - ofGetHeight())/2.f;
+    
     if (REALTIME){
-        ofSetWindowPosition(0, 0);
+//        ofSetWindowPosition(winPosX + ofGetWidth(), winPosY); //Extended desktop
+        ofSetWindowPosition(winPosX, winPosY);
         info = false;
+        inTitle = true;
+        blackout = false;
     }else{
         info = true;
+        inTitle = true;
+        blackout = false;
     }
     
+
 
 	sender.setup(HOST, PORT);
 	receiver.setup(RECV_PORT);
@@ -17,7 +29,6 @@ void testApp::setup(){
     
     
     title.loadImage("img/lonewolf_title.jpg");
-    inTitle = true;
 
     
     shotBallMade = false;
@@ -95,7 +106,6 @@ void testApp::setup(){
     balls.clear();
     pBodies.clear();
     pBodyIdx = 0;
-    
     
     // World
     aWorld = new World();
@@ -255,6 +265,10 @@ void testApp::update(){
                 shotBallMade = true;
             }
             
+            if (curStage == STAGE_NUM - 1 && !blackout) {
+                blackout = true;
+            }
+            
             isShot = false;
             bodyHit = false;
         }
@@ -279,39 +293,12 @@ void testApp::draw(){
 //    ofBackground(255);
     ofBackground(0);
 
-    if (inTitle){
-        movShow = false;
-        blobShow = false;
-        grayShow = false;
-        
-        title.draw(
-                   ofGetWidth()/2.f - title.width/2.f,
-                   ofGetHeight()/2.f-title.height/2.f);
-        
-    }
     
 
     // Draw gray image.
     if (grayShow){
         grayImage.draw(movDrawPosX, movDrawPosY);
     }
-
-    // Draw contourFinder
-    if (blobShow){
-        ofPushStyle();
-//        ofPushMatrix();
-//        ofTranslate(movDrawPosX, movDrawPosY);
-        ofSetLineWidth(1.0);
-        
-        for (int i = 0; i < contourFinder.nBlobs; i++){
-    //        contourFinder.blobs[i].draw(360,540);
-            contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
-
-        }
-//        ofPopMatrix();
-        ofPopStyle();
-    }
-
     
     // Draw movie.
     if (movShow){
@@ -326,6 +313,22 @@ void testApp::draw(){
             movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
             movie[curMovie].draw(movDrawPosX, movDrawPosY);
         }
+    }
+    
+    // Draw contourFinder
+    if (blobShow){
+        ofPushStyle();
+        //        ofPushMatrix();
+        //        ofTranslate(movDrawPosX, movDrawPosY);
+        ofSetLineWidth(1.0);
+        
+        for (int i = 0; i < contourFinder.nBlobs; i++){
+            //        contourFinder.blobs[i].draw(360,540);
+            contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
+            
+        }
+        //        ofPopMatrix();
+        ofPopStyle();
     }
     
     
@@ -359,7 +362,7 @@ void testApp::draw(){
         ofFill();
         ofPushMatrix();
         ofTranslate(shot_X, shot_Y);
-        ofEllipse(0, 0, 50, 50);
+        ofEllipse(0, 0, 20, 20);
         ofPopMatrix();
         ofPopStyle();
     }
@@ -384,13 +387,43 @@ void testApp::draw(){
 
 //    touchingCheck();
     
+    
+    if (inTitle){
+        printf("inTitle true.\n");
+        movShow = false;
+        blobShow = false;
+        grayShow = false;
+        
+        title.draw(
+                   ofGetWidth()/2.f - title.width/2.f,
+                   ofGetHeight()/2.f-title.height/2.f);
+    }
+    
+    if (blackout) {
+        ofSetColor(0);
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+        oscSendI("/blackout", 1);
+        for (int i = 1; i < STAGE_NUM - 1; i++) {
+            movie[i].setVolume(0.f);
+            movie[i].stop();
+        }
+        printf("blackout!\n");
+    }
+    
 }
 
 
 
 /* ------------------------------------ */
 
-
+bool testApp::isOriginalCopyed()
+{
+    if (!pBodiesOriginalCopy[curMovie].getIsReal() && !pBodiesOriginalCopy[curMovie].getIsOriginal() ) {
+        return true;
+    }else{
+        return false;
+    }
+}
 
 
 void testApp::drawPolygonBodies(){
@@ -580,6 +613,9 @@ void testApp::makeBodyAtCvPosition(){ //Make original
 
 
         pBodyIdx++;
+        
+        movie[curMovie].setVolume(0.f);
+        printf("curMovie: %d 's muted.\n", curMovie);
     }
     
     // Reset blobs points vector
@@ -847,10 +883,12 @@ void testApp::nextStage()
 
     movShow = true;
     blobShow = true;
+    
+    resetFaces();
 }
 
 
-void testApp::nextStage(unsigned long long time, bool enable)
+void testApp::nextStage(unsigned long long time, bool enable) //NOT USING
 {
     if (enable){
         unsigned long long curTime = ofGetElapsedTimeMillis();
@@ -1173,16 +1211,12 @@ void testApp::keyPressed(int key){
             
             
         case 'j':
-            cout << "j pressde" << endl;
             
-//            tMan = new Tm(iWorld, pBodies[0], 1000); //10000 = 10 sec
-            tMan->setPbody(&pBodiesOriginalCopy[curStage]);
-            tMan->setDupNum(targetNum);
-            tmOpen = true;
+            blackout = true;
             
             break;
 
-        case 'o':
+        case 'o': //Make targets
 //            if(OriginDestroyed){
                 tmEnable(targetNum); // int target num
                 OriginDestroyed = false;
@@ -1190,14 +1224,26 @@ void testApp::keyPressed(int key){
 //            }
             
             break;
+
             
-        case 'n': //next stage
-            if(nextStageReady){
-                nextStage();
-                nextStageReady = false;
-            }else{
-                cout << "When the shooting time end up, you can go next stage." << endl;
+        case 'n': //next step
+            
+            if (!inTitle){
+                
+                if(nextStageReady && curStage < STAGE_NUM - 2){
+                    nextStage();
+                    nextStageReady = false;
+                    
+                }else if(nextStageReady && curStage == STAGE_NUM - 2){
+                    
+                    if (curMovie != 0) movie[curMovie].stop();
+                    curStage++;
+                    curMovie = 0;
+                    movShow = true;
+                    blobShow = true;
+                }
             }
+            
             
             break;
 
