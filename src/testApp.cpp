@@ -169,11 +169,11 @@ void testApp::setup(){
     isFirstShot[4] = false;
     isFirstShot[5] = false;
     
-    bornPoint[0] = ofPoint(630, 397);
-    bornPoint[1] = ofPoint(580, 431);
-    bornPoint[2] = ofPoint(554, 449);
-    bornPoint[3] = ofPoint(472, 552);
-    bornPoint[4] = ofPoint(629, 348);
+    bornPoint[0] = ofPoint(630, 397); //aya
+    bornPoint[1] = ofPoint(553, 441); //han
+    bornPoint[2] = ofPoint(554, 449); //sewol
+    bornPoint[3] = ofPoint(230, 619); //park
+    bornPoint[4] = ofPoint(629, 348); //me
     bornPoint[5] = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
     
     
@@ -368,16 +368,18 @@ void testApp::draw(){
     // Draw body at cv pos
     if(pBodies.size()) drawPolygonBodies();
     
-    
-    // Draw ball
-    for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
-    }
 
-    
-    // Draw boxes
-    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
+    if (!REALTIME) {
+        // Draw ball
+        for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
+            (*iter)->renderAtBodyPosition();
+        }
+
+        
+        // Draw boxes
+        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            (*iter)->renderAtBodyPosition();
+        }
     }
     
     
@@ -715,17 +717,26 @@ void testApp::oscRecv()
 		receiver.getNextMessage(&m);
         
 		if(m.getAddress() == "/laserPos"){
-            isShot = true;
 			shot_X = m.getArgAsFloat(0);
 			shot_Y = m.getArgAsFloat(1);
             
-            shot_X = (shot_X/640.f)*ofGetWidth();
-            shot_Y = (shot_Y/480.f)*ofGetHeight();
+            // check first shot
+            if (shot_X == -1 && shot_Y == -1){
+                if(isFirstShot[curStage] == false) {
+                    isFirstShot[curStage] = true;
+                    firstShotCheck(curStage);
+                }else{
+                    printf("No tracking info.\n");
+                }
+            }else{
             
-            cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
-            
-            
-            shotPointTest = true;
+                shot_X = (shot_X/640.f)*ofGetWidth();
+                shot_Y = (shot_Y/480.f)*ofGetHeight();
+                
+                cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
+                isShot = true;
+                shotPointTest = true;
+            }
             
             
             
@@ -737,11 +748,14 @@ void testApp::oscRecv()
             }
         }
         
-//        else if(m.getAddress() == "/button"){
-//			butMsg = m.getArgAsInt32(0);
-//            if (butMsg) butPressed = true;
-//            
-//		}else if(m.getAddress() == "/wavLen"){
+        else if(m.getAddress() == "/butPresd"){
+			butMsg = m.getArgAsInt32(0);
+            if (butMsg){
+                tmEnable(targetNum[curStage]); // int target num
+            }
+            
+		}
+//            else if(m.getAddress() == "/wavLen"){
 //            cout << "wavLen received" << endl;
 //            int index = m.getArgAsInt32(0);
 //            float len = m.getArgAsFloat(1);
@@ -911,7 +925,7 @@ void testApp::nextStage()
     }
 
     movShow = true;
-    blobShow = true;
+    blobShow = false;
     
     resetFaces();
 }
@@ -1030,16 +1044,22 @@ void testApp::keyPressed(int key){
 		case '+':
 			threshold[curMovie]++;
 			if (threshold[curMovie] > 255) threshold[curMovie] = 255;
+            cout << "THS: " << threshold[curMovie] << endl;
+
 			break;
             
 		case '=':
 			threshold[curMovie] ++;
 			if (threshold[curMovie] > 255) threshold[curMovie] = 255;
+            cout << "THS: " << threshold[curMovie] << endl;
+
 			break;
             
 		case '-':
 			threshold[curMovie]--;
 			if (threshold[curMovie] < 0) threshold[curMovie] = 0;
+            cout << "THS: " << threshold[curMovie] << endl;
+            
 			break;
 
 
@@ -1212,18 +1232,18 @@ void testApp::keyPressed(int key){
             
             
         case 'h': //simulaton 'h'itting body
+            
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 bool isSelected = (*iter)->getSelectState();
                 
                 if (isSelected && (*iter)->getIsThereMBody()) {
-                    b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                     (*iter)->breakBody();
-                    
+                    break;
+             
 //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
-                    
-
                 }
             }
+            
             
             break;
             
@@ -1296,11 +1316,16 @@ void testApp::keyPressed(int key){
             break;
             
         case 'z':
-
-            for (int i = 0; i < STAGE_NUM; i++) {
-                cout << pBodiesOriginalCopy[i].getX() << " / " << pBodiesOriginalCopy[i].getY() << "current frame: " << movie[i].getCurrentFrame() << endl;
-                
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                printf("worldCenter of pbodies X: %f / Y: %f\n",
+                       (*iter)->getBody()->GetWorldCenter().x,
+                       (*iter)->getBody()->GetWorldCenter().y
+                       );
             }
+            printf("\n\n");
+            
+            
+
             break;
 
             

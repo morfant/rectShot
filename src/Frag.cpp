@@ -55,7 +55,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 //    mVertice[2].Set(0.0f, 1.0f);
     
     float fragArea = getArea(&vertices[0], 3);
-    printf("fragArea: %f\n", fragArea);
+//    printf("fragArea: %f\n", fragArea);
 
     
     

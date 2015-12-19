@@ -185,7 +185,7 @@ Faces::~Faces()
     
     if (isThereMbodybool){
 //        mWorld->DestroyBody(mBody2);
-        cout << "pb dest" << endl;
+//        cout << "pb dest" << endl;
         mWorld->DestroyBody(mBody);
     }
 

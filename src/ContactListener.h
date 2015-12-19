@@ -11,8 +11,9 @@
 #include "Box2D.h"
 #include "convertFunc.h"
 
-#define HOST "localhost"
+#define HOST "192.168.1.103"
 #define PORT 57120
+#define RECV_PORT 20000
 
 
 // ----Class definition----
