@@ -395,7 +395,7 @@ Frag::render()
         ofSetColor(outlineColor);
 
         // Draw outline
-        ofSetLineWidth(3.f);
+        ofSetLineWidth(1.f);
         ofBeginShape();
         for (int i = 0; i < 3; i++) {
             ofVertex(mVertice[i].x * BOX2D_SCALE, mVertice[i].y * BOX2D_SCALE * (-1.f) );

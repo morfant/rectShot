@@ -46,14 +46,14 @@ void testApp::setup(){
     movie[1].loadMovie("movies/ayaSum.mov");
     movie[2].loadMovie("movies/han720.mov");
     movie[3].loadMovie("movies/sewol2.mov");
-    movie[4].loadMovie("movies/pp480.mov");    
-//    movie[4].loadMovie("movies/pp720.mov");
-    movie[5].loadMovie("movies/i.mov");
+//    movie[4].loadMovie("movies/pp480.mov");    
+    movie[4].loadMovie("movies/pp720.mov");
+    movie[5].loadMovie("movies/me.mov");
     
     movAmp[1] = 0.5f;
     movAmp[2] = 0.5f;
-    movAmp[3] = 0.5f;
-    movAmp[4] = 0.5f;
+    movAmp[3] = 0.3f;
+    movAmp[4] = 0.2f;
     movAmp[5] = 0.5f;
 
     movDrawPosX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
@@ -622,7 +622,7 @@ void testApp::makeBodyAtCvPosition(){ //Make original
         aPbodyCopy->setFragOutlineColor(pBodyOutlineColor[curStage]);
 //        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
         
-        oscSendIIFF("/pbBorn", pBodyIdx, ORIGINAL_DUP_IDX, cvBlobPos.x, cvBlobPos.y);
+//        oscSendIIFF("/pbBorn", pBodyIdx, ORIGINAL_DUP_IDX, cvBlobPos.x, cvBlobPos.y);
 
         
         pBodies.push_back(aPbody);
@@ -642,6 +642,7 @@ void testApp::makeBodyAtCvPosition(){ //Make original
         
         movie[curMovie].setVolume(0.f);
         printf("curMovie: %d 's muted.\n", curMovie);
+//        videoEnd();
     }
     
     // Reset blobs points vector
@@ -1260,6 +1261,7 @@ void testApp::keyPressed(int key){
 
             OriginDestroyed = false;
             blobsSynMade = false;
+            blobShow = false;
             
             
             
