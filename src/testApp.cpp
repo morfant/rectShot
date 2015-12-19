@@ -27,10 +27,8 @@ void testApp::setup(){
 	receiver.setup(RECV_PORT);
     ofSetFrameRate(60.f);
     
-    
     title.loadImage("img/lonewolf_title.jpg");
 
-    
     shotBallMade = false;
     isShot = false;
     butPressed = false;
@@ -46,10 +44,17 @@ void testApp::setup(){
     blobShow = true;
     
     movie[1].loadMovie("movies/ayaSum.mov");
-    movie[2].loadMovie("movies/han480.mov");
+    movie[2].loadMovie("movies/han720.mov");
     movie[3].loadMovie("movies/sewol2.mov");
-    movie[4].loadMovie("movies/pp480.mov");
+    movie[4].loadMovie("movies/pp480.mov");    
+//    movie[4].loadMovie("movies/pp720.mov");
     movie[5].loadMovie("movies/i.mov");
+    
+    movAmp[1] = 0.5f;
+    movAmp[2] = 0.5f;
+    movAmp[3] = 0.5f;
+    movAmp[4] = 0.5f;
+    movAmp[5] = 0.5f;
 
     movDrawPosX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
     movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
@@ -135,14 +140,21 @@ void testApp::setup(){
     
     //TARGET MAKER
     tmOpen = false;
-    targetNum = 10;
+    targetNum[0] = 10; //aya
+    targetNum[1] = 10; //han
+    targetNum[2] = 10; //sewol
+    targetNum[3] = 10; //park
+    targetNum[4] = 30; //me
+    targetNum[5] = 0;
+
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
-    OriginDestroyed = true;
+    OriginDestroyed = false;
     nextStageReady = false;
     
     Faces* initDumy = new Faces();
     tMan = new Tm(iWorld, initDumy, 1000); //1000 = 1 sec
+    randFace = false;
     
     pBodyOutlineColor[0] = ofColor(10, 200, 100);
     pBodyOutlineColor[1] = ofColor(250, 0, 170);
@@ -166,6 +178,8 @@ void testApp::setup(){
     
     
     // OSC
+    blobsSynMade = false;
+    
     //to play title music
     oscSendI("/title", 1);
     
@@ -223,6 +237,12 @@ void testApp::update(){
         //TARGET MAKER
         if (tmOpen){
             
+            if (randFace){
+                int rand = ofRandom(curStage + 1);
+                tMan->setPbody(&pBodiesOriginalCopy[rand]);
+            }
+
+            
             Faces* tBody = tMan->update();
             
             if (tBody != NULL){
@@ -276,7 +296,13 @@ void testApp::update(){
 
         // OSC
         oscRecv();
-        if(OriginDestroyed) sendBlobsOSC();
+        if(OriginDestroyed){
+            if(!blobsSynMade){
+                oscSendI("/creatBlobSyn", blobsVec.size());
+                blobsSynMade = true;
+            }
+            sendBlobsOSC();
+        }
         
     }
     
@@ -407,7 +433,7 @@ void testApp::draw(){
             movie[i].setVolume(0.f);
             movie[i].stop();
         }
-        printf("blackout!\n");
+//        printf("blackout!\n");
     }
     
 }
@@ -753,7 +779,7 @@ void testApp::sendBlobsOSC()
     for(vector<ofxCvBlob>::iterator iter = blobsVec.begin(); iter != blobsVec.end(); iter++){
         
         ofxOscMessage m;
-        m.setAddress("/blobsMov");
+        m.setAddress("/blobs");
         m.addFloatArg(i);
         m.addFloatArg(iter->centroid.x);
         m.addFloatArg(iter->centroid.y);
@@ -875,6 +901,8 @@ void testApp::nextStage()
     if (curMovie < MOVNUM - 1){
         curMovie++;
         movie[curMovie].play();
+        movie[curMovie].setVolume(movAmp[curMovie]);
+        
     }
 
     if (curStage < STAGE_NUM){
@@ -952,6 +980,7 @@ void testApp::keyPressed(int key){
             if (curMovie != 0) movie[curMovie].stop();
 			curMovie = 1;
             movie[curMovie].play();
+            movie[curMovie].setVolume(movAmp[curMovie]);
 			break;
 
 		case '2':
@@ -1189,7 +1218,7 @@ void testApp::keyPressed(int key){
                     b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
                     (*iter)->breakBody();
                     
-                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
+//                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
                     
 
                 }
@@ -1218,15 +1247,22 @@ void testApp::keyPressed(int key){
 
         case 'o': //Make targets
 //            if(OriginDestroyed){
-                tmEnable(targetNum); // int target num
-                OriginDestroyed = false;
-//                nextStageReady = true;
+                tmEnable(targetNum[curStage]); // int target num
 //            }
             
             break;
 
             
         case 'n': //next step
+            
+            // Free previous blobs synths.
+            oscSendI("/creatBlobSyn", 0);
+
+            OriginDestroyed = false;
+            blobsSynMade = false;
+            
+            
+            
             
             if (!inTitle){
                 
@@ -1265,6 +1301,15 @@ void testApp::keyPressed(int key){
             }
             break;
 
+            
+        case 'r':
+            randFace = !randFace;
+            
+            if (randFace) printf("RandFace - ON!\n");
+            else printf("RandFace - OFF!\n");
+
+            break;
+            
             
 	}
 }

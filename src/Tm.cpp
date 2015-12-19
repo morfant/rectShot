@@ -43,7 +43,6 @@ void
 Tm::setPbody(Faces* pBody)
 {
     targetOrigin = pBody;
-    
 }
 
 void
@@ -84,7 +83,7 @@ Tm::dupPbody(Faces* pbody, float x, float y)
     
     // Get index
     int index = pbody->getIndex();
-    cout << "in Tm dupPbody index: " << index << endl;
+//    cout << "in Tm dupPbody index: " << index << endl;
     
     
     // GET Centroid

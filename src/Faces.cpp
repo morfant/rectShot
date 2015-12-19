@@ -39,7 +39,7 @@ Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float y
     isBreaked = false;
     isReal = _isReal;
     
-    fragLifeTimeBySec = 6.0f;
+    fragLifeTimeBySec = 12.0f;
     fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
     
     

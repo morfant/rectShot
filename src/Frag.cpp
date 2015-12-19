@@ -32,6 +32,7 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
     
     outlineDraw = false;
     outlineColor = outlineCol;
+    isSafeTri = false;
     
 
     
@@ -52,18 +53,29 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 //    mVertice[0].Set(0.0f, 0.0f);
 //    mVertice[1].Set(1.0f, 0.0f);
 //    mVertice[2].Set(0.0f, 1.0f);
+    
+    float fragArea = getArea(&vertices[0], 3);
+    printf("fragArea: %f\n", fragArea);
 
-    if(getArea(&vertices[0], 3) > 0){
+    
+    
+    if(fragArea > 0){
         triangle.Set(mVertice, 3);
     }else{
         cout << "safe tri made!!!" << endl;
         safeTriangle[0].Set(0.f, 0.f);
-        safeTriangle[1].Set(1.f, 1.f);
-        safeTriangle[2].Set(0.f, 1.f);
+        safeTriangle[1].Set(0.1f, 0.1f);
+        safeTriangle[2].Set(0.f, 0.1f);
         triangle.Set(safeTriangle, 3);
         isSafeTri = true;
     }
     
+    
+//    try {
+//        triangle.Set(mVertice, 3);
+//    } catch (<#catch parameter#>) {
+//        <#statements#>
+//    }
 
 	
 	b2FixtureDef myFixtureDef;
@@ -362,7 +374,7 @@ Frag::render()
     
     ofSetColor(0, 50, 120, alpha);
     
-//    if (isSafeTri) ofSetColor(255, 0, 0);
+    if (isSafeTri) ofSetColor(255, 0, 0);
     
 //    ofSetColor(0, 0, 0, alpha);
     ofFill();

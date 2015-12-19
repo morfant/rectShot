@@ -112,6 +112,7 @@ class testApp : public ofBaseApp{
         ofVideoGrabber 		vidGrabber;
         ofVideoPlayer 		movie[MOVNUM];
         ofVec2f             movRes[MOVNUM];
+        float               movAmp[MOVNUM];
         int                 curMovie;
         float               movDrawPosX, movDrawPosY;
         bool                movShow, grayShow, blobShow;
@@ -144,9 +145,10 @@ class testApp : public ofBaseApp{
     
         //TARGET MAKER
         ofColor     pBodyOutlineColor[STAGE_NUM];
+        int         targetNum[STAGE_NUM];
         Tm*         tMan;
         bool        tmOpen;
-        int         targetNum;
+        bool        randFace;
         int         curStage;
         unsigned long long stageStartTime;
         ofImage     title;
@@ -172,6 +174,7 @@ class testApp : public ofBaseApp{
         //OSC
         ofxOscSender            sender;
         ofxOscReceiver          receiver;
+        bool                    blobsSynMade;
 
     
         // container
