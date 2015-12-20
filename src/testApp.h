@@ -9,7 +9,7 @@
 // ---- Preprocessor command ----
 #pragma once
 
-#define REALTIME 1
+#define REALTIME 0
 
 // ---- Headers ----
 #include <iostream>
@@ -35,7 +35,7 @@ enum {
     GUNTIME = 10000,
     STAGE_NUM = 6,
     MOVNUM = 6, //Num of movie files + cam
-    TH_CAM = 100, //curMov = 0
+    TH_CAM = 0, //curMov = 0
     TH_1 = 94, //aya
     TH_2 = 103, //han
     TH_3 = 100, //sewol
@@ -81,7 +81,8 @@ class testApp : public ofBaseApp{
         void makeBodyAtCvPosition(vector<b2Vec2> vertices);
     
         //UTIL
-        float getArea(b2Vec2* vertices, int maxVCount);    
+        float getArea(b2Vec2* vertices, int maxVCount);
+        float getFragsArea();
     
     
         // OSC
@@ -90,6 +91,7 @@ class testApp : public ofBaseApp{
         void oscSendIFF(string addr, int i, float a, float b);
         void oscSendIF(string addr, int i, float a);
         void oscSendII(string addr, int i, int j);
+        void oscSendF(string addr, float i);
         void oscSendI(string addr, int i);
     
     
@@ -97,7 +99,7 @@ class testApp : public ofBaseApp{
         void nextStage();
         void nextStage(unsigned long long time, bool enable);
         void videoEnd();
-        void tmEnable(int tNum);
+        void tmEnable(int tNum, unsigned long long lifetime);
         void firstShotCheck(int curStage);
         bool isOriginalCopyed();
     
@@ -141,11 +143,13 @@ class testApp : public ofBaseApp{
         Ball*                   aBall;
         int                     pBodyIdx;
         bool                    touched;
+        float                   sumOfArea;
     
     
         //TARGET MAKER
         ofColor     pBodyOutlineColor[STAGE_NUM];
         int         targetNum[STAGE_NUM];
+        unsigned long long fragLifeTime[STAGE_NUM];
         Tm*         tMan;
         bool        tmOpen;
         bool        randFace;
@@ -153,6 +157,7 @@ class testApp : public ofBaseApp{
         unsigned long long stageStartTime;
         ofImage     title;
         bool        inTitle;
+        bool        inLastScene;
         bool        blackout;
         bool        OriginDestroyed;
         bool        nextStageReady;

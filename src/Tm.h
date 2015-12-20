@@ -32,6 +32,7 @@ protected:
     
     unsigned long long  startTime;
     unsigned long long  curTime;
+    unsigned long long  dupBodyFragLifeTime;
     float   timeInterval;
     Faces *   targetOrigin;
     
@@ -50,6 +51,7 @@ public:
     void    setTimer(float time);
     void    setPbody(Faces* pBody);
     void    setDupNum(int num);
+    void    setFragLifeTime(unsigned long long time);
     void    start();
     
     float   getTimer();
@@ -60,9 +62,9 @@ public:
         
 
     // Update & draw
-    Faces*    update();
-    bool            isEnd();
-    void    draw();
+    Faces*      update();
+    bool        isEnd();
+    void        draw();
     
     
     // Util

@@ -133,6 +133,7 @@ public:
     void    setIsNewBorn(bool born);
     void    setIsBreaked(bool isBreak);
     void    setFragOutlineColor(ofColor foc);
+    void    setFragLifeTimeBySec(unsigned long long lifetime);
     void    delMbody();
     void    pushForce(float x, float y);
         

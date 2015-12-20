@@ -52,6 +52,13 @@ Tm::setDupNum(int num)
 }
 
 void
+Tm::setFragLifeTime(unsigned long long time)
+{
+    dupBodyFragLifeTime = time;
+}
+
+
+void
 Tm::start()
 {
     enable = true;
@@ -112,6 +119,7 @@ Tm::dupPbody(Faces* pbody, float x, float y)
     // Duplicate pBody
     Faces * aPbody = new Faces(mWorld, &tVertice[0], kMAX_VERTICES, x, y, index, true, false, dupNum);
     aPbody->setFragOutlineColor(pbody->getFragOutlineColor());
+    aPbody->setFragLifeTimeBySec(dupBodyFragLifeTime);
 
     
     return aPbody;

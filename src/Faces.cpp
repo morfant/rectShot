@@ -645,6 +645,14 @@ Faces::setFragOutlineColor(ofColor foc)
 }
 
 
+void
+Faces::setFragLifeTimeBySec(unsigned long long lifetime)
+{
+    fragLifeTimeBySec = lifetime;
+    fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
+}
+
+
 
 void
 Faces::delMbody()

@@ -14,10 +14,12 @@ void testApp::setup(){
         ofSetWindowPosition(winPosX, winPosY);
         info = false;
         inTitle = true;
+        inLastScene = false;
         blackout = false;
     }else{
         info = true;
         inTitle = true;
+        inLastScene = false;
         blackout = false;
     }
     
@@ -145,7 +147,14 @@ void testApp::setup(){
     targetNum[2] = 10; //sewol
     targetNum[3] = 10; //park
     targetNum[4] = 30; //me
-    targetNum[5] = 0;
+    targetNum[5] = 30; //cam
+    
+    fragLifeTime[0] = 40.f; //aya
+    fragLifeTime[1] = 40.f; //han
+    fragLifeTime[2] = 40.f; //sewol
+    fragLifeTime[3] = 40.f; //park
+    fragLifeTime[4] = 40.f; //me
+    fragLifeTime[5] = 12.f; //cam
 
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
@@ -408,7 +417,8 @@ void testApp::draw(){
         << "num blobs found " << contourFinder.nBlobs << endl
         << "num polygonBodies " << pBodies.size() << endl
         << "aforce: " << aforce << endl
-        << "FPS: " << ofGetFrameRate();
+        << "FPS: " << ofGetFrameRate() << endl
+        << "Sum of Area: " << (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f << endl;
         ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
     }
@@ -478,7 +488,24 @@ void testApp::drawPolygonBodies(){
             
             delete (*iter);
             oscSendII("/pbDest", pidx, dupIdx);
+            
             iter = pBodies.erase(iter);
+            float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
+            oscSendF("/fgArea", fragAreaPercent);
+
+            if(inLastScene){
+                //cam ths adjust
+                threshold[0] = 130*(fragAreaPercent/100.f);
+                
+                if (fragAreaPercent > 25) {
+                    movShow = true;
+                }else{
+                    movShow = false;
+                }
+            }
+            
+            
+            
 //            cout << "pbodies size: " << pBodies.size() << endl;
 //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
             
@@ -498,6 +525,21 @@ void testApp::drawPolygonBodies(){
             if ( !(*iter)->getIsThereMBody() && !(*iter)->getIsBreaked()){
 //                cout << "pidx: " << pidx << " dupIdx: "<< dupIdx << " is breaked and disappearing" << endl;
                 oscSendII("/pbBrek", pidx, dupIdx);
+                float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
+                oscSendF("/fgArea", fragAreaPercent);
+                
+                if(inLastScene){
+                    //cam ths adjust
+                    threshold[0] = 130*(fragAreaPercent/100.f);
+
+                    if (fragAreaPercent > 25) {
+                        movShow = true;
+                    }else{
+                        movShow = false;
+                    }
+                    
+                }
+
                 (*iter)->setIsBreaked(true);
                 
                 vector<Frag*>frags = *(*iter)->getFrags();
@@ -706,6 +748,21 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
     
 }
 
+float testApp::getFragsArea(){
+    
+    sumOfArea = 0;
+    
+    for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++)
+    {
+        if (!(*iter)->getIsThereMBody()){
+            sumOfArea+=getArea((*iter)->getVertices(), kMAX_VERTICES);
+        }
+    };
+    
+    return sumOfArea; //Sum of Area of Frags.
+}
+
+
 
 // OSC
 void testApp::oscRecv()
@@ -751,7 +808,7 @@ void testApp::oscRecv()
         else if(m.getAddress() == "/butPresd"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg){
-                tmEnable(targetNum[curStage]); // int target num
+                tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
             }
             
 		}
@@ -848,6 +905,16 @@ testApp::oscSendII(string addr, int i, int j)
     m.setAddress(addr);
     m.addIntArg(i);
     m.addIntArg(j);
+    sender.sendMessage(m);
+}
+
+
+void
+testApp::oscSendF(string addr, float i)
+{
+    ofxOscMessage m;
+    m.setAddress(addr);
+    m.addFloatArg(i);
     sender.sendMessage(m);
 }
 
@@ -966,11 +1033,12 @@ void testApp::videoEnd()
             
 }
 
-void testApp::tmEnable(int tNum)
+void testApp::tmEnable(int tNum, unsigned long long lifetime)
 {
     cout << "target enabled, curStage: " << curStage << endl;
     tMan->setPbody(&pBodiesOriginalCopy[curStage]);
     tMan->setDupNum(tNum);
+    tMan->setFragLifeTime(lifetime);
 //    tMan->start();
     tmOpen = true;
 }
@@ -1268,7 +1336,7 @@ void testApp::keyPressed(int key){
 
         case 'o': //Make targets
 //            if(OriginDestroyed){
-                tmEnable(targetNum[curStage]); // int target num
+                tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
 //            }
             
             break;
@@ -1316,21 +1384,27 @@ void testApp::keyPressed(int key){
             break;
             
         case 'z':
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                printf("worldCenter of pbodies X: %f / Y: %f\n",
-                       (*iter)->getBody()->GetWorldCenter().x,
-                       (*iter)->getBody()->GetWorldCenter().y
-                       );
-            }
-            printf("\n\n");
             
             
-
             break;
 
             
         case 'r':
             randFace = !randFace;
+            
+            // Free previous blobs synths.
+            oscSendI("/creatBlobSyn", 0);
+            
+            if (!inLastScene) inLastScene = true;
+            
+            if (curMovie != 0) movie[curMovie].stop();
+            curMovie = 0;
+            movShow = false;
+            
+            OriginDestroyed = true;
+            blobsSynMade = false;
+            
+            
             
             if (randFace) printf("RandFace - ON!\n");
             else printf("RandFace - OFF!\n");
