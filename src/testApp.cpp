@@ -1,22 +1,31 @@
 #include "testApp.h"
 
+void testApp::exit()
+{
+    cout << "exiting.." << endl;
+    
+}
+
 //--------------------------------------------------------------
 void testApp::setup(){
     
-    int pjW = 1440;
-    int pjH = 900;
+    int pjW = 1920;
+    int pjH = 1080;
     
     float winPosX = (pjW - ofGetWidth())/2.f;
     float winPosY = (pjH - ofGetHeight())/2.f;
     
     if (REALTIME){
-//        ofSetWindowPosition(winPosX + ofGetWidth(), winPosY); //Extended desktop
-        ofSetWindowPosition(winPosX, winPosY);
+//        ofSetWindowPosition(winPosX + 1440, winPosY - 90); //Extended desktop
+        ofSetWindowPosition(0, 0);
+        
+
         info = false;
         inTitle = true;
         inLastScene = false;
         blackout = false;
     }else{
+        ofSetWindowPosition(0, 0);
         info = true;
         inTitle = true;
         inLastScene = false;
@@ -53,8 +62,8 @@ void testApp::setup(){
     movie[5].loadMovie("movies/me.mov");
     
     movAmp[1] = 0.5f;
-    movAmp[2] = 0.5f;
-    movAmp[3] = 0.3f;
+    movAmp[2] = 0.1f;
+    movAmp[3] = 0.1f;
     movAmp[4] = 0.2f;
     movAmp[5] = 0.5f;
 
@@ -146,15 +155,15 @@ void testApp::setup(){
     targetNum[1] = 10; //han
     targetNum[2] = 10; //sewol
     targetNum[3] = 10; //park
-    targetNum[4] = 30; //me
-    targetNum[5] = 30; //cam
+    targetNum[4] = 10; //me
+    targetNum[5] = 10; //cam
     
     fragLifeTime[0] = 40.f; //aya
     fragLifeTime[1] = 40.f; //han
     fragLifeTime[2] = 40.f; //sewol
     fragLifeTime[3] = 40.f; //park
     fragLifeTime[4] = 40.f; //me
-    fragLifeTime[5] = 12.f; //cam
+    fragLifeTime[5] = 20.f; //cam
 
     curStage = 0;
     stageStartTime = ofGetElapsedTimeMillis();
@@ -454,16 +463,6 @@ void testApp::draw(){
 
 /* ------------------------------------ */
 
-bool testApp::isOriginalCopyed()
-{
-    if (!pBodiesOriginalCopy[curMovie].getIsReal() && !pBodiesOriginalCopy[curMovie].getIsOriginal() ) {
-        return true;
-    }else{
-        return false;
-    }
-}
-
-
 void testApp::drawPolygonBodies(){
     
 //    cout << "num of pbodies: " << pBodies.size() << endl;
@@ -494,6 +493,9 @@ void testApp::drawPolygonBodies(){
             oscSendF("/fgArea", fragAreaPercent);
 
             if(inLastScene){
+                if(fragAreaPercent < 1) kBLOBNUM = 0;
+                else kBLOBNUM = 4;
+
                 //cam ths adjust
                 threshold[0] = 130*(fragAreaPercent/100.f);
                 
@@ -509,7 +511,7 @@ void testApp::drawPolygonBodies(){
 //            cout << "pbodies size: " << pBodies.size() << endl;
 //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
             
-        }else{ // When living
+        }else{ // When alive
             
             if(!pBodyIsOriginal){
                 bool pbIsBorn = (*iter)->getIsNewBorn();
@@ -529,6 +531,10 @@ void testApp::drawPolygonBodies(){
                 oscSendF("/fgArea", fragAreaPercent);
                 
                 if(inLastScene){
+                    
+                    if(fragAreaPercent < 1) kBLOBNUM = 0;
+                    else kBLOBNUM = 4;
+                    
                     //cam ths adjust
                     threshold[0] = 130*(fragAreaPercent/100.f);
 
@@ -778,13 +784,9 @@ void testApp::oscRecv()
 			shot_Y = m.getArgAsFloat(1);
             
             // check first shot
-            if (shot_X == -1 && shot_Y == -1){
-                if(isFirstShot[curStage] == false) {
-                    isFirstShot[curStage] = true;
-                    firstShotCheck(curStage);
-                }else{
-                    printf("No tracking info.\n");
-                }
+            if(isFirstShot[curStage] == false) {
+                isFirstShot[curStage] = true;
+                firstShotCheck(curStage);
             }else{
             
                 shot_X = (shot_X/640.f)*ofGetWidth();
@@ -794,31 +796,18 @@ void testApp::oscRecv()
                 isShot = true;
                 shotPointTest = true;
             }
-            
-            
-            
-		}else if(m.getAddress() == "/firstShot"){
-            
-            if (!isFirstShot[curStage]){
-                isFirstShot[curStage] = true;
-                firstShotCheck(curStage);
-            }
-        }
-        
-        else if(m.getAddress() == "/butPresd"){
+        }else if(m.getAddress() == "/gunButPressed"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg){
-                tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
+                if(!OriginDestroyed){
+                    if(isFirstShot[curStage] == true) {
+                        isFirstShot[curStage] = false;
+                    }
+                }else{
+                    tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
+                }
             }
-            
 		}
-//            else if(m.getAddress() == "/wavLen"){
-//            cout << "wavLen received" << endl;
-//            int index = m.getArgAsInt32(0);
-//            float len = m.getArgAsFloat(1);
-//            pBodies[index]->setAudioLen(len);
-//        }
-        
         
         else{
 			// unrecognized message: display on the bottom of the screen
@@ -1048,65 +1037,68 @@ void testApp::tmEnable(int tNum, unsigned long long lifetime)
 void testApp::keyPressed(int key){
 
 	switch (key){
-
         // Movie select - 0 means using vidGrabber
 		case '0':
-            if (curMovie != 0) movie[curMovie].stop();
-            curMovie = 0;
-			break;
-            
-		case '1':
-            inTitle = false;
-            grayShow = false;
-            movShow = true;
-            
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 1;
-            movie[curMovie].play();
-            movie[curMovie].setVolume(movAmp[curMovie]);
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 0;
+            }
 			break;
 
 		case '2':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 2;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 2;
+                movie[curMovie].play();
+            }
 			break;
-
 		case '3':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 3;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 3;
+                movie[curMovie].play();
+            }
 			break;
 
 		case '4':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 4;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 4;
+                movie[curMovie].play();
+            }
 			break;
 
 		case '5':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 5;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 5;
+                movie[curMovie].play();
+            }
 			break;
 
 		case '6':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 6;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 6;
+                movie[curMovie].play();
+            }
 			break;
 
 		case '7':
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 7;
-            movie[curMovie].play();
+            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 7;
+                movie[curMovie].play();
+            }
 			break;
             
             
             
         // Toggle threshold inverting.
 		case ' ':
-            inverting[curMovie] = !inverting[curMovie];
+            if(!REALTIME){
+                inverting[curMovie] = !inverting[curMovie];
+            }
 			break;
             
 		case '+':
@@ -1133,54 +1125,39 @@ void testApp::keyPressed(int key){
 
         // Toggle gray image play
 		case 'g':
-            if (grayShow) grayShow = false;
-            else grayShow = true;
-			break;
-
-		case 'G':
-            if (grayShow) grayShow = false;
-            else grayShow = true;
+            if(!REALTIME){
+                if (grayShow) grayShow = false;
+                else grayShow = true;
+            }
 			break;
             
             
         // Toggle original movie play full screen
 		case 'm':
-            if (movShow) movShow = false;
-            else{
-                grayShow = false;
-                movShow = true;
-            }
-			break;
-            
-		case 'M':
-            if (movShow) movShow = false;
-            else{
-                grayShow = false;
-                movShow = true;
+            if(!REALTIME){
+                if (movShow) movShow = false;
+                else{
+                    grayShow = false;
+                    movShow = true;
+                }
             }
 			break;
             
             
         // Toggle blobs drawing.
 		case 'b':
-            if (blobShow) blobShow = false;
-            else blobShow = true;
+            if(!REALTIME){
+                if (blobShow) blobShow = false;
+                else blobShow = true;
+            }
 			break;
             
-		case 'B':
-            if (blobShow) blobShow = false;
-            else blobShow = true;
-			break;
-
         // Toggle text info report.
 		case 'i':
-            if (info) info = false;
-            else info = true;
-			break;
-            
-		case 'I':
-            if (info) info = false;
-            else info = true;
+            if(!REALTIME){
+                if (info) info = false;
+                else info = true;
+            }
 			break;
             
         // Delete selected pbodies.
@@ -1214,89 +1191,53 @@ void testApp::keyPressed(int key){
 
         // Apply force to pBodies.
         case 't':
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                bool isSelected = (*iter)->getSelectState();
-                
-                if (isSelected) {
-                    b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-                    (*iter)->getBody()->ApplyForce(
-                                                   b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
-                                                   b2Vec2(ofGetMouseX(), ofGetMouseY()));
+            if(!REALTIME){
+                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                    bool isSelected = (*iter)->getSelectState();
+                    
+                    if (isSelected) {
+                        b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
+                        (*iter)->getBody()->ApplyForce(
+                                                       b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
+                                                       b2Vec2(ofGetMouseX(), ofGetMouseY()));
+                    }
                 }
             }
             
             break;
 
             
-        case 'T':
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                
-                b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-                //                printf("pBody x: %f, y: %f\n", pBodypos.x, pBodypos.y);
-                
-                (*iter)->getBody()->ApplyForce(
-                                               b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
-                                               b2Vec2(ofGetMouseX(), ofGetMouseY()));
-            }
-            
-            break;
-            
             
         // Add ball
         case 'a':
-            
-            aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), false);
-            balls.push_back(aBall);
+            if(!REALTIME){
+                aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), false);
+                balls.push_back(aBall);
+            }
             
             break;
             
             
         // Clear balls
         case 'c':
+            if(!REALTIME){
+                // clear b2Body
+                for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
+                    iWorld->DestroyBody((*iter)->getBody());
+                }
 
-            // clear b2Body
-            for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
-                iWorld->DestroyBody((*iter)->getBody());
+                // clear circle
+                balls.clear();
             }
-            
-            // clear circle
-            balls.clear();
 			break;
             
         case OF_KEY_UP:
-            aforce = aforce + 0.05f;
+            if(!REALTIME) aforce = aforce + 0.05f;
             break;
 
         case OF_KEY_DOWN:
-            aforce = aforce - 0.05f;
+            if(!REALTIME) aforce = aforce - 0.05f;
             break;
-
-        case OF_KEY_LEFT:
-            if (curStage > 0) {
-                curStage--;
-                cout << "curStage: " << curStage << endl;
-            }
-            
-            if (curMovie > 0) {
-                curMovie--;
-                cout << "curMovie: " << curMovie << endl;
-            }
-            
-            break;
-
-        case OF_KEY_RIGHT:
-            if (curStage < STAGE_NUM) {
-                curStage++;
-                cout << "curStage: " << curStage << endl;
-            }
-            
-            if (curMovie < STAGE_NUM) {
-                curMovie++;
-                cout << "curMovie: " << curMovie << endl;
-            }
-            
-            break;
-            
             
             
         case 'h': //simulaton 'h'itting body
@@ -1319,12 +1260,16 @@ void testApp::keyPressed(int key){
 //            cout << "count: " << iWorld->GetBodyCount() << endl;
 //            cout << "list: " << iWorld->GetBodyList() << endl;
 //            break;
+            
 
-        case 'd':
-//            cout << "d pressde" << endl;
-//            printf("mouse x: %d, y: %d\n", ofGetMouseX(), ofGetMouseY());
-//            
-//            dupPbody(pBodies[0], ofGetMouseX(), ofGetMouseY());
+        case 's': //video stop
+            if (curMoviePlaying){
+                movie[curMovie].stop();
+                curMoviePlaying = false;
+            }else{
+                movie[curMovie].play();
+                curMoviePlaying = true;
+            }
             break;
             
             
@@ -1333,20 +1278,32 @@ void testApp::keyPressed(int key){
             blackout = true;
             
             break;
-
+            
+		case '1':
+            inTitle = false;
+            grayShow = false;
+            movShow = true;
+            
+            if (curMovie != 0) movie[curMovie].stop();
+			curMovie = 1;
+            movie[curMovie].play();
+            movie[curMovie].setVolume(movAmp[curMovie]);
+			break;
+            
+            
         case 'o': //Make targets
-//            if(OriginDestroyed){
-                tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
-//            }
+            //            if(OriginDestroyed){
+            tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
+            //            }
             
             break;
-
+            
             
         case 'n': //next step
             
             // Free previous blobs synths.
             oscSendI("/creatBlobSyn", 0);
-
+            
             OriginDestroyed = false;
             blobsSynMade = false;
             blobShow = false;
@@ -1372,22 +1329,7 @@ void testApp::keyPressed(int key){
             
             
             break;
-
-        case 's': //video stop
-            if (curMoviePlaying){
-                movie[curMovie].stop();
-                curMoviePlaying = false;
-            }else{
-                movie[curMovie].play();
-                curMoviePlaying = true;
-            }
-            break;
             
-        case 'z':
-            
-            
-            break;
-
             
         case 'r':
             randFace = !randFace;

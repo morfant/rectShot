@@ -9,7 +9,7 @@
 // ---- Preprocessor command ----
 #pragma once
 
-#define REALTIME 0
+#define REALTIME 1
 
 // ---- Headers ----
 #include <iostream>
@@ -44,7 +44,6 @@ enum {
 
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
-    kBLOBNUM = 4,
     kMIN_BLOBAREA = 150
 };
 
@@ -56,6 +55,7 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+        void exit();
 		
     
 		void keyPressed(int key);
@@ -101,7 +101,6 @@ class testApp : public ofBaseApp{
         void videoEnd();
         void tmEnable(int tNum, unsigned long long lifetime);
         void firstShotCheck(int curStage);
-        bool isOriginalCopyed();
     
         // UI
         void touchingCheck();
@@ -123,6 +122,8 @@ class testApp : public ofBaseApp{
 
     
         //CV
+        int    kBLOBNUM = 4;
+    
         ofxCvColorImage			colorImg;
         ofxCvGrayscaleImage 	grayImage, grayBg, grayDiff;
         ofxCvContourFinder      contourFinder;
