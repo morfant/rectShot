@@ -25,7 +25,8 @@ void testApp::setup(){
         inLastScene = false;
         blackout = false;
     }else{
-        ofSetWindowPosition(0, 0);
+//        ofSetWindowPosition(0, 0);
+        ofSetWindowPosition((1440-800)/2, (900-600)/2);
         info = true;
         inTitle = true;
         inLastScene = false;
