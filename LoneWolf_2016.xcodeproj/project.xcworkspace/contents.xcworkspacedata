@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:cvBody_chainShape.xcodeproj">
+      location = "self:/Users/giy/of_v0.8.4_osx_release/apps/myApps/LoneWolf_2016/LoneWolf_2016.xcodeproj">
    </FileRef>
 </Workspace>
