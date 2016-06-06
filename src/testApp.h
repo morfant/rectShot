@@ -1,7 +1,5 @@
 //
 //  testApp.h
-//  cvBody_001
-//
 //  Created by giy.
 //
 //

@@ -887,23 +887,31 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		67E8112217D3341C0094D376 /* class */ = {
+		67D602731CC0C440000D4FAF /* shapes */ = {
 			isa = PBXGroup;
 			children = (
-				6758AA5817D386670078FA56 /* Box.h */,
-				6758AA5717D386670078FA56 /* Box.cpp */,
 				6780BE0417D36759006095C4 /* Faces.h */,
 				6780BE0317D36759006095C4 /* Faces.cpp */,
-				67347D7D17D171A00023B9AE /* World.h */,
-				67347D7C17D171A00023B9AE /* World.cpp */,
+				6771F1B71C115A120005B432 /* Frag.h */,
+				6771F1B61C115A120005B432 /* Frag.cpp */,
 				67E8112017D321A70094D376 /* Wall.h */,
 				67E8111F17D321A70094D376 /* Wall.cpp */,
 				67347D7817D171A00023B9AE /* Ball.h */,
 				67347D7717D171A00023B9AE /* Ball.cpp */,
+				6758AA5817D386670078FA56 /* Box.h */,
+				6758AA5717D386670078FA56 /* Box.cpp */,
+			);
+			name = shapes;
+			sourceTree = "<group>";
+		};
+		67E8112217D3341C0094D376 /* class */ = {
+			isa = PBXGroup;
+			children = (
+				67D602731CC0C440000D4FAF /* shapes */,
+				67347D7D17D171A00023B9AE /* World.h */,
+				67347D7C17D171A00023B9AE /* World.cpp */,
 				6768AA031BDA689A00BEA93C /* ContactListener.h */,
 				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
-				6771F1B71C115A120005B432 /* Frag.h */,
-				6771F1B61C115A120005B432 /* Frag.cpp */,
 				67AC82C31C1AF46500F7A687 /* Tm.h */,
 				67AC82C21C1AF46500F7A687 /* Tm.cpp */,
 			);
