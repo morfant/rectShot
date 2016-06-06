@@ -315,7 +315,7 @@
 		6771F1B71C115A120005B432 /* Frag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Frag.h; sourceTree = "<group>"; };
 		6780BE0317D36759006095C4 /* Faces.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Faces.cpp; sourceTree = "<group>"; };
 		6780BE0417D36759006095C4 /* Faces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Faces.h; sourceTree = "<group>"; };
-		679EDE761C1E600C0029C2DE /* LoneWolf_2016Debug.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoneWolf_2016Debug.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		679EDE761C1E600C0029C2DE /* rectShotDebug.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = rectShotDebug.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		679EDE781C1E600D0029C2DE /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		679EDE7C1C1E600D0029C2DE /* LoneWolf_2016 Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "LoneWolf_2016 Tests-Info.plist"; sourceTree = "<group>"; };
 		679EDE7E1C1E600D0029C2DE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -364,7 +364,7 @@
 		E45BE9770E8CC7DD009D7055 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		E45BE9790E8CC7DD009D7055 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		E45BE97A0E8CC7DD009D7055 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
-		E4B69B5B0A3A1756003C02F2 /* LoneWolf_2016Debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LoneWolf_2016Debug.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4B69B5B0A3A1756003C02F2 /* rectShotDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rectShotDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "openFrameworks-Info.plist"; sourceTree = "<group>"; };
 		E4C2424410CC5A17004149E2 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		E4C2424510CC5A17004149E2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -1031,8 +1031,8 @@
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				E45BE5980E8CC70C009D7055 /* frameworks */,
-				E4B69B5B0A3A1756003C02F2 /* LoneWolf_2016Debug.app */,
-				679EDE761C1E600C0029C2DE /* LoneWolf_2016Debug.xctest */,
+				E4B69B5B0A3A1756003C02F2 /* rectShotDebug.app */,
+				679EDE761C1E600C0029C2DE /* rectShotDebug.xctest */,
 				679EDE7A1C1E600D0029C2DE /* cvBody_chainShape Tests */,
 				679EDE771C1E600D0029C2DE /* Frameworks */,
 			);
@@ -1143,9 +1143,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		679EDE751C1E600C0029C2DE /* LoneWolf_2016 Tests */ = {
+		679EDE751C1E600C0029C2DE /* rectShot Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 679EDE871C1E600D0029C2DE /* Build configuration list for PBXNativeTarget "LoneWolf_2016 Tests" */;
+			buildConfigurationList = 679EDE871C1E600D0029C2DE /* Build configuration list for PBXNativeTarget "rectShot Tests" */;
 			buildPhases = (
 				679EDE721C1E600C0029C2DE /* Sources */,
 				679EDE731C1E600C0029C2DE /* Frameworks */,
@@ -1156,14 +1156,14 @@
 			dependencies = (
 				679EDE841C1E600D0029C2DE /* PBXTargetDependency */,
 			);
-			name = "LoneWolf_2016 Tests";
+			name = "rectShot Tests";
 			productName = "cvBody_chainShape Tests";
-			productReference = 679EDE761C1E600C0029C2DE /* LoneWolf_2016Debug.xctest */;
+			productReference = 679EDE761C1E600C0029C2DE /* rectShotDebug.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		E4B69B5A0A3A1756003C02F2 /* LoneWolf_2016 */ = {
+		E4B69B5A0A3A1756003C02F2 /* rectShot */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "LoneWolf_2016" */;
+			buildConfigurationList = E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "rectShot" */;
 			buildPhases = (
 				E4B69B580A3A1756003C02F2 /* Sources */,
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
@@ -1175,9 +1175,9 @@
 			dependencies = (
 				E4EEB9AC138B136A00A80321 /* PBXTargetDependency */,
 			);
-			name = LoneWolf_2016;
+			name = rectShot;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* LoneWolf_2016Debug.app */;
+			productReference = E4B69B5B0A3A1756003C02F2 /* rectShotDebug.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -1193,7 +1193,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "LoneWolf_2016" */;
+			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "rectShot" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1215,8 +1215,8 @@
 			);
 			projectRoot = "";
 			targets = (
-				E4B69B5A0A3A1756003C02F2 /* LoneWolf_2016 */,
-				679EDE751C1E600C0029C2DE /* LoneWolf_2016 Tests */,
+				E4B69B5A0A3A1756003C02F2 /* rectShot */,
+				679EDE751C1E600C0029C2DE /* rectShot Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -1355,7 +1355,7 @@
 /* Begin PBXTargetDependency section */
 		679EDE841C1E600D0029C2DE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E4B69B5A0A3A1756003C02F2 /* LoneWolf_2016 */;
+			target = E4B69B5A0A3A1756003C02F2 /* rectShot */;
 			targetProxy = 679EDE831C1E600D0029C2DE /* PBXContainerItemProxy */;
 		};
 		E4EEB9AC138B136A00A80321 /* PBXTargetDependency */ = {
@@ -1416,7 +1416,7 @@
 				INFOPLIST_FILE = "cvBody_chainShape Tests/LoneWolf_2016 Tests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = LoneWolf_2016Debug;
+				PRODUCT_NAME = rectShotDebug;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -1458,7 +1458,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "cvBody_chainShape Tests/LoneWolf_2016 Tests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRODUCT_NAME = LoneWolf_2016Debug;
+				PRODUCT_NAME = rectShotDebug;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -1793,7 +1793,7 @@
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
 				);
-				PRODUCT_NAME = LoneWolf_2016Debug;
+				PRODUCT_NAME = rectShotDebug;
 				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1901,7 +1901,7 @@
 					"$(OF_CORE_LIBS)",
 					../../../addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a,
 				);
-				PRODUCT_NAME = LoneWolf_2016Debug;
+				PRODUCT_NAME = rectShotDebug;
 				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1910,7 +1910,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		679EDE871C1E600D0029C2DE /* Build configuration list for PBXNativeTarget "LoneWolf_2016 Tests" */ = {
+		679EDE871C1E600D0029C2DE /* Build configuration list for PBXNativeTarget "rectShot Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				679EDE851C1E600D0029C2DE /* Debug */,
@@ -1919,7 +1919,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "LoneWolf_2016" */ = {
+		E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "rectShot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4B69B4E0A3A1720003C02F2 /* Debug */,
@@ -1928,7 +1928,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "LoneWolf_2016" */ = {
+		E4B69B5F0A3A1757003C02F2 /* Build configuration list for PBXNativeTarget "rectShot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4B69B600A3A1757003C02F2 /* Debug */,
