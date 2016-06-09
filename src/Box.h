@@ -26,7 +26,7 @@ protected:
     float   posY;
     
     // Size
-    float   size = 10.f;
+    float   size = 100.f;
     
 	// Box2D
 	b2Body*		mBody;
@@ -56,6 +56,10 @@ public:
     // Update & draw
     void    update();
     void    draw();
+    
+    
+    // etc
+    bool    toBlack = false;
     
     
     

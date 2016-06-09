@@ -139,6 +139,7 @@ class testApp : public ofBaseApp{
         b2World*                iWorld; //aWorld -> getWorld()
         Wall                    *left, *right, *floor, *ceil;
         Box*                    aBox;
+        Box*                    bBox;
         Ball*                   aBall;
         int                     pBodyIdx;
         bool                    touched;
@@ -185,6 +186,7 @@ class testApp : public ofBaseApp{
         Faces       pBodiesOriginalCopy[STAGE_NUM];
         vector<Ball*>           balls;
         vector<Box*>            boxes;
+        vector<Box*>            blackBoxes;
         vector<Faces*>          pBodies;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;

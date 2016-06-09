@@ -23,8 +23,8 @@ Box::Box(b2World* aWorld, float x, float y)
 //    posY = ofGetHeight()/2;
     
 	b2BodyDef myBodyDef;
-	myBodyDef.type = b2_staticBody;
-//	myBodyDef.type = b2_dynamicBody;
+//	myBodyDef.type = b2_staticBody;
+	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -37,8 +37,8 @@ Box::Box(b2World* aWorld, float x, float y)
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &myPolygonShape;
 	myFixtureDef.density = 20.f;
-    myFixtureDef.restitution = 0.5f;
-    myFixtureDef.isSensor = true;
+    myFixtureDef.restitution = 0.8f;
+//    myFixtureDef.isSensor = true;
     mBody->CreateFixture(&myFixtureDef);
 
 	
@@ -97,7 +97,12 @@ Box::renderAtBodyPosition()
     b2Vec2 pos = mBody->GetPosition();
     
     ofPushStyle();
-    ofSetColor(0, 0, 255);
+    
+    if (toBlack){
+        ofSetColor(0, 0, 0);
+    }else{
+        ofSetColor(255, 255, 255);
+    }
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
     ofSetRectMode(OF_RECTMODE_CENTER);
@@ -122,3 +127,5 @@ Box::draw()
 
 
 }
+
+

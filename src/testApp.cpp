@@ -139,10 +139,10 @@ void testApp::setup(){
 
     // Wall - box
     int thickness = 20.f;
-    left = new Wall(iWorld, 0, ofGetHeight()/2, thickness, ofGetHeight());
-    right = new Wall(iWorld, ofGetWidth(), ofGetHeight()/2, thickness, ofGetHeight());
-    floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight(), ofGetWidth(), thickness);
-    ceil = new Wall(iWorld, ofGetWidth()/2, 0, ofGetWidth(), thickness);
+    left = new Wall(iWorld, 0 - thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
+    right = new Wall(iWorld, ofGetWidth() + thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
+    floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight() + thickness/2, ofGetWidth(), thickness);
+    ceil = new Wall(iWorld, ofGetWidth()/2, 0 - thickness/2, ofGetWidth(), thickness);
     
     
     // vector init
@@ -334,7 +334,7 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
   
-
+    
 //    ofBackground(255);
     ofBackground(0);
 
@@ -384,11 +384,12 @@ void testApp::draw(){
     ceil->renderAtBodyPosition();
     
     
+    
     // Draw body at cv pos
     if(pBodies.size()) drawPolygonBodies();
     
 
-    if (!REALTIME) {
+//    if (!REALTIME) {
         // Draw ball
         for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
             (*iter)->renderAtBodyPosition();
@@ -399,7 +400,13 @@ void testApp::draw(){
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
             (*iter)->renderAtBodyPosition();
         }
-    }
+
+        // Draw black boxes
+        for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+            (*iter)->renderAtBodyPosition();
+        }
+    
+//    }
     
     
     // LaserPointTracking point
@@ -1040,57 +1047,59 @@ void testApp::keyPressed(int key){
 	switch (key){
         // Movie select - 0 means using vidGrabber
 		case '0':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 0;
-            }
+//            }
 			break;
 
 		case '2':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 2;
                 movie[curMovie].play();
-            }
+                
+                cout << "press 2" << endl;
+//            }
 			break;
 		case '3':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 3;
                 movie[curMovie].play();
-            }
+//            }
 			break;
 
 		case '4':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 4;
                 movie[curMovie].play();
-            }
+//            }
 			break;
 
 		case '5':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 5;
                 movie[curMovie].play();
-            }
+//            }
 			break;
 
 		case '6':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 6;
                 movie[curMovie].play();
-            }
+//            }
 			break;
 
 		case '7':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
                 curMovie = 7;
                 movie[curMovie].play();
-            }
+//            }
 			break;
             
             
@@ -1126,39 +1135,39 @@ void testApp::keyPressed(int key){
 
         // Toggle gray image play
 		case 'g':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (grayShow) grayShow = false;
                 else grayShow = true;
-            }
+//            }
 			break;
             
             
         // Toggle original movie play full screen
 		case 'm':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (movShow) movShow = false;
                 else{
                     grayShow = false;
                     movShow = true;
                 }
-            }
+//            }
 			break;
             
             
         // Toggle blobs drawing.
 		case 'b':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (blobShow) blobShow = false;
                 else blobShow = true;
-            }
+//            }
 			break;
             
         // Toggle text info report.
 		case 'i':
-            if(!REALTIME){
+//            if(!REALTIME){
                 if (info) info = false;
                 else info = true;
-            }
+//            }
 			break;
             
         // Delete selected pbodies.
@@ -1211,17 +1220,17 @@ void testApp::keyPressed(int key){
             
         // Add ball
         case 'a':
-            if(!REALTIME){
+//            if(!REALTIME){
                 aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), false);
                 balls.push_back(aBall);
-            }
+//            }
             
             break;
             
             
         // Clear balls
         case 'c':
-            if(!REALTIME){
+//            if(!REALTIME){
                 // clear b2Body
                 for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
                     iWorld->DestroyBody((*iter)->getBody());
@@ -1229,7 +1238,16 @@ void testApp::keyPressed(int key){
 
                 // clear circle
                 balls.clear();
+            
+            
+            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+                iWorld->DestroyBody((*iter)->getBody());
             }
+            
+            // clear circle
+            boxes.clear();
+            
+//            }
 			break;
             
         case OF_KEY_UP:
@@ -1264,15 +1282,42 @@ void testApp::keyPressed(int key){
             
 
         case 's': //video stop
-            if (curMoviePlaying){
-                movie[curMovie].stop();
-                curMoviePlaying = false;
-            }else{
-                movie[curMovie].play();
-                curMoviePlaying = true;
-            }
+//            if (curMoviePlaying){
+//                movie[curMovie].stop();
+//                curMoviePlaying = false;
+//            }else{
+//                movie[curMovie].play();
+//                curMoviePlaying = true;
+//            }
+            
+            
+            inTitle = false;
+            bBox = new Box(iWorld, ofGetWidth()/2, ofGetHeight()/2);
+            boxes.push_back(bBox);
             break;
             
+        case 'z':
+//            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+//                iWorld->DestroyBody((*iter)->getBody());
+//            }
+//
+            if (boxes.size()){
+                iWorld->DestroyBody((boxes.back())->getBody());
+                boxes.pop_back();
+            }
+            
+            break;
+            
+        case 'd':
+            if (boxes.size()){
+                
+                boxes.back()->toBlack = true;
+                boxes.pop_back();
+                
+                blackBoxes.push_back(boxes.back());
+            }
+            
+            break;
             
         case 'j':
             
