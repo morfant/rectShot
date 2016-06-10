@@ -337,7 +337,11 @@ void testApp::draw(){
     
 //    ofBackground(255);
     ofBackground(0);
+    
+    ofSetColor(0, 255, 0);
+    ofCircle(500, 500, 5);
 
+    ofCircle(1000, 500, 5);
     
 
     // Draw gray image.
@@ -398,11 +402,13 @@ void testApp::draw(){
         
         // Draw boxes
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            (*iter)->update();
             (*iter)->renderAtBodyPosition();
         }
 
         // Draw black boxes
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+            (*iter)->update();
             (*iter)->renderAtBodyPosition();
         }
     

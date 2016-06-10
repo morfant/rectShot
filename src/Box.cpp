@@ -98,10 +98,13 @@ Box::renderAtBodyPosition()
     
     ofPushStyle();
     
+//    float alpha = (255 - age);
+    float alpha = 255;
+    
     if (toBlack){
-        ofSetColor(0, 0, 0);
+        ofSetColor(0, 0, 0, MAX(0, alpha));
     }else{
-        ofSetColor(255, 255, 255);
+        ofSetColor(255, 255, 255, MAX(0, alpha));
     }
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
@@ -116,7 +119,7 @@ Box::renderAtBodyPosition()
 void
 Box::update()
 {
-    
+    age++;
 }
 
 
