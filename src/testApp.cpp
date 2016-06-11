@@ -21,14 +21,14 @@ void testApp::setup(){
         
 
         info = false;
-        inTitle = true;
+        inTitle = false;
         inLastScene = false;
         blackout = false;
     }else{
 //        ofSetWindowPosition(0, 0);
         ofSetWindowPosition((1440-800)/2, (900-600)/2);
         info = true;
-        inTitle = true;
+        inTitle = false;
         inLastScene = false;
         blackout = false;
     }
@@ -51,9 +51,9 @@ void testApp::setup(){
     curMoviePlaying = true;
     
     // Playing source select
-    movShow = true;
+    movShow = false;
     grayShow = false;
-    blobShow = true;
+    blobShow = false;
     
     movie[1].loadMovie("movies/ayaSum.mov");
     movie[2].loadMovie("movies/han720.mov");
@@ -295,6 +295,19 @@ void testApp::update(){
                     }
                 }
             }
+
+            
+            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+//                if ( (*iter)->getIsThereMBody() ){
+                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+                        (*iter)->breakBody();
+                        cout << "hit!" << endl;
+                        bodyHit = true;
+                        //                    break;
+                    }
+//                }
+            }
+            
             
             if(!bodyHit){
             
@@ -315,6 +328,7 @@ void testApp::update(){
 
         // OSC
         oscRecv();
+        
         if(OriginDestroyed){
             if(!blobsSynMade){
                 oscSendI("/creatBlobSyn", blobsVec.size());
@@ -334,14 +348,27 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
   
+    // Box isinside test
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        
+//        cout << "MousePos: " << ofGetMouseX() << " , " << ofGetMouseY() << endl;
+        
+        if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+//            (*iter)->breakBody();
+            cout << "Box isinsed!!" << endl;
+//            bodyHit = true;
+            //                    break;
+        }else{
+//            cout << "NN" << endl;
+        }
+    }
     
 //    ofBackground(255);
     ofBackground(0);
     
-    ofSetColor(0, 255, 0);
-    ofCircle(500, 500, 5);
-
-    ofCircle(1000, 500, 5);
+    
+    
+    
     
 
     // Draw gray image.
@@ -450,7 +477,7 @@ void testApp::draw(){
     
     
     if (inTitle){
-        printf("inTitle true.\n");
+//        printf("inTitle true.\n");
         movShow = false;
         blobShow = false;
         grayShow = false;
@@ -470,6 +497,18 @@ void testApp::draw(){
         }
 //        printf("blackout!\n");
     }
+ 
+    
+    
+    
+    //TEST POINTS
+    ofSetColor(0, 255, 0);
+    ofCircle(500, 500, 5);
+    
+    ofCircle(1000, 500, 5);
+    
+    ofSetColor(255, 0, 0);
+    ofCircle(400, 300, 5);
     
 }
 
@@ -810,6 +849,7 @@ void testApp::oscRecv()
                 isShot = true;
                 shotPointTest = true;
             }
+            
         }else if(m.getAddress() == "/gunButPressed"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg){
@@ -1264,6 +1304,9 @@ void testApp::keyPressed(int key){
             if(!REALTIME) aforce = aforce - 0.05f;
             break;
             
+        case 'q':
+            isShot = true;
+            break;
             
         case 'h': //simulaton 'h'itting body
             
@@ -1275,6 +1318,18 @@ void testApp::keyPressed(int key){
                     break;
              
 //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
+                }
+            }
+            
+ 
+            
+            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+                
+                if ((*iter)->getIsThereMBody()) {
+                    (*iter)->breakBody();
+                    break;
+                    
+                    //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
                 }
             }
             
@@ -1438,11 +1493,16 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
+
     
     if (button == 0){
-        makeFaceAt(x, y);
-        cout << "makefaceat x: " << x << " / y: " << y << endl;
-        selBlobRect = 0;
+        
+        cout << "MousePos x: " << x << " / y: " << y << endl;
+        
+        
+//        makeFaceAt(x, y);
+//        cout << "makefaceat x: " << x << " / y: " << y << endl;
+//        selBlobRect = 0;
     }
         
     

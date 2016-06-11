@@ -14,8 +14,11 @@
 #include <iostream>
 #include "ofMain.h"
 #include "Box2D.h"
+#include "Frag.h"
 #include "convertFunc.h"
 
+#define N_VERTICE 4 //for Rectangle.
+#define N_FRAGS 40
 
 // ----Class definition----
 class Box{
@@ -33,13 +36,39 @@ protected:
 	b2Body*		mBody;
     b2World*    mWorld;
     
+    const int     maxVertexCount = N_VERTICE; //just for rectangle.
+    
+    b2Vec2 mVertice[N_FRAGS];
+    b2Vec2 mVerticeDiv[N_FRAGS];
+    b2Vec2 tVertice[N_VERTICE];
+    
+    
+    ofColor fragOutlineColor;
+    vector<Frag*>   mFrags;
+    bool                    isAlive;
+    bool                    isThereMbodybool;
+    bool                    isOriginal;
+    float       fragLifeTimeBySec;
+    float       fragLifeTime;
+    
+    
     
 public:
+    
+    // VARIABLE
+    // etc
+    bool    toBlack = false;
+    int     age = 0;
+    
+    
+    // FUNCTION
     // Birth and Death
     Box(b2World* world, float x, float y);
     ~Box();
     
     // Getter
+    bool    getIsThereMBody();
+    
     float   getX();
     float   getY();
     
@@ -58,12 +87,22 @@ public:
     void    update();
     void    draw();
     
+    // Etc
+    void    delMbody();
+    float   getArea(b2Vec2*, int);
+    float   perp_dot(ofVec2f a, ofVec2f b);
+    float   perp_dot(b2Vec2 a, b2Vec2 b);
     
-    // etc
-    bool    toBlack = false;
-    int     age = 0;
+    void    breakBody();
+    void    makeMvertice();
+    bool    IsInside(b2Vec2 p);
+    void    pushForce(float x, float y);
     
+    // Frag
+    void    renderFrags();
+    void    clearFrags();
     
+
     
     
     
