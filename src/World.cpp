@@ -15,8 +15,8 @@ World::World()
     gravity = b2Vec2(GRAVITY_X, GRAVITY_Y);
     mWorld = new b2World(gravity);
     
-    contactlistener = new ContactListener();
-    mWorld->SetContactListener(contactlistener);
+//    contactlistener = new ContactListener();
+//    mWorld->SetContactListener(contactlistener);
     
 
 }

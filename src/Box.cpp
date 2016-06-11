@@ -21,7 +21,7 @@ Box::Box(b2World* aWorld, float x, float y)
     
     isThereMbodybool = true;
     
-    fragLifeTimeBySec = 6.0f;
+    fragLifeTimeBySec = 2.0f;
     fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
     
     
@@ -78,19 +78,25 @@ Box::renderFrags()
 {
     if (!isThereMbodybool){
         
-        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end();) {
-            bool fragIsAlive = (*iter)->update();
-            
-            if (!fragIsAlive) {
-                delete (*iter);
-                iter = mFrags.erase(iter);
-                isAlive = false;
+        if (mFrags.size()){
+            for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end();) {
+                bool fragIsAlive = (*iter)->update();
                 
-            }else{
-                (*iter)->render();
-                iter++;
+                if (!fragIsAlive) {
+                    delete (*iter);
+                    iter = mFrags.erase(iter);
+                    
+                    
+                }else{
+                    (*iter)->render();
+                    iter++;
+                }
             }
+        }else{
+//            cout << "All frags gone" << endl;
+            isFragsRemain = false;
         }
+        
     }
     
 }
@@ -104,6 +110,11 @@ Box::getIsThereMBody()
     return isThereMbodybool;
 }
 
+bool
+Box::getFragsRemain()
+{
+    return isFragsRemain;
+}
 
 float
 Box::getX()
@@ -131,6 +142,14 @@ Box::getBody()
 
 }
 
+
+void
+Box::setToBlack(bool makeBlack)
+{
+    toBlack = makeBlack;
+}
+
+
 void
 Box::setX(float _posX)
 {
@@ -157,16 +176,31 @@ Box::renderAtBodyPosition()
         
     //    float alpha = (255 - age);
         float alpha = 255;
-        
-        if (toBlack){
-            ofSetColor(0, 0, 0, MAX(0, alpha));
-        }else{
-            ofSetColor(255, 255, 255, MAX(0, alpha));
-        }
+//        
+//        if (toBlack){
+//            ofSetColor(0, 0, 0, MAX(0, alpha));
+//            
+//        }else{
+//            ofSetColor(255, 255, 255, MAX(0, alpha));
+//        }
         ofPushMatrix();
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
         ofSetRectMode(OF_RECTMODE_CENTER);
-        ofRect(0, 0, size, size);
+
+        if (toBlack){
+            ofSetColor(255, 255, 255, 255);
+//            ofNoFill();
+//            ofFill();
+            ofRect(0, 0, size+4, size+4);
+            
+            ofSetColor(0, 0, 0, MAX(0, alpha));
+//            ofFill();
+            ofRect(0, 0, size, size);
+            
+        }else{
+            ofSetColor(255, 255, 255, MAX(0, alpha));
+            ofRect(0, 0, size, size);
+        }
         ofPopMatrix();
         ofPopStyle();
     }else{
@@ -180,7 +214,7 @@ Box::renderAtBodyPosition()
 void
 Box::update()
 {
-    age++;
+//    age++;
 }
 
 
@@ -417,6 +451,85 @@ Box::breakBody()
     //    breakFrags();
 //    pushForce(cx, cy);
     
+}
+
+
+void
+Box::breakBody(float hitX, float hitY)
+{
+    
+    if (isThereMbodybool) delMbody();
+    
+    makeMvertice();
+    
+    float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
+    float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
+    //    cout << "movX: " << movX << " / " << "movY: " << movY << endl;
+    
+    
+    // Translate to (movX, movY)
+    for (int i = 0; i <= N_FRAGS; i++){
+        mVerticeDiv[i].x = mVerticeDiv[i].x + (movX + posX - size/2);
+        mVerticeDiv[i].y = mVerticeDiv[i].y + (movY + posY - size/2);
+    }
+    
+    
+    float cx = hitX;
+    float cy = hitY;
+    
+    //    cout << "cx: " << cx << " / " << "cy: " << cy << endl;
+    
+    
+    int fragIdx = 0;
+    for (int i = 0; i < N_FRAGS; i++){
+        
+        b2Vec2 vertices[3];
+        //        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+        b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+        b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+        
+        ofVec2f vAB(b.x - a.x, b.y - a.y);
+        ofVec2f vBC(c.x - b.x, c.y - b.y);
+        
+        vAB.normalize();
+        vBC.normalize();
+        
+        float d = perp_dot(vAB, vBC);
+        
+        //        if(d < 0){
+        //                        cout << "RIGHT\n";
+        //        }else{
+        //                        cout << "LEFT\n";
+        //        }
+        
+        for (int j = 0; j < 3; j++){
+            //            vertices[0] = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+            vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+        }
+        
+        // To keep CCW direction.
+        if (d < 0){
+            //            cout << "2 and 1 changed\n" << endl;
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        }
+        
+        
+        // If the area did not have minus value.
+        if(getArea(&vertices[0], 3) > 0){
+            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, 0, fragIdx, fragOutlineColor);
+            aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
+            mFrags.push_back(aFrag);
+            fragIdx++;
+        }
+        
+    }
+    
+    //    breakFrags();
+//        pushForce(cx, cy);
     
 }
 
@@ -425,11 +538,9 @@ void
 Box::pushForce(float x, float y)
 {
     
-    //    cout << "cx: " << x << " / " << "cy: " << y << endl;
-    
     for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
         
-        float forceMul = 0.005f;
+        float forceMul = 0.001f;
         b2Vec2 centerPoint = (*iter)->getBody(0)->GetWorldCenter();
         
         //        cout << "idx: " << i << " - centerPoint of frags: " << _toPixelX(centerPoint.x) << " / " << _toPixelY(centerPoint.y) << endl;

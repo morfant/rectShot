@@ -29,8 +29,8 @@ protected:
     float   posY;
     
     // Size
-//    float   size = 100.f;
-    float   size = 180.f;
+    float   size = 100.f;
+//    float   size = 180.f;
     
 	// Box2D
 	b2Body*		mBody;
@@ -45,19 +45,19 @@ protected:
     
     ofColor fragOutlineColor;
     vector<Frag*>   mFrags;
-    bool                    isAlive;
+    bool    isFragsRemain = true;
     bool                    isThereMbodybool;
     bool                    isOriginal;
     float       fragLifeTimeBySec;
     float       fragLifeTime;
     
+    bool    toBlack = false;
     
     
 public:
     
     // VARIABLE
     // etc
-    bool    toBlack = false;
     int     age = 0;
     
     
@@ -68,6 +68,7 @@ public:
     
     // Getter
     bool    getIsThereMBody();
+    bool    getFragsRemain();
     
     float   getX();
     float   getY();
@@ -77,6 +78,7 @@ public:
     b2Body*     getBody();
     
     // Setter
+    void    setToBlack(bool makeBlack);
     void    setX(float posX);
     void    setY(float posY);
         
@@ -94,6 +96,7 @@ public:
     float   perp_dot(b2Vec2 a, b2Vec2 b);
     
     void    breakBody();
+    void    breakBody(float hitPointX, float hitPointY);
     void    makeMvertice();
     bool    IsInside(b2Vec2 p);
     void    pushForce(float x, float y);

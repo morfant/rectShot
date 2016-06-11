@@ -289,8 +289,9 @@ void testApp::update(){
                 if ( (*iter)->getIsThereMBody() ){
                     if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                         (*iter)->breakBody();
-                        cout << "hit!" << endl;
+                        cout << "hit Face!" << endl;
                         bodyHit = true;
+                    
     //                    break;
                     }
                 }
@@ -298,14 +299,28 @@ void testApp::update(){
 
             
             for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-//                if ( (*iter)->getIsThereMBody() ){
+                if ( (*iter)->getIsThereMBody() ){
                     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-                        (*iter)->breakBody();
-                        cout << "hit!" << endl;
+//                        (*iter)->breakBody();
+                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        cout << "hit Box!" << endl;
                         bodyHit = true;
-                        //                    break;
+                        
                     }
-//                }
+                }
+            }
+            
+            
+            for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+                if ( (*iter)->getIsThereMBody() ){
+                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+                        //                        (*iter)->breakBody();
+                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+//                        blackBoxes.erase(iter);
+                        cout << "hit Black Box!" << endl;
+                        bodyHit = true;
+                    }
+                }
             }
             
             
@@ -349,21 +364,18 @@ void testApp::update(){
 void testApp::draw(){
   
     // Box isinside test
-    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-        
-//        cout << "MousePos: " << ofGetMouseX() << " , " << ofGetMouseY() << endl;
+//    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+    for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
         
         if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-//            (*iter)->breakBody();
             cout << "Box isinsed!!" << endl;
-//            bodyHit = true;
-            //                    break;
         }else{
-//            cout << "NN" << endl;
+            cout << "NN" << endl;
         }
     }
+
     
-//    ofBackground(255);
+    //    ofBackground(255);
     ofBackground(0);
     
     
@@ -428,16 +440,22 @@ void testApp::draw(){
 
         
         // Draw boxes
+    if (boxes.size()){
+//        cout << "size of boxes: " << boxes.size() << endl;
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
             (*iter)->update();
             (*iter)->renderAtBodyPosition();
         }
-
+    }
+    
+    if (blackBoxes.size()){
+//        cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
         // Draw black boxes
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
             (*iter)->update();
             (*iter)->renderAtBodyPosition();
         }
+    }
     
 //    }
     
@@ -509,6 +527,35 @@ void testApp::draw(){
     
     ofSetColor(255, 0, 0);
     ofCircle(400, 300, 5);
+    
+    
+    
+    // Clear no Frags box
+    if (boxes.size()){
+        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); ) {
+            bool hasFrags = (*iter)->getFragsRemain();
+            if (!hasFrags){
+                boxes.erase(iter);
+                cout << "size of boxes after erase: " << boxes.size() << endl;
+            }else{
+                iter++;
+            }
+        }
+    }
+    
+    if (blackBoxes.size()){
+        for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); ) {
+            bool hasFrags = (*iter)->getFragsRemain();
+            if (!hasFrags){
+                blackBoxes.erase(iter);
+                cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
+            }else{
+                iter++;
+            }
+        }
+    }
+    
+    
     
 }
 
@@ -841,11 +888,8 @@ void testApp::oscRecv()
                 isFirstShot[curStage] = true;
                 firstShotCheck(curStage);
             }else{
-            
-                shot_X = (shot_X/640.f)*ofGetWidth();
-                shot_Y = (shot_Y/480.f)*ofGetHeight();
                 
-                cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
+//                cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
                 isShot = true;
                 shotPointTest = true;
             }
@@ -1277,21 +1321,23 @@ void testApp::keyPressed(int key){
         // Clear balls
         case 'c':
 //            if(!REALTIME){
-                // clear b2Body
+                // ball
                 for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
                     iWorld->DestroyBody((*iter)->getBody());
                 }
-
-                // clear circle
                 balls.clear();
             
+                // box
+                for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+                    if ((*iter)->getIsThereMBody()) iWorld->DestroyBody((*iter)->getBody());
+                }
+                boxes.clear();
             
-            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-                iWorld->DestroyBody((*iter)->getBody());
-            }
-            
-            // clear circle
-            boxes.clear();
+                // blackbox
+                for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+                    if ((*iter)->getIsThereMBody()) iWorld->DestroyBody((*iter)->getBody());
+                }
+                blackBoxes.clear();
             
 //            }
 			break;
@@ -1322,14 +1368,22 @@ void testApp::keyPressed(int key){
             }
             
  
-            
-            for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            if (boxes.size() > 1){
                 
-                if ((*iter)->getIsThereMBody()) {
-                    (*iter)->breakBody();
-                    break;
-                    
-                    //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
+                for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+                    if ((*iter)->getIsThereMBody()) {
+                        (*iter)->breakBody();
+                        break;
+                    }
+                }
+                
+            }else{
+                
+                for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+                    if ((*iter)->getIsThereMBody()) {
+                        (*iter)->breakBody();
+                        break;
+                    }
                 }
             }
             
@@ -1370,12 +1424,15 @@ void testApp::keyPressed(int key){
             break;
             
         case 'd':
-            if (boxes.size()){
+            if (boxes.size() > 0){
                 
-                boxes.back()->toBlack = true;
+                boxes.back()->setToBlack(true);
+                blackBoxes.push_back(boxes.back());
+                cout << "size after pop back: " << boxes.size() << endl;
                 boxes.pop_back();
                 
-                blackBoxes.push_back(boxes.back());
+                
+                
             }
             
             break;
