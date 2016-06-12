@@ -7,7 +7,7 @@
 // ---- Preprocessor command ----
 #pragma once
 
-#define REALTIME 1
+#define REALTIME 0
 
 // ---- Headers ----
 #include <iostream>
@@ -137,7 +137,7 @@ class testApp : public ofBaseApp{
         //Box2d
         World*                  aWorld;
         b2World*                iWorld; //aWorld -> getWorld()
-        Wall                    *left, *right, *floor, *ceil;
+        Wall                    *left, *right, *floor, *ceil, *center;
         Box*                    aBox;
         Box*                    bBox;
         Ball*                   aBall;

@@ -8,6 +8,7 @@ void testApp::exit()
 
 //--------------------------------------------------------------
 void testApp::setup(){
+
     
     int pjW = 1920;
     int pjH = 1080;
@@ -17,16 +18,16 @@ void testApp::setup(){
     
     if (REALTIME){
 //        ofSetWindowPosition(winPosX + 1440, winPosY - 90); //Extended desktop
-        ofSetWindowPosition(0, 0);
-        
+        ofSetWindowPosition(1440, 0);
 
         info = false;
         inTitle = false;
         inLastScene = false;
         blackout = false;
     }else{
+        ofSetWindowPosition(0, 0);
 //        ofSetWindowPosition(0, 0);
-        ofSetWindowPosition((1440-800)/2, (900-600)/2);
+        // ofSetWindowPosition((1440-800)/2, (900-600)/2);
         info = true;
         inTitle = false;
         inLastScene = false;
@@ -128,22 +129,13 @@ void testApp::setup(){
     aWorld = new World();
     iWorld = aWorld -> getWorld();
 
-    /*
-    // Wall - edge body
-    left = new Wall(iWorld, b2Vec2(0, 0), b2Vec2(0, ofGetHeight()), ofGetHeight());
-    right = new Wall(iWorld, b2Vec2(ofGetWidth(), 0), b2Vec2(ofGetWidth(), ofGetHeight()), ofGetHeight());
-    floor = new Wall(iWorld, b2Vec2(0, ofGetHeight()), b2Vec2(ofGetWidth(), ofGetHeight()), ofGetWidth());
-    ceil = new Wall(iWorld, b2Vec2(0, 0), b2Vec2(ofGetWidth(), 0), ofGetWidth());
-    */
-    
-
     // Wall - box
     int thickness = 20.f;
     left = new Wall(iWorld, 0 - thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
     right = new Wall(iWorld, ofGetWidth() + thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
     floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight() + thickness/2, ofGetWidth(), thickness);
     ceil = new Wall(iWorld, ofGetWidth()/2, 0 - thickness/2, ofGetWidth(), thickness);
-    
+    center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight());
     
     // vector init
     blobsPts.clear();
@@ -426,7 +418,9 @@ void testApp::draw(){
     right->renderAtBodyPosition();
     floor->renderAtBodyPosition();
     ceil->renderAtBodyPosition();
-    
+    center->renderAtBodyPosition();
+
+
     
     
     // Draw body at cv pos
@@ -1323,13 +1317,13 @@ void testApp::keyPressed(int key){
             
             break;
             
-        case 'w':
-            ofSetWindowPosition(-ofGetWidth()/2, 0);
+        case 'w': //Show right screen area
+            ofSetWindowPosition(1440 - 1024, 0);
             break;
             
             
-        case 'e':
-            ofSetWindowPosition(0, 0);
+        case 'e': //Show left screen area
+            ofSetWindowPosition(1440, 0);
             break;
             
             
