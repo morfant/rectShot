@@ -43,7 +43,9 @@ enum {
 #define BOX2D_SCALE		80. // 1 meter of box2D world is 80 pixel on the screen. MUST FLOAT type!
 #define _toPixelX(x)	(ofGetWidth() / 2.f + (BOX2D_SCALE * x))
 #define _toPixelY(y)	(ofGetHeight() / 2.f - (BOX2D_SCALE * y))
-#define _toWorldX(x)	(_round2(((ofGetWidth() / 2.f) - x) / BOX2D_SCALE) * -1.f)
+
+// #define _toWorldX(x)	(_round2(((ofGetWidth() / 2.f) - x) / BOX2D_SCALE) * -1.f)
+#define _toWorldX(x)	(_round2((x - (ofGetWidth() / 2.f)) / BOX2D_SCALE))
 #define _toWorldY(y)	(_round2(((ofGetHeight() / 2.f) - y) / BOX2D_SCALE))
 
 #define _toWorldScale(v) (_round2(v / BOX2D_SCALE))

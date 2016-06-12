@@ -910,10 +910,10 @@
 				67D602731CC0C440000D4FAF /* shapes */,
 				67347D7D17D171A00023B9AE /* World.h */,
 				67347D7C17D171A00023B9AE /* World.cpp */,
-				6768AA031BDA689A00BEA93C /* ContactListener.h */,
-				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
 				67AC82C31C1AF46500F7A687 /* Tm.h */,
 				67AC82C21C1AF46500F7A687 /* Tm.cpp */,
+				6768AA031BDA689A00BEA93C /* ContactListener.h */,
+				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
 			);
 			name = class;
 			sourceTree = "<group>";

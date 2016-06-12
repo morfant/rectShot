@@ -18,6 +18,7 @@ Box::Box(b2World* aWorld, float x, float y)
     mWorld = aWorld;
     posX = x;
     posY = y;
+    cout << "origin pos X / Y: " << posX << " / " << posY << endl;
     
     isThereMbodybool = true;
     
@@ -29,9 +30,12 @@ Box::Box(b2World* aWorld, float x, float y)
 //    posY = ofGetHeight()/2;
     
 	b2BodyDef myBodyDef;
-//	myBodyDef.type = b2_staticBody;
+	// myBodyDef.type = b2_staticBody;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+
+    cout << "world pos X / Y: " << _toWorldX(posX) << " / " << _toWorldY(posY) << endl;
+
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
 //    cout << "addr of aWorld in Box: " << aWorld << endl;
@@ -315,23 +319,23 @@ Box::makeMvertice()
     
     
     
-//    mVerticeDiv[0] = b2Vec2(0, 0);
-//    mVerticeDiv[1] = b2Vec2(0, size/n * 1);
-//    mVerticeDiv[2] = b2Vec2(0, size/n * 2);
-//
-//    mVerticeDiv[3] = b2Vec2(0, size/n * 3);
-//    mVerticeDiv[4] = b2Vec2(size/n * 1, size/n * 3);
-//    mVerticeDiv[5] = b2Vec2(size/n * 2, size/n * 3);
-//
-//    mVerticeDiv[6] = b2Vec2(size/n * 3, size/n * 3);
-//    mVerticeDiv[7] = b2Vec2(size/n * 3, size/n * 2);
-//    mVerticeDiv[8] = b2Vec2(size/n * 3, size/n * 1);
-//
-//    mVerticeDiv[9] = b2Vec2(size/n * 3, 0);
-//    mVerticeDiv[10] = b2Vec2(size/n * 2, 0);
-//    mVerticeDiv[11] = b2Vec2(size/n * 1, 0);
-//    
-//    mVerticeDiv[12] = b2Vec2(0, 0);
+   // mVerticeDiv[0] = b2Vec2(0, 0);
+   // mVerticeDiv[1] = b2Vec2(0, size/n * 1);
+   // mVerticeDiv[2] = b2Vec2(0, size/n * 2);
+
+   // mVerticeDiv[3] = b2Vec2(0, size/n * 3);
+   // mVerticeDiv[4] = b2Vec2(size/n * 1, size/n * 3);
+   // mVerticeDiv[5] = b2Vec2(size/n * 2, size/n * 3);
+
+   // mVerticeDiv[6] = b2Vec2(size/n * 3, size/n * 3);
+   // mVerticeDiv[7] = b2Vec2(size/n * 3, size/n * 2);
+   // mVerticeDiv[8] = b2Vec2(size/n * 3, size/n * 1);
+
+   // mVerticeDiv[9] = b2Vec2(size/n * 3, 0);
+   // mVerticeDiv[10] = b2Vec2(size/n * 2, 0);
+   // mVerticeDiv[11] = b2Vec2(size/n * 1, 0);
+   
+   // mVerticeDiv[12] = b2Vec2(0, 0);
     
     
 //    for (int i = 0; i <= N_FRAGS; i++){
@@ -379,23 +383,20 @@ Box::breakBody()
     if (isThereMbodybool) delMbody();
     
     makeMvertice();
-    
-    float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
-    float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
-//    cout << "movX: " << movX << " / " << "movY: " << movY << endl;
-    
+   
+    b2Vec2 pos = mBody->GetPosition();
+    // cout << "GetPosX: " << pos.x << " / " << pos.y << endl;
+    // cout << "toPixelX: " << _toPixelX(pos.x) << " / " << _toPixelY(pos.y) << endl;
 
-    
-    
     // Translate to (movX, movY)
     for (int i = 0; i <= N_FRAGS; i++){
-        mVerticeDiv[i].x = mVerticeDiv[i].x + (movX + posX - size/2);
-        mVerticeDiv[i].y = mVerticeDiv[i].y + (movY + posY - size/2);
+        mVerticeDiv[i].x = mVerticeDiv[i].x + _toPixelX(pos.x) - size/2;
+        mVerticeDiv[i].y = mVerticeDiv[i].y + _toPixelY(pos.y) - size/2;
     }
     
     
-    float cx = posX + movX;
-    float cy = posY + movY;
+    float cx = _toPixelX(pos.x); 
+    float cy = _toPixelY(pos.y);
     
 //    cout << "cx: " << cx << " / " << "cy: " << cy << endl;
 
@@ -440,13 +441,14 @@ Box::breakBody()
         
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, 0, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx, fragOutlineColor);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;
         }
         
     }
+    
     
     //    breakFrags();
 //    pushForce(cx, cy);
@@ -461,22 +463,19 @@ Box::breakBody(float hitX, float hitY)
     if (isThereMbodybool) delMbody();
     
     makeMvertice();
-    
-    float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
-    float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
-    //    cout << "movX: " << movX << " / " << "movY: " << movY << endl;
-    
-    
+   
+    b2Vec2 pos = mBody->GetPosition();
+    // cout << "GetPosX: " << pos.x << " / " << pos.y << endl;
+    // cout << "toPixelX: " << _toPixelX(pos.x) << " / " << _toPixelY(pos.y) << endl;
+
     // Translate to (movX, movY)
     for (int i = 0; i <= N_FRAGS; i++){
-        mVerticeDiv[i].x = mVerticeDiv[i].x + (movX + posX - size/2);
-        mVerticeDiv[i].y = mVerticeDiv[i].y + (movY + posY - size/2);
+        mVerticeDiv[i].x = mVerticeDiv[i].x + _toPixelX(pos.x) - size/2;
+        mVerticeDiv[i].y = mVerticeDiv[i].y + _toPixelY(pos.y) - size/2;
     }
-    
     
     float cx = hitX;
     float cy = hitY;
-    
     //    cout << "cx: " << cx << " / " << "cy: " << cy << endl;
     
     
@@ -520,7 +519,7 @@ Box::breakBody(float hitX, float hitY)
         
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, 0, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx, fragOutlineColor);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;

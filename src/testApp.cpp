@@ -365,7 +365,8 @@ void testApp::draw(){
   
     // Box isinside test
 //    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-    for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+    for (vector<Box*>::iterator iter = blackBoxes.begin();
+        iter != blackBoxes.end(); iter++) {
         
         if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
             cout << "Box isinsed!!" << endl;
@@ -441,7 +442,7 @@ void testApp::draw(){
         
         // Draw boxes
     if (boxes.size()){
-//        cout << "size of boxes: " << boxes.size() << endl;
+       // cout << "size of boxes: " << boxes.size() << endl;
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
             (*iter)->update();
             (*iter)->renderAtBodyPosition();
@@ -449,7 +450,7 @@ void testApp::draw(){
     }
     
     if (blackBoxes.size()){
-//        cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
+       // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
         // Draw black boxes
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
             (*iter)->update();
@@ -527,8 +528,13 @@ void testApp::draw(){
     
     ofSetColor(255, 0, 0);
     ofCircle(400, 300, 5);
-    
-    
+
+
+    //CENTER LINE
+    ofSetLineWidth(2.0);
+    ofSetColor(255);
+    ofLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+   
     
     // Clear no Frags box
     if (boxes.size()){
@@ -1317,6 +1323,15 @@ void testApp::keyPressed(int key){
             
             break;
             
+        case 'w':
+            ofSetWindowPosition(-ofGetWidth()/2, 0);
+            break;
+            
+            
+        case 'e':
+            ofSetWindowPosition(0, 0);
+            break;
+            
             
         // Clear balls
         case 'c':
@@ -1356,20 +1371,20 @@ void testApp::keyPressed(int key){
             
         case 'h': //simulaton 'h'itting body
             
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                bool isSelected = (*iter)->getSelectState();
+//             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+//                 bool isSelected = (*iter)->getSelectState();
                 
-                if (isSelected && (*iter)->getIsThereMBody()) {
-                    (*iter)->breakBody();
-                    break;
+//                 if (isSelected && (*iter)->getIsThereMBody()) {
+//                     (*iter)->breakBody();
+//                     break;
              
-//                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
-                }
-            }
+// //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
+//                 }
+//             }
             
  
-            if (boxes.size() > 1){
-                
+            if (boxes.size() > 0){
+                cout << "Hit a box!" << endl;
                 for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
                         (*iter)->breakBody();
@@ -1378,7 +1393,7 @@ void testApp::keyPressed(int key){
                 }
                 
             }else{
-                
+                cout << "Hit a blackBox!" << endl;
                 for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
                         (*iter)->breakBody();
@@ -1407,8 +1422,9 @@ void testApp::keyPressed(int key){
             
             
             inTitle = false;
-            bBox = new Box(iWorld, ofGetWidth()/2, ofGetHeight()/2);
+            bBox = new Box(iWorld, ofGetWidth()*3/4, ofGetHeight()/2.f);
             boxes.push_back(bBox);
+            cout << "size of boxes after construct" << boxes.size() << endl;
             break;
             
         case 'z':

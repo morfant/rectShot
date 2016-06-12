@@ -11,7 +11,8 @@ int main( ){
     
 //	ofSetupOpenGL(1200, 900, OF_WINDOW);			// <--------
 //	ofSetupOpenGL(1160, 880, OF_WINDOW);			// <--------
-	ofSetupOpenGL(800, 600, OF_WINDOW);			// <--------
+//	ofSetupOpenGL(800, 600, OF_WINDOW);			// <--------
+	ofSetupOpenGL(800 * 2, 600, OF_WINDOW);			// <--------
 //    ofSetupOpenGL(1440, 900, OF_WINDOW);			// <-------- setup the GL context
 
     
