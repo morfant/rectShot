@@ -14,11 +14,14 @@
 
 Box::Box(b2World* aWorld, float x, float y)
 {
+
+    ofTrueTypeFont::setGlobalDpi(72);
+    verdana14.loadFont("verdana.ttf", 40, true, true);
     
     mWorld = aWorld;
     posX = x;
     posY = y;
-    cout << "origin pos X / Y: " << posX << " / " << posY << endl;
+    // cout << "origin pos X / Y: " << posX << " / " << posY << endl;
     
     isThereMbodybool = true;
     
@@ -33,8 +36,7 @@ Box::Box(b2World* aWorld, float x, float y)
 	// myBodyDef.type = b2_staticBody;
 	myBodyDef.type = b2_dynamicBody;
     myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
-
-    cout << "world pos X / Y: " << _toWorldX(posX) << " / " << _toWorldY(posY) << endl;
+    // cout << "world pos X / Y: " << _toWorldX(posX) << " / " << _toWorldY(posY) << endl;
 
 	mBody = mWorld -> CreateBody(&myBodyDef);
     
@@ -192,10 +194,8 @@ Box::renderAtBodyPosition()
         ofSetRectMode(OF_RECTMODE_CENTER);
 
         if (toBlack){
-            ofSetColor(255, 255, 255, 255);
-//            ofNoFill();
-//            ofFill();
-            ofRect(0, 0, size+4, size+4);
+            // ofSetColor(255, 255, 255, 255);
+            // ofRect(0, 0, size+4, size+4);
             
             ofSetColor(0, 0, 0, MAX(0, alpha));
 //            ofFill();
@@ -218,6 +218,16 @@ Box::renderAtBodyPosition()
 void
 Box::update()
 {
+    if (isThereMbodybool){
+        string touchCnt = ofToString(countTouch());
+        
+        b2Vec2 pos = mBody->GetPosition();
+        
+        ofSetColor(255, 0, 0);
+        verdana14.drawString(touchCnt, _toPixelX(pos.x) - 20, _toPixelY(pos.y) + 10);
+        // cout << "GetPosX: " << _toPixelX(pos.x) << " / " << _toPixelY(pos.y) << endl;
+    }
+
 //    age++;
 }
 
@@ -453,6 +463,21 @@ Box::breakBody()
     //    breakFrags();
 //    pushForce(cx, cy);
     
+}
+
+
+int
+Box::countTouch()
+{
+    int touchCount = 0;
+
+    for (b2ContactEdge* ce = mBody->GetContactList(); ce; ce = ce->next)
+    {
+        b2Contact* c = ce->contact;
+        touchCount++;
+    }
+
+    return touchCount;
 }
 
 

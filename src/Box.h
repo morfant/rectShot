@@ -55,6 +55,8 @@ protected:
     
     
 public:
+
+    ofTrueTypeFont verdana14;
     
     // VARIABLE
     // etc
@@ -100,7 +102,9 @@ public:
     void    makeMvertice();
     bool    IsInside(b2Vec2 p);
     void    pushForce(float x, float y);
-    
+    int     countTouch();
+
+
     // Frag
     void    renderFrags();
     void    clearFrags();

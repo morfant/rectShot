@@ -268,6 +268,9 @@ void testApp::update(){
         }
         
 
+
+
+
         // SHOOTING CHECK
         if(shotBallMade){
             delete aBall;
@@ -357,15 +360,15 @@ void testApp::draw(){
   
     // Box isinside test
 //    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-    for (vector<Box*>::iterator iter = blackBoxes.begin();
-        iter != blackBoxes.end(); iter++) {
+    // for (vector<Box*>::iterator iter = blackBoxes.begin();
+    //     iter != blackBoxes.end(); iter++) {
         
-        if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-            cout << "Box isinsed!!" << endl;
-        }else{
-            cout << "NN" << endl;
-        }
-    }
+    //     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+    //         cout << "Box isinsed!!" << endl;
+    //     }else{
+    //         cout << "NN" << endl;
+    //     }
+    // }
 
     
     //    ofBackground(255);
@@ -438,8 +441,8 @@ void testApp::draw(){
     if (boxes.size()){
        // cout << "size of boxes: " << boxes.size() << endl;
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-            (*iter)->update();
             (*iter)->renderAtBodyPosition();
+            (*iter)->update();
         }
     }
     
@@ -447,8 +450,8 @@ void testApp::draw(){
        // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
         // Draw black boxes
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-            (*iter)->update();
             (*iter)->renderAtBodyPosition();
+            (*iter)->update();
         }
     }
     
@@ -1418,7 +1421,7 @@ void testApp::keyPressed(int key){
             inTitle = false;
             bBox = new Box(iWorld, ofGetWidth()*3/4, ofGetHeight()/2.f);
             boxes.push_back(bBox);
-            cout << "size of boxes after construct" << boxes.size() << endl;
+            // cout << "size of boxes after construct" << boxes.size() << endl;
             break;
             
         case 'z':
