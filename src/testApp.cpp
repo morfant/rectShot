@@ -9,7 +9,7 @@ void testApp::exit()
 //--------------------------------------------------------------
 void testApp::setup(){
 
-    
+    //Set projection width / height
     int pjW = 1920;
     int pjH = 1080;
     
@@ -34,8 +34,9 @@ void testApp::setup(){
         blackout = false;
     }
     
+  
 
-
+    //OSC
 	sender.setup(HOST, PORT);
 	receiver.setup(RECV_PORT);
     ofSetFrameRate(60.f);
@@ -187,6 +188,18 @@ void testApp::setup(){
     bornPoint[4] = ofPoint(629, 348); //me
     bornPoint[5] = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
     
+
+
+    //darkBoxes
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 6; j++){
+            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1));
+            darkBox->setToBlack(true);
+            darkBoxes.push_back(darkBox);
+        }
+    }
+
+
     
     // OSC
     blobsSynMade = false;
@@ -194,10 +207,25 @@ void testApp::setup(){
     //to play title music
     oscSendI("/title", 1);
     
+
+    //AUDIO - for get 'amp'
+    soundPlayer.loadSound(ofToDataPath("pp.wav"));
+    soundPlayer.setLoop(true);
+    soundPlayer.play();
+    nBandsToGet = 1;
+  
+
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+    
+    //GET FFT just 1 band = approximately getting 'amp'.
+    ofSoundUpdate();
+    float * val = ofSoundGetSpectrum(nBandsToGet);
+    fftSmoothed *= 0.96f;
+    if (fftSmoothed < val[0]) fftSmoothed = val[0];
+    
     
     if(!inTitle){
         // Box2D world update
@@ -436,7 +464,20 @@ void testApp::draw(){
             (*iter)->renderAtBodyPosition();
         }
 
-        
+
+    if (darkBoxes.size()){
+       // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
+        // Draw black boxes
+        float mulForce = 40.f;
+        for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+            (*iter)->renderAtBodyPosition();
+            // (*iter)->update();
+            (*iter)->getBody()->ApplyForce(b2Vec2(fftSmoothed * mulForce, fftSmoothed * mulForce), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+            // (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(fftSmoothed, fftSmoothed), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+  
+        }
+    }
+
         // Draw boxes
     if (boxes.size()){
        // cout << "size of boxes: " << boxes.size() << endl;
@@ -454,7 +495,7 @@ void testApp::draw(){
             (*iter)->update();
         }
     }
-    
+   
 //    }
     
     
@@ -558,13 +599,26 @@ void testApp::draw(){
         }
     }
     
+    if (darkBoxes.size()){
+        for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); ) {
+            bool hasFrags = (*iter)->getFragsRemain();
+            if (!hasFrags){
+                darkBoxes.erase(iter);
+                cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
+            }else{
+                iter++;
+            }
+        }
+    }
+
+    //AUDIO - visualize
+    ofSetColor(245, 58, 135);
+    ofFill();       
+    ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
     
     
 }
 
-
-
-/* ------------------------------------ */
 
 void testApp::drawPolygonBodies(){
     
@@ -1294,19 +1348,17 @@ void testApp::keyPressed(int key){
 
         // Apply force to pBodies.
         case 't':
-            if(!REALTIME){
-                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                    bool isSelected = (*iter)->getSelectState();
-                    
-                    if (isSelected) {
-                        b2Vec2 pBodypos = b2Vec2((*iter)->getX(), (*iter)->getY());
-                        (*iter)->getBody()->ApplyForce(
-                                                       b2Vec2((ofGetMouseX() - pBodypos.x)*aforce, (pBodypos.y - ofGetMouseY())*aforce),
-                                                       b2Vec2(ofGetMouseX(), ofGetMouseY()));
-                    }
+
+            if (darkBoxes.size()){
+               // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
+                // Draw black boxes
+                for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+                    // (*iter)->getBody()->ApplyForce(b2Vec2(40.f, 40.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                    (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                    // (*iter)->update();
                 }
             }
-            
+           
             break;
 
             
@@ -1419,7 +1471,7 @@ void testApp::keyPressed(int key){
             
             
             inTitle = false;
-            bBox = new Box(iWorld, ofGetWidth()*3/4, ofGetHeight()/2.f);
+            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f);
             boxes.push_back(bBox);
             // cout << "size of boxes after construct" << boxes.size() << endl;
             break;
@@ -1438,14 +1490,18 @@ void testApp::keyPressed(int key){
             
         case 'd':
             if (boxes.size() > 0){
-                
                 boxes.back()->setToBlack(true);
                 blackBoxes.push_back(boxes.back());
                 cout << "size after pop back: " << boxes.size() << endl;
                 boxes.pop_back();
-                
-                
-                
+            }
+
+
+            if (darkBoxes.size() > 0){
+                darkBoxes.back()->setToBlack(true);
+                blackBoxes.push_back(darkBoxes.back());
+                cout << "size after pop back: " << darkBoxes.size() << endl;
+                darkBoxes.pop_back();
             }
             
             break;

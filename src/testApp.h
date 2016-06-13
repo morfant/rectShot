@@ -38,7 +38,7 @@ enum {
     TH_2 = 103, //han
     TH_3 = 100, //sewol
     TH_4 = 113, //park
-    TH_5 = 111, //me
+    TH_5 = 111, //meÍ
 
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
@@ -55,6 +55,13 @@ class testApp : public ofBaseApp{
 		void draw();
         void exit();
 		
+
+        //AUDIO
+        ofSoundPlayer   soundPlayer;
+        float 				fftSmoothed = 0;
+        int                 nBandsToGet;
+    
+
     
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -187,6 +194,7 @@ class testApp : public ofBaseApp{
         vector<Ball*>           balls;
         vector<Box*>            boxes;
         vector<Box*>            blackBoxes;
+        vector<Box*>            darkBoxes;
         vector<Faces*>          pBodies;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;

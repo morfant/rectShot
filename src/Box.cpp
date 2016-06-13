@@ -182,23 +182,16 @@ Box::renderAtBodyPosition()
         
     //    float alpha = (255 - age);
         float alpha = 255;
-//        
-//        if (toBlack){
-//            ofSetColor(0, 0, 0, MAX(0, alpha));
-//            
-//        }else{
-//            ofSetColor(255, 255, 255, MAX(0, alpha));
-//        }
+
         ofPushMatrix();
         ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));
         ofSetRectMode(OF_RECTMODE_CENTER);
 
         if (toBlack){
-            // ofSetColor(255, 255, 255, 255);
-            // ofRect(0, 0, size+4, size+4);
+            ofSetColor(255, 255, 255, 255);
+            ofRect(0, 0, size+4, size+4);
             
             ofSetColor(0, 0, 0, MAX(0, alpha));
-//            ofFill();
             ofRect(0, 0, size, size);
             
         }else{

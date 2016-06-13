@@ -29,7 +29,7 @@ protected:
     float   posY;
     
     // Size
-    float   size = 100.f;
+    float   size = 128.f; // 1024 / 8
 //    float   size = 180.f;
     
 	// Box2D
