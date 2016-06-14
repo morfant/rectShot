@@ -21,6 +21,110 @@ Faces::Faces()
 }
 
 
+Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float cx, float cy)
+{
+
+    for (int i = 0; i < kMAX_VERTICES; i++) {
+        mVertice[i] = vertices[i];
+    }
+    
+    mWorld = aWorld;
+    posX = cx;
+    posY = cy;
+    maxVertexCount = maxVCount;
+    index = 0;
+    dupIndex = 0;
+    isOriginal = 0;
+    isBreaked = false;
+    isReal = true;
+    
+    fragLifeTimeBySec = 12.0f;
+    fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
+    
+    
+    if (isReal){
+        
+        isAlive = true;
+        isThereMbodybool = true;
+        fragNum = kMAX_VERTICES/kSAMPLING_INTV;
+
+        pBodyUserData = POLYGON_BODY;
+        smallBodyUserData = OT_BODY;
+        
+        curSection = 0;
+        curPointofSection = 0;
+
+        // outline tarcker
+        rotSpd = 1.0f;
+        audioLen = 0.f;
+        getSection();
+        
+        
+        for (int i = 0; i < maxVertexCount; i++) {
+            mPts[i].x = _toWorldX(mVertice[i].x);
+            mPts[i].y = _toWorldY(mVertice[i].y);
+        }
+        
+        
+        b2BodyDef myBodyDef;
+        // myBodyDef.type = b2_dynamicBody;
+        myBodyDef.type = b2_staticBody;
+        myBodyDef.position.Set(0, 0);
+    //    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+    //    myBodyDef.linearVelocity.Set(4.0f, 0);
+        mBody = mWorld -> CreateBody(&myBodyDef);
+    //    mBody2 = mWorld -> CreateBody(&myBodyDef);
+        
+        
+    #ifdef POLYGON_BODY
+        // Polygon body
+        b2PolygonShape myPolygonShape;
+        for (int i = 0; i < kMAX_VERTICES - 1; i++) {
+            mPtsP[i].x = mPts[i].x * 1.0;
+            mPtsP[i].y = mPts[i].y * 1.0;
+        }
+        
+        myPolygonShape.Set(mPtsP, maxVertexCount);
+    #else
+        // Chain loop body
+        b2ChainShape chain;
+        chain.CreateLoop(mPts, maxVertexCount);
+    #endif
+        
+        
+        
+        b2FixtureDef myFixtureDef;
+    //  b2FixtureDef myFixtureDef2;
+        
+    #ifdef POLYGON_BODY
+    //  myFixtureDef2.shape = &myPolygonShape;
+        myFixtureDef.shape = &myPolygonShape;
+    #else
+        myFixtureDef.shape = &chain;
+
+    #endif
+        
+        myFixtureDef.density = 1.f;
+        myFixtureDef.restitution = 0.8f;
+        mBody->CreateFixture(&myFixtureDef);
+        mBody->SetUserData((void*)pBodyUserData);
+    //    mBody->SetLinearVelocity(b2Vec2(1.f, 0));
+
+        // Set default status
+        selected = true;
+        //contactedColor = ofColor(0, 200, 25);
+        contactedColor = ofColor(0, 200, 0);
+//        normalColor = ofColor(0, 200, 25);
+        normalColor = ofColor(0, 50, 120);
+        outliner_rad = 5.f;
+        fragOutlineColor = ofColor(255);
+        
+        isNewBorn = true;
+    }
+    
+}
+
+
 Faces::Faces(b2World* aWorld, b2Vec2* vertices, int maxVCount, float xx, float yy, int idx, bool _isReal, bool isOrigin, int dupIdx)
 {
     

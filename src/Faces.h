@@ -92,6 +92,7 @@ public:
     // Birth and Death
     Faces();
     Faces(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y, int idx, bool isReal, bool isOrigin, int dupIdx);
+    Faces(b2World* world, b2Vec2* vertices, int maxVCount, float x, float y);
     
     ~Faces();
     

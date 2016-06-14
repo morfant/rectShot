@@ -81,6 +81,9 @@ class testApp : public ofBaseApp{
         void makeFaces(int blobNum);
         void drawPolygonBodies();
         void resetFaces();
+    
+        void makeBodyAtCvPosition(ofFile file, float drawPosX, float drawPosY);
+    
         void makeBodyAtCvPosition();
         void makeBodyAtCvPosition(b2Vec2* vertices);
         void makeBodyAtCvPosition(vector<b2Vec2> vertices);
@@ -88,6 +91,7 @@ class testApp : public ofBaseApp{
         //UTIL
         float getArea(b2Vec2* vertices, int maxVCount);
         float getFragsArea();
+        float ofToFloat(string);
     
     
         // OSC
@@ -114,6 +118,10 @@ class testApp : public ofBaseApp{
     
     
         /*--------------------VARIABLE--------------------*/
+
+        //FILE
+        ofFile              fileToRead;
+        
         //MOVIE, VIDEO
         ofVideoGrabber 		vidGrabber;
         ofVideoPlayer 		movie[MOVNUM];

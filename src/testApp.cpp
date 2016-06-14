@@ -9,6 +9,10 @@ void testApp::exit()
 //--------------------------------------------------------------
 void testApp::setup(){
 
+
+    //File
+    fileToRead = ofToDataPath("file.txt");
+
     //Set projection width / height
     int pjW = 1920;
     int pjH = 1080;
@@ -55,7 +59,7 @@ void testApp::setup(){
     // Playing source select
     movShow = false;
     grayShow = false;
-    blobShow = false;
+    blobShow = true;
     
     movie[1].loadMovie("movies/ayaSum.mov");
     movie[2].loadMovie("movies/han720.mov");
@@ -189,15 +193,15 @@ void testApp::setup(){
     bornPoint[5] = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
     
 
-
-    //darkBoxes
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 6; j++){
-            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1));
-            darkBox->setToBlack(true);
-            darkBoxes.push_back(darkBox);
-        }
-    }
+    //LEFT SIDE OF SCREEN
+    //Prepare darkBoxes
+    // for (int i = 0; i < 8; i++){
+    //     for (int j = 0; j < 6; j++){
+    //         Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1));
+    //         darkBox->setToBlack(true);
+    //         darkBoxes.push_back(darkBox);
+    //     }
+    // }
 
 
     
@@ -211,7 +215,7 @@ void testApp::setup(){
     //AUDIO - for get 'amp'
     soundPlayer.loadSound(ofToDataPath("pp.wav"));
     soundPlayer.setLoop(true);
-    soundPlayer.play();
+    // soundPlayer.play();
     nBandsToGet = 1;
   
 
@@ -385,6 +389,14 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+
+    ofBackground(0, 0, 0);
+    
+    //RIGHT SIDE OF SCREEN
+    ofSetColor(148, 211, 230);
+    ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+    
+
   
     // Box isinside test
 //    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
@@ -399,8 +411,6 @@ void testApp::draw(){
     // }
 
     
-    //    ofBackground(255);
-    ofBackground(0);
     
     
     
@@ -737,6 +747,7 @@ void testApp::makeFaceAt(float x, float y)
         ofRectangle tBoundingRect;
         tBoundingRect.x = blobsVec[i].boundingRect.x + movDrawPosX;
         tBoundingRect.y = blobsVec[i].boundingRect.y + movDrawPosY;
+
         tBoundingRect.width = blobsVec[i].boundingRect.width;
         tBoundingRect.height = blobsVec[i].boundingRect.height;
         
@@ -756,12 +767,16 @@ void testApp::makeFaceAt(float x, float y)
 
 void testApp::makeFaces(int blobNum){
     
+    cout << "makeFaces()" << endl;
+    
     if (blobNum != 0){ // blobNum 0 means "Nothing selected".
         //clear containers
         blobsVec.clear();
         blobsPts.clear();
         blobsPtsDiv.clear();
         blobCenterPos.clear();
+
+        string dataStr = "";
         
         // get vector<ofxCvBlob>
         blobsVec = contourFinder.blobs;
@@ -774,12 +789,15 @@ void testApp::makeFaces(int blobNum){
             
             // Transform blobsPts
             for (vector<ofPoint>::iterator iter = blobsPts.begin(); iter != blobsPts.end(); iter++) {
-                (*iter).x = (*iter).x + movDrawPosX;
-                (*iter).y = (*iter).y + movDrawPosY;
+                // (*iter).x = (*iter).x + movDrawPosX;
+                // (*iter).y = (*iter).y + movDrawPosY;
+
+                (*iter).x = (*iter).x;
+                (*iter).y = (*iter).y;
             }
             
-            cvBlobPos = blobsVec[blobNum - 1].centroid + ofPoint(movDrawPosX, movDrawPosY);
-//            cvBlobPos = blobsVec[blobNum - 1].centroid;
+            // cvBlobPos = blobsVec[blobNum - 1].centroid + ofPoint(movDrawPosX, movDrawPosY);
+           cvBlobPos = blobsVec[blobNum - 1].centroid;
         }
         
         if(blobsPts.size() > 0){
@@ -811,10 +829,75 @@ void testApp::makeFaces(int blobNum){
             temp.y = blobsPts[blobsPts.size() - 1].y;
             blobsPtsDiv.push_back(temp);
             
-            makeBodyAtCvPosition();
+
+            // Add vertices
+            for (vector<b2Vec2>::iterator iter = blobsPtsDiv.begin(); iter != blobsPtsDiv.end(); iter++) {
+
+                string data_X = ofToString((*iter).x);
+                string data_Y = ofToString((*iter).y);
+
+                dataStr.append(data_X);
+                dataStr.append("/");
+                dataStr.append(data_Y);
+                dataStr.append(",");
+
+            }
+
+            // Add center point
+            string centerPoint_X = ofToString(cvBlobPos.x);
+            string centerPoint_Y = ofToString(cvBlobPos.y);
+            dataStr.append(centerPoint_X);
+            dataStr.append("/");
+            dataStr.append(centerPoint_Y);
+  
+            // cout << "content of blobsPtsDiv" << dataStr << endl; 
+
+            ofFile newfile(ofToDataPath("file.txt"), ofFile::WriteOnly);
+            newfile.create();
+            
+            newfile << dataStr;
+            newfile.close();
+
+            // makeBodyAtCvPosition();
             
         }
     }
+}
+
+float testApp::ofToFloat(string str) {
+    istringstream stream(str);
+    float result;
+    stream >> result;
+    return result;
+}
+
+
+void testApp::makeBodyAtCvPosition(ofFile argFile, float drawPosX, float drawPosY){
+
+    string strFromFile = "";
+    argFile >> strFromFile;
+
+    //Split str to each pairs
+    vector<string> pairStr = ofSplitString(strFromFile, ",");
+
+    //Vertices
+    vector<b2Vec2> vertices;
+    for (vector<string>::iterator iter = pairStr.begin(); iter != pairStr.end() - 1; iter++) {
+        vector<string> pt = ofSplitString((*iter), "/"); //split X and Y
+        b2Vec2 tPt = b2Vec2(ofToFloat(pt[0]), ofToFloat(pt[1]));
+        vertices.push_back(tPt);
+    }
+
+    //CenterPoint
+    vector<string> cPair = ofSplitString(pairStr.back(), "/"); //cPair = centerPointPair
+    b2Vec2 centerPoint = b2Vec2(ofToFloat(cPair[0]), ofToFloat(cPair[1]));
+
+   if(getArea(&vertices[0], vertices.size()) > 0){ // If the area did not have minus value.
+       // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
+       // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, centerPoint.x, centerPoint.y);
+       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, drawPosX, drawPosY);
+       pBodies.push_back(aPbody);
+   }
 }
 
 
@@ -899,7 +982,7 @@ float testApp::getArea(b2Vec2* vertices, int maxVCount){
 
     int i,j;
     double area = 0;
-    
+
     for (i = 0; i < maxVCount; i++) {
         j = (i + 1) % maxVCount;
         area += vertices[i].x * vertices[j].y;
@@ -1346,6 +1429,13 @@ void testApp::keyPressed(int key){
 			break;
             
 
+
+        case 'v':
+            // makeBodyAtCvPosition(fileToRead, ofGetMouseX(), ofGetMouseX());
+            makeBodyAtCvPosition(fileToRead, ofGetWidth()/2, ofGetHeight()/2);
+            break;
+
+
         // Apply force to pBodies.
         case 't':
 
@@ -1623,12 +1713,11 @@ void testApp::mousePressed(int x, int y, int button){
     
     if (button == 0){
         
-        cout << "MousePos x: " << x << " / y: " << y << endl;
+       cout << "MousePos x: " << x << " / y: " << y << endl;
         
-        
-//        makeFaceAt(x, y);
-//        cout << "makefaceat x: " << x << " / y: " << y << endl;
-//        selBlobRect = 0;
+       makeFaceAt(x, y);
+       cout << "makefaceat x: " << x << " / y: " << y << endl;
+       selBlobRect = 0;
     }
         
     
