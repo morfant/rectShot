@@ -354,6 +354,142 @@ Faces::IsInside(b2Vec2 p)
 
 
 void
+Faces::breakBody(float hitX, float hitY)
+{
+    
+    if (isThereMbodybool) delMbody();
+
+    
+    float movX = (mBody->GetWorldCenter().x * BOX2D_SCALE);
+    float movY = (mBody->GetWorldCenter().y * BOX2D_SCALE * (-1.f));
+
+    float cx = hitX + movX;
+    float cy = hitY + movY;
+    // float cx = posX + movX;
+    // float cy = posY + movY;
+//    float movX = _toPixelX(mBody->GetWorldCenter().x) + posX;
+//    float movY = _toPixelY(mBody->GetWorldCenter().y) + posY;
+    
+    
+//    float movX = posX;
+//    float movY = posY;
+    
+    
+    // get intervald virtices
+    
+    // Add first point of blob polygon shape.
+    b2Vec2 first = b2Vec2(0, 0);
+    first.x = mVertice[0].x + movX;
+    first.y = mVertice[0].y + movY;
+    mVerticeDiv[0] = first;
+    
+    // Add middle points of blob polygon shape.
+    for (int i = 1; i < (fragNum - 1); i++) {
+        b2Vec2 temp = b2Vec2(0, 0);
+        temp.x = mVertice[kSAMPLING_INTV * i].x + movX;
+        temp.y = mVertice[kSAMPLING_INTV * i].y + movY;
+        mVerticeDiv[i] = temp;
+    }
+    
+    // Add end point of blob polygon shape
+    b2Vec2 last = b2Vec2(0, 0);
+    last.x = mVertice[kMAX_VERTICES - 1].x + movX;
+    last.y = mVertice[kMAX_VERTICES - 1].y + movY;
+    mVerticeDiv[fragNum - 1] = last;
+    
+    for (int i = 0; i < fragNum; i++){
+//        cout << i << ": " <<  mVerticeDiv[i].x << " / " << mVerticeDiv[i].y << endl;
+    }
+    
+
+    int fragIdx = 0;
+    for (int i = 0; i < fragNum - 1; i++){
+        b2Vec2 vertices[3];
+//        b2Vec2 a = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+        b2Vec2 a = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+        b2Vec2 b = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        b2Vec2 c = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+
+//        b2Vec2 a = b2Vec2(1, 1);
+//        b2Vec2 b = b2Vec2(2, 3);
+//        b2Vec2 c = b2Vec2(0, 0);
+        
+
+//        ofVec2f vh(-1, 0);
+//        ofVec2f vv(0, -1);
+        ofVec2f vAB(b.x - a.x, b.y - a.y);
+        ofVec2f vBC(c.x - b.x, c.y - b.y);
+//        ofVec2f vAC(c.x - a.x, c.y - a.y);
+        
+//        vh.normalize();
+//        vv.normalize();
+        vAB.normalize();
+        vBC.normalize();
+//        vAC.normalize();
+
+//        float d = perp_dot(b - a, c - b);
+        float d = perp_dot(vAB, vBC);
+        if(d < 0){
+//            cout << "RIGHT\n";
+        }else{
+//            cout << "LEFT\n";
+        }
+        
+//        float angleHAB = acos(vh.dot(vAB));
+//        float angleHAC = acos(vh.dot(vAC));
+//        float angleVAB = acos(vv.dot(vAB));
+//        float angleVAC = acos(vv.dot(vAC));
+//        float angleABBC = acos(vAB.dot(vBC));
+//        
+//        
+//        cout << "angleHAB : " << (-1.f) * _toDegree(angleHAB) << endl;
+//        cout << "angleHAC : " << (-1.f) * _toDegree(angleHAC) << endl;
+//
+//        cout << "angleVAB : " << (-1.f) * _toDegree(angleVAB) << endl;
+//        cout << "angleVAC : " << (-1.f) * _toDegree(angleVAC) << endl;
+//        
+//        cout << "angleAB-BC : " << (-1.f) * _toDegree(angleABBC) << endl;
+        
+        
+        for (int j = 0; j < 3; j++){
+//            vertices[0] = b2Vec2(_toWorldX(movX), _toWorldY(movY));
+            vertices[0] = b2Vec2(_toWorldX(cx), _toWorldY(cy));
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+        }
+
+        // To keep CCW direction.
+        if (d < 0){
+//            cout << "2 and 1 changed\n" << endl;
+            vertices[1] = b2Vec2(_toWorldX(mVerticeDiv[i+1].x), _toWorldY(mVerticeDiv[i+1].y));
+            vertices[2] = b2Vec2(_toWorldX(mVerticeDiv[i].x), _toWorldY(mVerticeDiv[i].y));
+        }
+        
+        
+//        cout << "triangle " << i << " : " << "\n" <<
+//        vertices[0].x << " / " << vertices[0].y << "\n" <<
+//        vertices[1].x << " / " << vertices[1].y << "\n" <<
+//        vertices[2].x << " / " << vertices[2].y << "\n" <<
+//        endl;
+
+        // If the area did not have minus value.
+        if(getArea(&vertices[0], 3) > 0){
+            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
+            mFrags.push_back(aFrag);
+            fragIdx++;
+        }
+    
+    }
+    
+//    breakFrags();
+    pushForce(cx, cy);
+    
+    
+}
+
+
+void
 Faces::breakBody()
 {
     
@@ -486,7 +622,6 @@ Faces::breakBody()
     
 }
 
-
 //void
 //Faces::breakFrags()
 //{
@@ -560,6 +695,11 @@ Faces::getFragOutlineColor()
     return fragOutlineColor;
 }
 
+bool
+Faces::getFragsRemain()
+{
+    return isFragsRemain;
+}
 
 vector<Frag*> *
 Faces::getFrags()
@@ -791,24 +931,31 @@ Faces::pushForce(float x, float y)
 }
 
 
+
 void
 Faces::renderFrags()
 {
     if (!isThereMbodybool){
         
-        for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end();) {
-            bool fragIsAlive = (*iter)->update();
-            
-            if (!fragIsAlive) {
-                delete (*iter);
-                iter = mFrags.erase(iter);
-                isAlive = false;
+        if (mFrags.size()){
+            for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end();) {
+                bool fragIsAlive = (*iter)->update();
                 
-            }else{
-                (*iter)->render();
-                iter++;
+                if (!fragIsAlive) {
+                    delete (*iter);
+                    iter = mFrags.erase(iter);
+                    
+                    
+                }else{
+                    (*iter)->render();
+                    iter++;
+                }
             }
+        }else{
+//            cout << "All frags gone" << endl;
+            isFragsRemain = false;
         }
+        
     }
     
 }

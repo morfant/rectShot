@@ -50,7 +50,7 @@ protected:
     b2Vec2 tVertice[kMAX_VERTICES];
     
     int     fragNum;
-    
+    bool    isFragsRemain = true;
     
     int     maxVertexCount; // maxVertexCount
     int     index;
@@ -97,6 +97,7 @@ public:
     ~Faces();
     
     // Getter
+    bool    getFragsRemain();
     float   getArea(b2Vec2* vertices, int maxVCount);
     float   getX();
     float   getY();
@@ -143,6 +144,7 @@ public:
     void    renderFrags();
     void    getSection();
     void    breakBody();
+    void    breakBody(float hitX, float hitY);
     void    breakFrags();
     
 

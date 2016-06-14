@@ -314,12 +314,12 @@ void testApp::update(){
             
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
-                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                        (*iter)->breakBody();
+                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+//                        (*iter)->breakBody();
+                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         cout << "hit Face!" << endl;
                         bodyHit = true;
-                    
-    //                    break;
                     }
                 }
             }
@@ -332,7 +332,6 @@ void testApp::update(){
                         (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         cout << "hit Box!" << endl;
                         bodyHit = true;
-                        
                     }
                 }
             }
@@ -584,7 +583,19 @@ void testApp::draw(){
     ofLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
    
     
-    // Clear no Frags box
+    // Clear no Frags bodies
+    if (pBodies.size()){
+        for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); ) {
+            bool hasFrags = (*iter)->getFragsRemain();
+            if (!hasFrags){
+                pBodies.erase(iter);
+                cout << "size of pBodies after erase: " << pBodies.size() << endl;
+            }else{
+                iter++;
+            }
+        }
+    }
+
     if (boxes.size()){
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
@@ -1447,16 +1458,15 @@ void testApp::keyPressed(int key){
             
         case 'h': //simulaton 'h'itting body
             
-//             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-//                 bool isSelected = (*iter)->getSelectState();
-                
-//                 if (isSelected && (*iter)->getIsThereMBody()) {
-//                     (*iter)->breakBody();
-//                     break;
-             
-// //                    cout << "world center: " << (*iter)->getBody()->GetWorldCenter().x << " / " << (*iter)->getBody()->GetWorldCenter().y << endl;
-//                 }
-//             }
+            if (pBodies.size()){
+                cout << "Hit a pBody!" << endl;
+                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+                    if ((*iter)->getIsThereMBody()) {
+                        (*iter)->breakBody();
+                        break;
+                    }
+                }
+            }
             
  
             if (boxes.size() > 0){
@@ -1468,7 +1478,7 @@ void testApp::keyPressed(int key){
                     }
                 }
                 
-            }else{
+            }else if (blackBoxes.size() > 0) {
                 cout << "Hit a blackBox!" << endl;
                 for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
@@ -1476,8 +1486,7 @@ void testApp::keyPressed(int key){
                         break;
                     }
                 }
-            }
-            
+            }            
             
             break;
             
