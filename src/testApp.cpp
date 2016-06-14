@@ -756,18 +756,19 @@ void testApp::makeFaceAt(float x, float y)
 //            printf("Selected blob rect number: %d\n", selBlobRect);
 //            printf("centroid X: %f / Y: %f\n",
 //                   blobsVec[i].centroid.x, blobsVec[i].centroid.y);
-            makeFaces(selBlobRect);
+
+
+            saveFaceVerticeToFile(selBlobRect, "verticeData.txt");
+            // makeBodyAtCvPosition(selBlobRect);
+
             break;
         }
     }
 }
 
 
-
-
-void testApp::makeFaces(int blobNum){
-    
-    cout << "makeFaces()" << endl;
+//Update 'blobsPtsDiv', 'cvBlobNum'
+void testApp::makeFaceVertice(int blobNum){
     
     if (blobNum != 0){ // blobNum 0 means "Nothing selected".
         //clear containers
@@ -775,8 +776,6 @@ void testApp::makeFaces(int blobNum){
         blobsPts.clear();
         blobsPtsDiv.clear();
         blobCenterPos.clear();
-
-        string dataStr = "";
         
         // get vector<ofxCvBlob>
         blobsVec = contourFinder.blobs;
@@ -786,18 +785,7 @@ void testApp::makeFaces(int blobNum){
         
         if(cvBlobNum != 0){
             blobsPts = blobsVec[blobNum - 1].pts;
-            
-            // Transform blobsPts
-            for (vector<ofPoint>::iterator iter = blobsPts.begin(); iter != blobsPts.end(); iter++) {
-                // (*iter).x = (*iter).x + movDrawPosX;
-                // (*iter).y = (*iter).y + movDrawPosY;
-
-                (*iter).x = (*iter).x;
-                (*iter).y = (*iter).y;
-            }
-            
-            // cvBlobPos = blobsVec[blobNum - 1].centroid + ofPoint(movDrawPosX, movDrawPosY);
-           cvBlobPos = blobsVec[blobNum - 1].centroid;
+            cvBlobPos = blobsVec[blobNum - 1].centroid;
         }
         
         if(blobsPts.size() > 0){
@@ -810,9 +798,7 @@ void testApp::makeFaces(int blobNum){
             }
             
             // Make blobsPtsDiv
-            b2Vec2 temp = b2Vec2(0, 0);
-            temp.x = blobsPts[0].x;
-            temp.y = blobsPts[0].y;
+            b2Vec2 temp = b2Vec2(blobsPts[0].x, blobsPts[0].y);
             
             // Add first point of blob polygon shape.
             blobsPtsDiv.push_back(temp);
@@ -828,51 +814,61 @@ void testApp::makeFaces(int blobNum){
             temp.x = blobsPts[blobsPts.size() - 1].x;
             temp.y = blobsPts[blobsPts.size() - 1].y;
             blobsPtsDiv.push_back(temp);
-            
 
-            // Add vertices
-            for (vector<b2Vec2>::iterator iter = blobsPtsDiv.begin(); iter != blobsPtsDiv.end(); iter++) {
-
-                string data_X = ofToString((*iter).x);
-                string data_Y = ofToString((*iter).y);
-
-                dataStr.append(data_X);
-                dataStr.append("/");
-                dataStr.append(data_Y);
-                dataStr.append(",");
-
-            }
-
-            // Add center point
-            string centerPoint_X = ofToString(cvBlobPos.x);
-            string centerPoint_Y = ofToString(cvBlobPos.y);
-            dataStr.append(centerPoint_X);
-            dataStr.append("/");
-            dataStr.append(centerPoint_Y);
-  
-            // cout << "content of blobsPtsDiv" << dataStr << endl; 
-
-            ofFile newfile(ofToDataPath("file.txt"), ofFile::WriteOnly);
-            newfile.create();
-            
-            newfile << dataStr;
-            newfile.close();
-
-            // makeBodyAtCvPosition();
-            
         }
     }
 }
 
-float testApp::ofToFloat(string str) {
-    istringstream stream(str);
-    float result;
-    stream >> result;
-    return result;
+
+void testApp::saveFaceVerticeToFile(int blobNum, string fileName){
+
+    //update blobPtsDiv, cvBlobPos
+    makeFaceVertice(blobNum);
+    string dataStr = "";
+    
+    // Add vertices - Assume that it's center point is (0, 0)
+    for (vector<b2Vec2>::iterator iter = blobsPtsDiv.begin(); iter != blobsPtsDiv.end(); iter++) {
+
+        string data_X = ofToString((*iter).x - cvBlobPos.x);
+        string data_Y = ofToString((*iter).y - cvBlobPos.y);
+
+        dataStr.append(data_X);
+        dataStr.append("/");
+        dataStr.append(data_Y);
+        dataStr.append(",");
+
+    }
+
+    // cout << "content of blobsPtsDiv" << dataStr << endl; 
+
+    ofFile newfile(ofToDataPath(fileName), ofFile::WriteOnly);
+    newfile.create();
+    
+    newfile << dataStr;
+    newfile.close();
 }
 
 
-void testApp::makeBodyAtCvPosition(ofFile argFile, float drawPosX, float drawPosY){
+
+
+void testApp::makeBodyAt(float posX, float posY){
+
+    int maxVCount = blobsPtsDiv.size();
+
+    vector<b2Vec2> vertices;
+    for (vector<b2Vec2>::iterator iter = blobsPtsDiv.begin(); iter != blobsPtsDiv.end(); iter++) {
+        b2Vec2 tPt = b2Vec2((*iter).x + posX, (*iter).y + posY);
+        vertices.push_back(tPt);
+    }
+
+    if(getArea(&vertices[0], maxVCount) > 0){ // If the area did not have minus value.
+        Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY);
+        pBodies.push_back(aPbody);
+    } 
+}
+
+
+void testApp::makeBodyFromFile(ofFile argFile, float posX, float posY){
 
     string strFromFile = "";
     argFile >> strFromFile;
@@ -880,87 +876,20 @@ void testApp::makeBodyAtCvPosition(ofFile argFile, float drawPosX, float drawPos
     //Split str to each pairs
     vector<string> pairStr = ofSplitString(strFromFile, ",");
 
-    //Vertices
+    //Vertices translate
     vector<b2Vec2> vertices;
     for (vector<string>::iterator iter = pairStr.begin(); iter != pairStr.end() - 1; iter++) {
         vector<string> pt = ofSplitString((*iter), "/"); //split X and Y
-        b2Vec2 tPt = b2Vec2(ofToFloat(pt[0]), ofToFloat(pt[1]));
+        b2Vec2 tPt = b2Vec2(ofToFloat(pt[0]) + posX, ofToFloat(pt[1]) + posY);
         vertices.push_back(tPt);
     }
 
-    //CenterPoint
-    vector<string> cPair = ofSplitString(pairStr.back(), "/"); //cPair = centerPointPair
-    b2Vec2 centerPoint = b2Vec2(ofToFloat(cPair[0]), ofToFloat(cPair[1]));
-
    if(getArea(&vertices[0], vertices.size()) > 0){ // If the area did not have minus value.
-       // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
-       // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, centerPoint.x, centerPoint.y);
-       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, drawPosX, drawPosY);
+       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY);
        pBodies.push_back(aPbody);
    }
 }
 
-
-void testApp::makeBodyAtCvPosition(){ //Make original
-
-    if(getArea(&blobsPtsDiv[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        Faces * aPbody = new Faces(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
-        aPbody->setFragOutlineColor(pBodyOutlineColor[curStage]);
-        
-        
-        Faces * aPbodyCopy = new Faces(iWorld, &blobsPtsDiv[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, false, false, COPY_DUP_IDX);
-        aPbodyCopy->setFragOutlineColor(pBodyOutlineColor[curStage]);
-//        printf("cvBlobPos x: %f, y: %f\n", cvBlobPos.x, cvBlobPos.y);
-        
-//        oscSendIIFF("/pbBorn", pBodyIdx, ORIGINAL_DUP_IDX, cvBlobPos.x, cvBlobPos.y);
-
-        
-        pBodies.push_back(aPbody);
-        
-        
-//        cout << aPbody << endl;
-//        cout << "pBody push_back" << endl;
-        
-        pBodiesOriginalCopy[curStage] = *aPbodyCopy;
-        
-//        for (int i = 0; i < STAGE_NUM; i++) {
-//         cout << pBodiesOriginalCopy[i].getX() << " / " << pBodiesOriginalCopy[i].getY() << endl;
-//        }
-
-
-        pBodyIdx++;
-        
-        movie[curMovie].setVolume(0.f);
-        printf("curMovie: %d 's muted.\n", curMovie);
-//        videoEnd();
-    }
-    
-    // Reset blobs points vector
-    blobsPts.clear();
-    blobsPtsDiv.clear();
-    
-    
-}
-
-void testApp::makeBodyAtCvPosition(b2Vec2* vertices){
-    
-    if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
-        
-        pBodies.push_back(aPbody);
-        pBodyIdx++;
-    }
-}
-
-void testApp::makeBodyAtCvPosition(vector<b2Vec2> vertices){
-    
-    if(getArea(&vertices[0], kMAX_VERTICES) > 0){ // If the area did not have minus value.
-        Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, cvBlobPos.x, cvBlobPos.y, pBodyIdx, true, true, ORIGINAL_DUP_IDX);
-        
-        pBodies.push_back(aPbody);
-        pBodyIdx++;
-    }
-}
 
 void testApp::resetFaces(){
 
@@ -976,7 +905,16 @@ void testApp::resetFaces(){
     
 }
 
-// UTIL
+
+/* ================================ UTIL ================================ */
+
+float testApp::ofToFloat(string str) {
+    istringstream stream(str);
+    float result;
+    stream >> result;
+    return result;
+}
+
 // I don't know how it works.
 float testApp::getArea(b2Vec2* vertices, int maxVCount){
 
@@ -1431,8 +1369,7 @@ void testApp::keyPressed(int key){
 
 
         case 'v':
-            // makeBodyAtCvPosition(fileToRead, ofGetMouseX(), ofGetMouseX());
-            makeBodyAtCvPosition(fileToRead, ofGetWidth()/2, ofGetHeight()/2);
+            makeBodyFromFile(fileToRead, ofGetMouseX(), ofGetMouseY());
             break;
 
 

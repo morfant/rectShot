@@ -75,18 +75,16 @@ class testApp : public ofBaseApp{
     
         // CV
         void sendBlobsOSC();
-        void makeFaceAt(float x, float y);
-    
+        void makeFaceAt(float posX, float posY);
+        void makeBodyAt(float posX, float posY); 
+        
         //Box2d
-        void makeFaces(int blobNum);
         void drawPolygonBodies();
         void resetFaces();
-    
-        void makeBodyAtCvPosition(ofFile file, float drawPosX, float drawPosY);
-    
-        void makeBodyAtCvPosition();
-        void makeBodyAtCvPosition(b2Vec2* vertices);
-        void makeBodyAtCvPosition(vector<b2Vec2> vertices);
+
+        void makeFaceVertice(int blobNum);
+        void saveFaceVerticeToFile(int blobNum, string fileName);
+        void makeBodyFromFile(ofFile file, float drawPosX, float drawPosY);
     
         //UTIL
         float getArea(b2Vec2* vertices, int maxVCount);
