@@ -110,6 +110,9 @@ class testApp : public ofBaseApp{
         void firstShotCheck(int curStage);
     
         // UI
+        bool slideLeft = false;
+        bool slideRight = false;
+        bool slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe);
         void touchingCheck();
     
     
@@ -117,6 +120,9 @@ class testApp : public ofBaseApp{
     
         /*--------------------VARIABLE--------------------*/
 
+        //WINDOW
+        ofPoint             windowPosition;
+    
         //FILE
         ofFile              fileToRead;
         

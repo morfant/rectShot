@@ -11,7 +11,8 @@ void testApp::setup(){
 
 
     //File
-    fileToRead = ofToDataPath("file.txt");
+    // fileToRead = ofToDataPath("file.txt");
+    fileToRead = ofToDataPath("verticeData.txt");
 
     //Set projection width / height
     int pjW = 1920;
@@ -22,14 +23,23 @@ void testApp::setup(){
     
     if (REALTIME){
 //        ofSetWindowPosition(winPosX + 1440, winPosY - 90); //Extended desktop
-        ofSetWindowPosition(1440, 0);
+        
+        windowPosition = ofPoint(1440, 0);
+        ofSetWindowPosition(windowPosition.x, windowPosition.y);
+        
 
         info = false;
         inTitle = false;
         inLastScene = false;
         blackout = false;
     }else{
-        ofSetWindowPosition(0, 0);
+        
+        windowPosition = ofPoint(0, 0);
+        ofSetWindowPosition(windowPosition.x, windowPosition.y);
+
+        // cout << ofGetWidth() << endl;
+        // ofSetWindowPosition(ofGetWidth(), windowPosition.y);
+
 //        ofSetWindowPosition(0, 0);
         // ofSetWindowPosition((1440-800)/2, (900-600)/2);
         info = true;
@@ -60,14 +70,27 @@ void testApp::setup(){
     movShow = false;
     grayShow = false;
     blobShow = true;
+
+    // movie[1].loadMovie("movies/ayaSum.mov");
     
-    movie[1].loadMovie("movies/ayaSum.mov");
-    movie[2].loadMovie("movies/han720.mov");
-    movie[3].loadMovie("movies/sewol2.mov");
-//    movie[4].loadMovie("movies/pp480.mov");    
-    movie[4].loadMovie("movies/pp720.mov");
-    movie[5].loadMovie("movies/me.mov");
-    
+
+    for (int i = 1; i < MOVNUM; i++){
+        movie[i].loadMovie("movies/" + ofToString(i) + ".mp4");
+    };
+
+    // movie[1].loadMovie("movies/01.mp4");
+    // movie[2].loadMovie("movies/01.mp4");
+    // movie[3].loadMovie("movies/01.mp4");
+    // movie[4].loadMovie("movies/01.mp4");
+    // movie[5].loadMovie("movies/01.mp4");
+    // movie[6].loadMovie("movies/01.mp4");
+    // movie[7].loadMovie("movies/01.mp4");
+    // movie[8].loadMovie("movies/01.mp4");
+    // movie[9].loadMovie("movies/01.mp4");
+    // movie[10].loadMovie("movies/01.mp4");
+    // movie[11].loadMovie("movies/01.mp4");
+
+  
     movAmp[1] = 0.5f;
     movAmp[2] = 0.1f;
     movAmp[3] = 0.1f;
@@ -275,32 +298,6 @@ void testApp::update(){
             blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
             cvBlobNum = blobsVec.size();
         }
-        
-        
-        //TARGET MAKER
-        if (tmOpen){
-            
-            if (randFace){
-                int rand = ofRandom(curStage + 1);
-                tMan->setPbody(&pBodiesOriginalCopy[rand]);
-            }
-
-            
-            Faces* tBody = tMan->update();
-            
-            if (tBody != NULL){
-                pBodies.push_back(tBody);
-//                cout << "Pbody duplicated." << endl;
-            }
-            
-            if(tMan->isEnd()){
-//                cout << "Next stage ready" << endl;
-                nextStageReady = true;
-            }
-        }
-        
-
-
 
 
         // SHOOTING CHECK
@@ -393,6 +390,7 @@ void testApp::draw(){
     
     //RIGHT SIDE OF SCREEN
     ofSetColor(148, 211, 230);
+    // ofSetColor(10, 10, 10);
     ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
     
 
@@ -433,6 +431,7 @@ void testApp::draw(){
             movDrawPosX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
             movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
             movie[curMovie].draw(movDrawPosX, movDrawPosY);
+            // movie[curMovie].draw(0, 0);
         }
     }
     
@@ -446,6 +445,7 @@ void testApp::draw(){
         for (int i = 0; i < contourFinder.nBlobs; i++){
             //        contourFinder.blobs[i].draw(360,540);
             contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
+            // contourFinder.blobs[i].draw(0, 0);
             
         }
         //        ofPopMatrix();
@@ -636,10 +636,74 @@ void testApp::draw(){
     ofSetColor(245, 58, 135);
     ofFill();       
     ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
+
+
+    //WINDOW SLIDE
+    if (slideRight){
+        if (slideWindowInTime(ofPoint(ofGetWidth()/2, 0), ofPoint(ofGetWidth(), 0), 20)){
+            cout << windowPosition.x << endl;
+            slideRight = false;
+        }
+    }else if (slideLeft){
+        if (slideWindowInTime(ofPoint(ofGetWidth(), 0), ofPoint(ofGetWidth()/2, 0), 20)){
+            cout << windowPosition.x << endl;
+            slideLeft = false;
+        }
+    }
     
     
 }
 
+/* ================ FUNCTIONS ================ */
+
+bool testApp::slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe)
+{
+
+    bool isDone = false;
+
+    cout << "slide? " << endl;
+    // dir 0 : large -> small
+    // dir 1 : small -> large
+    int dir = 1;
+    if (bPos.x > ePos.x) dir = 0;
+
+    cout << "dir?" << dir << endl;
+
+    float d = bPos.distance(ePos);
+    int dist = (int)d;
+    
+    cout << "dist" << dist << endl;
+
+    int distToMove = 1 + (int)d/nframe;
+
+    cout << "distToMove" << distToMove << endl;
+
+    if (dir){
+        if (windowPosition.x >= bPos.x && windowPosition.x <= ePos.x){
+            int nextPos = windowPosition.x + distToMove;
+            if (nextPos > ePos.x) nextPos = ePos.x;
+            windowPosition.x = nextPos;
+        }else{
+            return false;
+        }
+    }else{
+        if (windowPosition.x <= bPos.x && windowPosition.x > ePos.x){
+            int nextPos = windowPosition.x - distToMove;
+            windowPosition.x = MAX(nextPos, ePos.x);
+        }else{
+            return false;
+        }
+    }
+
+    ofSetWindowPosition(windowPosition.x, 0);
+
+    if (windowPosition.x == ePos.x){
+        isDone = true;
+    }
+
+    return isDone;
+
+}
 
 void testApp::drawPolygonBodies(){
     
@@ -770,7 +834,9 @@ void testApp::makeFaceAt(float x, float y)
 
 
             saveFaceVerticeToFile(selBlobRect, "verticeData.txt");
-            // makeBodyAtCvPosition(selBlobRect);
+            
+            //FIXME: Fix body created position
+//            makeBodyAt(x, y);
 
             break;
         }
@@ -1227,8 +1293,9 @@ void testApp::keyPressed(int key){
         // Movie select - 0 means using vidGrabber
 		case '0':
 //            if(!REALTIME){
-                if (curMovie != 0) movie[curMovie].stop();
-                curMovie = 0;
+                // if (curMovie != 0) movie[curMovie].stop();
+                movie[curMovie].stop();
+                // curMovie = 0;
 //            }
 			break;
 
@@ -1285,9 +1352,14 @@ void testApp::keyPressed(int key){
             
         // Toggle threshold inverting.
 		case ' ':
-            if(!REALTIME){
-                inverting[curMovie] = !inverting[curMovie];
+            if (curMoviePlaying){
+                movie[curMovie].stop();
+                curMoviePlaying = false;
+            }else{
+                movie[curMovie].play();
+                curMoviePlaying = true;
             }
+  
 			break;
             
 		case '+':
@@ -1383,6 +1455,15 @@ void testApp::keyPressed(int key){
             makeBodyFromFile(fileToRead, ofGetMouseX(), ofGetMouseY());
             break;
 
+        case 'y':
+            slideLeft = true;
+            slideRight = false;
+            break;
+
+        case 'u':
+            slideRight = true;
+            slideLeft = false;
+            break;
 
         // Apply force to pBodies.
         case 't':
@@ -1497,15 +1578,7 @@ void testApp::keyPressed(int key){
             
 
         case 's': //video stop
-//            if (curMoviePlaying){
-//                movie[curMovie].stop();
-//                curMoviePlaying = false;
-//            }else{
-//                movie[curMovie].play();
-//                curMoviePlaying = true;
-//            }
-            
-            
+          
             inTitle = false;
             bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f);
             boxes.push_back(bBox);
