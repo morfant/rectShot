@@ -32,17 +32,23 @@ enum {
     COPY_DUP_IDX = 0,
     GUNTIME = 10000,
     STAGE_NUM = 6,
-    MOVNUM = 6, //Num of movie files + cam
+    MOVNUM = 12, //Num of movie files + cam
     TH_CAM = 0, //curMov = 0
     TH_1 = 94, //aya
     TH_2 = 103, //han
     TH_3 = 100, //sewol
     TH_4 = 113, //park
     TH_5 = 111, //meÍ
+    TH_6 = 111, //meÍ
+    TH_7 = 111, //meÍ
+    TH_8 = 111, //meÍ
+    TH_9 = 111, //meÍ
+    TH_10 = 111, //meÍ
+    TH_11 = 111, //meÍ
 
     CV_CAM_WIDTH = 720,
     CV_CAM_HEIGHT = 480,
-    kMIN_BLOBAREA = 150
+    kMIN_BLOBAREA = 200
 };
 
 

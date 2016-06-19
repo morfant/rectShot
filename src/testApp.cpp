@@ -75,7 +75,11 @@ void testApp::setup(){
     
 
     for (int i = 1; i < MOVNUM; i++){
-        movie[i].loadMovie("movies/" + ofToString(i) + ".mp4");
+        if (i == 7 || i == 9){
+            movie[i].loadMovie("movies/" + ofToString(i) + ".mov");
+        }else{
+            movie[i].loadMovie("movies/" + ofToString(i) + ".mp4");
+        }
     };
 
     // movie[1].loadMovie("movies/01.mp4");
@@ -140,10 +144,12 @@ void testApp::setup(){
     threshold[3] = TH_3;
     threshold[4] = TH_4;
     threshold[5] = TH_5;
-//    threshold[6] = TH_6;
-//    threshold[7] = TH_7;
-//    threshold[8] = TH_8;
-//    threshold[9] = TH_9;
+    threshold[6] = TH_6;
+    threshold[7] = TH_7;
+    threshold[8] = TH_8;
+    threshold[9] = TH_9;
+    threshold[10] = TH_10;
+    threshold[11] = TH_11;
 
     
     // Box2D
@@ -833,7 +839,8 @@ void testApp::makeFaceAt(float x, float y)
 //                   blobsVec[i].centroid.x, blobsVec[i].centroid.y);
 
 
-            saveFaceVerticeToFile(selBlobRect, "verticeData.txt");
+            saveFaceVerticeToFile(selBlobRect, ofToString(curMovie) + ".txt");
+
             
             //FIXME: Fix body created position
 //            makeBodyAt(x, y);
@@ -1290,15 +1297,17 @@ void testApp::tmEnable(int tNum, unsigned long long lifetime)
 void testApp::keyPressed(int key){
 
 	switch (key){
-        // Movie select - 0 means using vidGrabber
-		case '0':
-//            if(!REALTIME){
-                // if (curMovie != 0) movie[curMovie].stop();
-                movie[curMovie].stop();
-                // curMovie = 0;
-//            }
-			break;
-
+        case '1':
+            inTitle = false;
+            grayShow = false;
+            movShow = true;
+            
+            if (curMovie != 0) movie[curMovie].stop();
+            curMovie = 1;
+            movie[curMovie].play();
+            movie[curMovie].setVolume(movAmp[curMovie]);
+            break;
+  
 		case '2':
 //            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
@@ -1308,6 +1317,7 @@ void testApp::keyPressed(int key){
                 cout << "press 2" << endl;
 //            }
 			break;
+
 		case '3':
 //            if(!REALTIME){
                 if (curMovie != 0) movie[curMovie].stop();
@@ -1347,7 +1357,39 @@ void testApp::keyPressed(int key){
                 movie[curMovie].play();
 //            }
 			break;
-            
+
+        case '8':
+//            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 8;
+                movie[curMovie].play();
+//            }
+            break;
+
+        case '9':
+//            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 9;
+                movie[curMovie].play();
+//            }
+            break;
+
+         case '0':
+//            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 10;
+                movie[curMovie].play();
+//            }
+            break;
+
+         case '`':
+//            if(!REALTIME){
+                if (curMovie != 0) movie[curMovie].stop();
+                curMovie = 11;
+                movie[curMovie].play();
+//            }
+            break;
+                      
             
             
         // Toggle threshold inverting.
@@ -1452,7 +1494,8 @@ void testApp::keyPressed(int key){
 
 
         case 'v':
-            makeBodyFromFile(fileToRead, ofGetMouseX(), ofGetMouseY());
+            // makeBodyFromFile(fileToRead, ofGetMouseX(), ofGetMouseY());
+            makeBodyFromFile(ofToString(curMovie)+".txt", ofGetMouseX(), ofGetMouseY());
             break;
 
         case 'y':
@@ -1620,18 +1663,7 @@ void testApp::keyPressed(int key){
             blackout = true;
             
             break;
-            
-		case '1':
-            inTitle = false;
-            grayShow = false;
-            movShow = true;
-            
-            if (curMovie != 0) movie[curMovie].stop();
-			curMovie = 1;
-            movie[curMovie].play();
-            movie[curMovie].setVolume(movAmp[curMovie]);
-			break;
-            
+          
             
         case 'o': //Make targets
             //            if(OriginDestroyed){
