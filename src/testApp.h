@@ -27,7 +27,7 @@
 
 // ---- Macros ----
 enum {
-    
+    FACENUM = 7,
     ORIGINAL_DUP_IDX = 0,
     COPY_DUP_IDX = 0,
     GUNTIME = 10000,
@@ -146,6 +146,7 @@ class testApp : public ofBaseApp{
     
         //CV
         int    kBLOBNUM = 4;
+        int    curFace = 1;
     
         ofxCvColorImage			colorImg;
         ofxCvGrayscaleImage 	grayImage, grayBg, grayDiff;

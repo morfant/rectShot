@@ -320,8 +320,14 @@ void testApp::update(){
                     // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 //                        (*iter)->breakBody();
-                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+
                         cout << "hit Face!" << endl;
+
+                        int faceLife = (*iter)->getLife();
+                        if (faceLife > 0) (*iter)->shot();
+                        else (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        
+                        //Make forec at shot position
                         bodyHit = true;
                     }
                 }
@@ -946,7 +952,8 @@ void testApp::makeBodyAt(float posX, float posY){
     }
 
     if(getArea(&vertices[0], maxVCount) > 0){ // If the area did not have minus value.
-        Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY);
+        // Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY);
+        Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY, 3);
         pBodies.push_back(aPbody);
     } 
 }
@@ -969,7 +976,8 @@ void testApp::makeBodyFromFile(ofFile argFile, float posX, float posY){
     }
 
    if(getArea(&vertices[0], vertices.size()) > 0){ // If the area did not have minus value.
-       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY);
+       // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY);
+       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY, 3);
        pBodies.push_back(aPbody);
    }
 }
@@ -1575,7 +1583,51 @@ void testApp::keyPressed(int key){
         case OF_KEY_DOWN:
             if(!REALTIME) aforce = aforce - 0.05f;
             break;
-            
+
+         case OF_KEY_LEFT:
+            //Delete previous Faces
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+                bool isSelected = (*iter)->getSelectState();
+                
+                if (isSelected) {
+                    (*iter)->clearFrags();
+                    delete (*iter);
+                    iter = pBodies.erase(iter);
+                }else{
+                    iter++;
+                }
+            }
+
+            if (curFace >= 1){
+                cout << "FACE NUM: " << "vertices/"+ofToString(curFace)+".txt" << endl;
+                makeBodyFromFile("vertices/"+ofToString(curFace)+".txt", ofGetMouseX(), ofGetMouseY());
+                curFace--;
+            }
+ 
+            break;
+
+         case OF_KEY_RIGHT:
+            //Delete previous Faces
+            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+                bool isSelected = (*iter)->getSelectState();
+                
+                if (isSelected) {
+                    (*iter)->clearFrags();
+                    delete (*iter);
+                    iter = pBodies.erase(iter);
+                }else{
+                    iter++;
+                }
+            }
+
+            if (curFace <= FACENUM){
+                cout << "FACE NUM: " << "vertices/"+ofToString(curFace)+".txt" << endl;
+                makeBodyFromFile("vertices/"+ofToString(curFace)+".txt", ofGetMouseX(), ofGetMouseY());
+                curFace++;
+            }
+
+            break;
+             
         case 'q':
             isShot = true;
             break;
