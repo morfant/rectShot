@@ -62,8 +62,8 @@ Box::Box(b2World* aWorld, float x, float y, int catBit, int maskBit)
     
     // Frag setting
     fragOutlineColor = ofColor(255);
+    fragFillColor = ofColor(0, 50, 120);
     
-	
 }
 
 Box::~Box()
@@ -460,7 +460,8 @@ Box::breakBody()
         
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx,
+                fragOutlineColor, fragFillColor, FRAG1_CATE_BIT, FRAG1_MASK_BIT);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;
@@ -553,7 +554,8 @@ Box::breakBody(float hitX, float hitY)
         
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, pos.x, pos.y, vertices, 0, fragIdx,
+                fragOutlineColor, fragFillColor, FRAG1_CATE_BIT, FRAG1_MASK_BIT);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;

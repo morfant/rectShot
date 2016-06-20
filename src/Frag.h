@@ -46,6 +46,7 @@ protected:
     // Color
     bool        outlineDraw;
     ofColor     outlineColor;
+    ofColor     fillColor;
     
     
     
@@ -66,7 +67,11 @@ protected:
     
 public:
     // Birth and Death
-    Frag(b2World* world, float mx, float my, b2Vec2* vertices, int pBodyIdx, int idx, ofColor outlineCol);
+    Frag(b2World* world, float mx, float my, b2Vec2* vertices,
+        int pBodyIdx, int idx, ofColor outlineCol, ofColor fillColor,
+        int cateBit, int maskBit);
+    Frag(b2World* world, float mx, float my, b2Vec2* vertices,
+        int pBodyIdx, int idx, ofColor outlineCol);
     ~Frag();
     
     bool isContactSelf();

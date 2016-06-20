@@ -170,6 +170,11 @@ class testApp : public ofBaseApp{
         bool                    touched;
         float                   sumOfArea;
     
+
+
+        //Frag
+        int                     fragLife = 3;
+        ofColor                 fragColor;
     
         //TARGET MAKER
         ofColor     pBodyOutlineColor[STAGE_NUM];

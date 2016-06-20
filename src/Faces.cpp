@@ -126,10 +126,12 @@ Faces::Faces(b2World* aWorld, b2Vec2* vertices,
 }
 
 
+//USING ONE
 Faces::Faces(b2World* aWorld, b2Vec2* vertices,
-    int maxVCount, float cx, float cy, int _life)
+    int maxVCount, float cx, float cy, int _life, ofColor _fragFillColor)
 {
     life = _life;
+    fragFillColor = _fragFillColor;
 
     for (int i = 0; i < maxVCount; i++) {
         mVertice[i] = vertices[i];
@@ -583,7 +585,9 @@ Faces::breakBody(float hitX, float hitY)
 
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            // Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, movX, movY, vertices,
+                index, fragIdx, fragOutlineColor, fragFillColor, FRAG2_CATE_BIT, FRAG2_MASK_BIT);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;
@@ -717,7 +721,9 @@ Faces::breakBody()
 
         // If the area did not have minus value.
         if(getArea(&vertices[0], 3) > 0){
-            Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            // Frag * aFrag = new Frag(mWorld, movX, movY, vertices, index, fragIdx, fragOutlineColor);
+            Frag * aFrag = new Frag(mWorld, movX, movY, vertices,
+                index, fragIdx, fragOutlineColor, fragFillColor, FRAG2_CATE_BIT, FRAG2_MASK_BIT);
             aFrag->setLifeLong(fragLifeTime); // Frag will die after n Frame. 0 means 'immortal'.
             mFrags.push_back(aFrag);
             fragIdx++;
@@ -759,6 +765,7 @@ Faces::shot()
         normalColor = hittingColor;
     }
 }
+
 
 void
 Faces::setContact(bool cont)

@@ -153,7 +153,7 @@ void testApp::setup(){
 
     //speziell
     center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight(),
-        0x000D, 0x000D);
+        CENTERWALL_CATE_BIT, CENTERWALL_MASK_BIT);
     
     // vector init
     blobsPts.clear();
@@ -164,12 +164,16 @@ void testApp::setup(){
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 6; j++){
             //00000001(1)
-            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1), 0x0001, 0x0001);
+            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
+                DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
             darkBox->setToBlack(true);
             darkBoxes.push_back(darkBox);
         }
     }
 
+
+    //FRAG
+    fragColor = ofColor(70, 140, 60);
 
     
     // OSC
@@ -391,7 +395,7 @@ void testApp::draw(){
         }
     }
    
-   
+
     // DRAW BODIES 
     if(pBodies.size()) drawPolygonBodies();
     
@@ -851,7 +855,8 @@ void testApp::makeBodyAt(float posX, float posY){
 
     if(getArea(&vertices[0], maxVCount) > 0){ // If the area did not have minus value.
         // Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY);
-        Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY, 3);
+        Faces * aPbody = new Faces(iWorld, &vertices[0], maxVCount, posX, posY,
+            fragLife, fragColor);
         pBodies.push_back(aPbody);
     } 
 }
@@ -875,7 +880,8 @@ void testApp::makeBodyFromFile(ofFile argFile, float posX, float posY){
 
    if(getArea(&vertices[0], vertices.size()) > 0){ // If the area did not have minus value.
        // Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY);
-       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY, 3);
+       Faces * aPbody = new Faces(iWorld, &vertices[0], kMAX_VERTICES, posX, posY,
+       fragLife, fragColor);
        pBodies.push_back(aPbody);
    }
 }
@@ -1579,7 +1585,8 @@ void testApp::keyPressed(int key){
           
             inTitle = false;
             //0x00000111(7)
-            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f, 0x0007, 0x0007);
+            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f,
+                BOX_CATE_BIT, BOX_MASK_BIT);
             boxes.push_back(bBox);
             // cout << "size of boxes after construct" << boxes.size() << endl;
             break;

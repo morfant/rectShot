@@ -62,8 +62,8 @@ Wall::Wall(b2World* aWorld, int x, int y, float w, float h)
 	b2FixtureDef myFixtureDef;
 
     //00001111(15)
-    myFixtureDef.filter.categoryBits = 0x000F;
-    myFixtureDef.filter.maskBits = 0x000F;
+    myFixtureDef.filter.categoryBits = WALL_CATE_BIT;
+    myFixtureDef.filter.maskBits = WALL_MASK_BIT;
 
 	myFixtureDef.shape = &myPolygonShape;
 	myFixtureDef.density = 1.f;

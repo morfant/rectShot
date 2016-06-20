@@ -44,6 +44,7 @@ protected:
     
     
     ofColor fragOutlineColor;
+    ofColor fragFillColor;
     vector<Frag*>   mFrags;
     bool    isFragsRemain = true;
     bool                    isThereMbodybool;

@@ -10,6 +10,37 @@
 #pragma once
 
 // ---- Macros ----
+
+
+enum {
+    //1111 1111
+    WALL_CATE_BIT = 0x00FF,
+    WALL_MASK_BIT = 0x00FF,
+
+    //1000 0000
+    CENTERWALL_CATE_BIT = 0x0080,
+    CENTERWALL_MASK_BIT = 0x0080,
+
+    //1100 0000
+    DARKBOX_CATE_BIT = 0x00C0,
+    DARKBOX_MASK_BIT = 0x00C0,
+
+    //1110 0000
+    BOX_CATE_BIT = 0x00E0,
+    BOX_MASK_BIT = 0x00E0,
+
+    //FRAG FROM BOX
+    //0111 0000
+    FRAG1_CATE_BIT = 0x0070,
+    FRAG1_MASK_BIT = 0x0070,
+
+    //FRAG FROM POLYGON BODY
+    //0011 0000
+    FRAG2_CATE_BIT = 0x0030,
+    FRAG2_MASK_BIT = 0x0030
+
+};
+
 enum { //box2d Userdata
     BALL = 1,
     SUPER_BALL = 11,

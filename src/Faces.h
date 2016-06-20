@@ -60,6 +60,7 @@ protected:
     ofColor     contactedColor;
     ofColor     normalColor;
     ofColor     fragOutlineColor;
+    ofColor     fragFillColor;
     
     // Select interface
     bool        selected;
@@ -98,7 +99,7 @@ public:
     Faces(b2World* world, b2Vec2* vertices,
         int maxVCount, float x, float y);
     Faces(b2World* world, b2Vec2* vertices,
-        int maxVCount, float x, float y, int life);
+        int maxVCount, float x, float y, int life, ofColor fragFillCol);
     
     ~Faces();
     

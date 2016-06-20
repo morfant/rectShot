@@ -11,6 +11,95 @@
 
 // ----Birth & Death----
 
+Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices,
+    int pbIdx, int idx, ofColor outlineCol, ofColor _fillColor,
+    int catBit, int maskBit)
+{
+
+    // osc
+//  sender.setup(HOST, PORT);
+
+    // Set Userdata
+    pBodyIndex = pbIdx;
+    index = idx;
+    fragUserData = (pBodyIndex * 10000) + (index * 100) + FRAG;
+    
+    lifeLong = 0;
+    age = 0;
+    isAlive = true;
+    
+    mWorld = aWorld;
+    posX = mx;
+    posY = my;
+    
+    outlineDraw = false;
+    outlineColor = outlineCol;
+    isSafeTri = false;
+
+    fillColor = _fillColor;
+    
+    
+    for (int i = 0; i < 3; i++){
+        mVertice[i] = vertices[i];
+//        cout << "i : " << i << mVertice[i].x << " / " << mVertice[i].y << endl;
+    }
+    
+    b2BodyDef myBodyDef;
+    myBodyDef.type = b2_dynamicBody;
+//    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+    myBodyDef.position.Set(0, 0);
+    mBody = mWorld -> CreateBody(&myBodyDef);
+    
+    b2PolygonShape triangle;
+    
+//    mVertice[0].Set(0.0f, 0.0f);
+//    mVertice[1].Set(1.0f, 0.0f);
+//    mVertice[2].Set(0.0f, 1.0f);
+    
+    float fragArea = getArea(&vertices[0], 3);
+//    printf("fragArea: %f\n", fragArea);
+
+    
+    
+    if(fragArea > 0){
+        triangle.Set(mVertice, 3);
+    }else{
+        cout << "safe tri made!!!" << endl;
+        safeTriangle[0].Set(0.f, 0.f);
+        safeTriangle[1].Set(0.1f, 0.1f);
+        safeTriangle[2].Set(0.f, 0.1f);
+        triangle.Set(safeTriangle, 3);
+        isSafeTri = true;
+    }
+    
+    
+//    try {
+//        triangle.Set(mVertice, 3);
+//    } catch (<#catch parameter#>) {
+//        <#statements#>
+//    }
+
+    
+    b2FixtureDef myFixtureDef;
+    myFixtureDef.shape = &triangle;
+    myFixtureDef.density = 0.5f;
+
+    //00000010(2) : not to collide with darkbox
+    myFixtureDef.filter.categoryBits = catBit;
+    myFixtureDef.filter.maskBits = maskBit;
+
+//    myFixtureDef.restitution = 0.01f;
+//    myFixtureDef.friction = 0.7f;
+    mBody->CreateFixture(&myFixtureDef);
+    mBody->SetUserData((void*)fragUserData);
+    
+//    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
+
+    
+    isNewBorn = true;
+}
+
+
 Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int idx, ofColor outlineCol)
 {
 
@@ -33,8 +122,12 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
     outlineDraw = false;
     outlineColor = outlineCol;
     isSafeTri = false;
-    
 
+    //Pale blue
+    fillColor = ofColor(0, 50, 120);
+
+    //White
+    // fillColor = ofColor(255, 255, 255);
     
     
     for (int i = 0; i < 3; i++){
@@ -233,8 +326,9 @@ Frag::render()
     ofPushStyle();
 //    ofSetColor(0, 200, 255, alpha);
 
+    fillColor.a = alpha;
+    ofSetColor(fillColor);
     
-    ofSetColor(0, 50, 120, alpha);
     
     if (isSafeTri) ofSetColor(255, 0, 0);
     
