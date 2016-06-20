@@ -52,6 +52,7 @@ protected:
     float       fragLifeTime;
     
     bool    toBlack = false;
+    ofColor         normalColor;
     
     
 public:
@@ -65,7 +66,7 @@ public:
     
     // FUNCTION
     // Birth and Death
-    Box(b2World* world, float x, float y);
+    Box(b2World* world, float x, float y, int cbit, int mbit);
     ~Box();
     
     // Getter

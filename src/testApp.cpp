@@ -69,10 +69,8 @@ void testApp::setup(){
     // Playing source select
     movShow = false;
     grayShow = false;
-    blobShow = true;
+    blobShow = false;
 
-    // movie[1].loadMovie("movies/ayaSum.mov");
-    
 
     for (int i = 1; i < MOVNUM; i++){
         if (i == 7 || i == 9){
@@ -82,26 +80,16 @@ void testApp::setup(){
         }
     };
 
-    // movie[1].loadMovie("movies/01.mp4");
-    // movie[2].loadMovie("movies/01.mp4");
-    // movie[3].loadMovie("movies/01.mp4");
-    // movie[4].loadMovie("movies/01.mp4");
-    // movie[5].loadMovie("movies/01.mp4");
-    // movie[6].loadMovie("movies/01.mp4");
-    // movie[7].loadMovie("movies/01.mp4");
-    // movie[8].loadMovie("movies/01.mp4");
-    // movie[9].loadMovie("movies/01.mp4");
-    // movie[10].loadMovie("movies/01.mp4");
-    // movie[11].loadMovie("movies/01.mp4");
+   // movie[11].loadMovie("movies/01.mp4");
 
   
-    movAmp[1] = 0.5f;
+    movAmp[1] = 1.0f;
     movAmp[2] = 0.1f;
     movAmp[3] = 0.1f;
     movAmp[4] = 0.2f;
     movAmp[5] = 0.5f;
 
-    movDrawPosX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
+    movDrawPosX = (ofGetWidth()/4.f) - (movie[curMovie].width/2.f);
     movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
     
     curMovie = 1; // 0 means using vidGrabber.
@@ -109,8 +97,6 @@ void testApp::setup(){
     
     
     // Get movie Width / Height
-    movRes[0] = ofVec2f(CV_CAM_WIDTH, CV_CAM_HEIGHT);
-    
     for (int i = 1; i < MOVNUM; i++){
         movRes[i].x = movie[i].getWidth();
         movRes[i].y = movie[i].getHeight();
@@ -124,12 +110,7 @@ void testApp::setup(){
         inverting[i] = false;
     }
     
-    // Using cam
     ofSetLogLevel(OF_LOG_VERBOSE);
-//    vidGrabber.listDevices();
-    vidGrabber.setDeviceID(0);
-    vidGrabber.setVerbose(true);
-    vidGrabber.initGrabber(CV_CAM_WIDTH, CV_CAM_HEIGHT);
     
     // Using movie files
     colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
@@ -169,68 +150,25 @@ void testApp::setup(){
     right = new Wall(iWorld, ofGetWidth() + thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
     floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight() + thickness/2, ofGetWidth(), thickness);
     ceil = new Wall(iWorld, ofGetWidth()/2, 0 - thickness/2, ofGetWidth(), thickness);
-    center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight());
+
+    //speziell
+    center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight(),
+        0x000D, 0x000D);
     
     // vector init
     blobsPts.clear();
     blobsPtsDiv.clear();
     
-    
-    //TARGET MAKER
-    tmOpen = false;
-    targetNum[0] = 10; //aya
-    targetNum[1] = 10; //han
-    targetNum[2] = 10; //sewol
-    targetNum[3] = 10; //park
-    targetNum[4] = 10; //me
-    targetNum[5] = 10; //cam
-    
-    fragLifeTime[0] = 40.f; //aya
-    fragLifeTime[1] = 40.f; //han
-    fragLifeTime[2] = 40.f; //sewol
-    fragLifeTime[3] = 40.f; //park
-    fragLifeTime[4] = 40.f; //me
-    fragLifeTime[5] = 20.f; //cam
-
-    curStage = 0;
-    stageStartTime = ofGetElapsedTimeMillis();
-    OriginDestroyed = false;
-    nextStageReady = false;
-    
-    Faces* initDumy = new Faces();
-    tMan = new Tm(iWorld, initDumy, 1000); //1000 = 1 sec
-    randFace = false;
-    
-    pBodyOutlineColor[0] = ofColor(10, 200, 100);
-    pBodyOutlineColor[1] = ofColor(250, 0, 170);
-    pBodyOutlineColor[2] = ofColor(200, 250, 10);
-    pBodyOutlineColor[3] = ofColor(100, 250, 200);
-    pBodyOutlineColor[4] = ofColor(0, 200, 10);
-    
-    isFirstShot[0] = false;
-    isFirstShot[1] = false;
-    isFirstShot[2] = false;
-    isFirstShot[3] = false;
-    isFirstShot[4] = false;
-    isFirstShot[5] = false;
-    
-    bornPoint[0] = ofPoint(630, 397); //aya
-    bornPoint[1] = ofPoint(553, 441); //han
-    bornPoint[2] = ofPoint(554, 449); //sewol
-    bornPoint[3] = ofPoint(230, 619); //park
-    bornPoint[4] = ofPoint(629, 348); //me
-    bornPoint[5] = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
-    
-
-    //LEFT SIDE OF SCREEN
-    //Prepare darkBoxes
-    // for (int i = 0; i < 8; i++){
-    //     for (int j = 0; j < 6; j++){
-    //         Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1));
-    //         darkBox->setToBlack(true);
-    //         darkBoxes.push_back(darkBox);
-    //     }
-    // }
+  
+    //PREPARE DARK BOXES!
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 6; j++){
+            //00000001(1)
+            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1), 0x0001, 0x0001);
+            darkBox->setToBlack(true);
+            darkBoxes.push_back(darkBox);
+        }
+    }
 
 
     
@@ -252,7 +190,8 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-    
+
+
     //GET FFT just 1 band = approximately getting 'amp'.
     ofSoundUpdate();
     float * val = ofSoundGetSpectrum(nBandsToGet);
@@ -272,14 +211,8 @@ void testApp::update(){
         bool bNewFrame = false;
 
         //cam
-        if (curMovie == 0) {
-            vidGrabber.update();
-            bNewFrame = vidGrabber.isFrameNew();
-        }else{
-            //movie
-            movie[curMovie].update();
-            bNewFrame = movie[curMovie].isFrameNew();
-        }
+        movie[curMovie].update();
+        bNewFrame = movie[curMovie].isFrameNew();
 
         if (bNewFrame){
 
@@ -287,14 +220,8 @@ void testApp::update(){
             colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
             grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
         
-            if (curMovie == 0){// For vidGrabber
-                vidGrabber.update();
-                colorImg.setFromPixels(vidGrabber.getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-            }else{// For vidPlayer
-                movie[curMovie].update();
-                colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-            }
-        
+            movie[curMovie].update();
+            colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
             grayImage.setFromColorImage(colorImg);
             grayImage.threshold(threshold[curMovie], inverting[curMovie]);
             
@@ -306,23 +233,24 @@ void testApp::update(){
         }
 
 
-        // SHOOTING CHECK
+        // Previous superball shooting check
         if(shotBallMade){
             delete aBall;
             shotBallMade = false;
         }
         
         
+        //SHOOTING CHECK
         if (isShot){
             
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
                     // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-//                        (*iter)->breakBody();
 
                         cout << "hit Face!" << endl;
 
+                        // Consider 'life' of face object
                         int faceLife = (*iter)->getLife();
                         if (faceLife > 0) (*iter)->shot();
                         else (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
@@ -336,10 +264,12 @@ void testApp::update(){
             
             for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
+                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-//                        (*iter)->breakBody();
-                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+
                         cout << "hit Box!" << endl;
+
+                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         bodyHit = true;
                     }
                 }
@@ -348,11 +278,12 @@ void testApp::update(){
             
             for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
+                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
                     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-                        //                        (*iter)->breakBody();
-                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
-//                        blackBoxes.erase(iter);
+
                         cout << "hit Black Box!" << endl;
+
+                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         bodyHit = true;
                     }
                 }
@@ -362,15 +293,12 @@ void testApp::update(){
             if(!bodyHit){
             
                 cout << "No hit!" << endl;
-                aBall = new Ball(iWorld, shot_X, shot_Y, true);
-                //                    balls.push_back(aBall);
+                // aBall = new Ball(iWorld, shot_X, shot_Y, true);
+                aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), true);
                 shotBallMade = true;
             }
             
-            if (curStage == STAGE_NUM - 1 && !blackout) {
-                blackout = true;
-            }
-            
+            // Reset booleans
             isShot = false;
             bodyHit = false;
         }
@@ -398,73 +326,6 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    ofBackground(0, 0, 0);
-    
-    //RIGHT SIDE OF SCREEN
-    ofSetColor(148, 211, 230);
-    // ofSetColor(10, 10, 10);
-    ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
-    
-
-  
-    // Box isinside test
-//    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-    // for (vector<Box*>::iterator iter = blackBoxes.begin();
-    //     iter != blackBoxes.end(); iter++) {
-        
-    //     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
-    //         cout << "Box isinsed!!" << endl;
-    //     }else{
-    //         cout << "NN" << endl;
-    //     }
-    // }
-
-    
-    
-    
-    
-    
-    
-
-    // Draw gray image.
-    if (grayShow){
-        grayImage.draw(movDrawPosX, movDrawPosY);
-    }
-    
-    // Draw movie.
-    if (movShow){
-        if (curMovie == 0) {
-            //            vidGrabber.draw(0, 0);
-            movDrawPosX = (ofGetWidth()/2.f) - (vidGrabber.width/2.f);
-            movDrawPosY = (ofGetHeight()/2.f) - (vidGrabber.height/2.f);
-            vidGrabber.draw(movDrawPosX, movDrawPosY);
-            
-        }else{
-            movDrawPosX = (ofGetWidth()/2.f) - (movie[curMovie].width/2.f);
-            movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
-            movie[curMovie].draw(movDrawPosX, movDrawPosY);
-            // movie[curMovie].draw(0, 0);
-        }
-    }
-    
-    // Draw contourFinder
-    if (blobShow){
-        ofPushStyle();
-        //        ofPushMatrix();
-        //        ofTranslate(movDrawPosX, movDrawPosY);
-        ofSetLineWidth(1.0);
-        
-        for (int i = 0; i < contourFinder.nBlobs; i++){
-            //        contourFinder.blobs[i].draw(360,540);
-            contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
-            // contourFinder.blobs[i].draw(0, 0);
-            
-        }
-        //        ofPopMatrix();
-        ofPopStyle();
-    }
-    
-    
     // Draw Box2D walls
     left->renderAtBodyPosition();
     right->renderAtBodyPosition();
@@ -473,19 +334,30 @@ void testApp::draw(){
     center->renderAtBodyPosition();
 
 
+    ofBackground(0, 0, 0);
     
+    //RIGHT SIDE OF SCREEN
+    ofSetColor(148, 211, 230);
+    // ofSetColor(10, 10, 10);
+    ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
     
-    // Draw body at cv pos
-    if(pBodies.size()) drawPolygonBodies();
+   
+    // Draw movie.
+    if (movShow){
+      movie[curMovie].draw(movDrawPosX, movDrawPosY);
+        // movie[curMovie].draw(0, 0);
+
+    }
     
 
-//    if (!REALTIME) {
-        // Draw ball
-        for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
-            (*iter)->renderAtBodyPosition();
-        }
+    
+    
+    // Draw ball
+    for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+    }
 
-
+    // Like a darkmaterial in the outer space
     if (darkBoxes.size()){
        // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
         // Draw black boxes
@@ -499,7 +371,8 @@ void testApp::draw(){
         }
     }
 
-        // Draw boxes
+
+    // Draw boxes
     if (boxes.size()){
        // cout << "size of boxes: " << boxes.size() << endl;
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
@@ -508,6 +381,7 @@ void testApp::draw(){
         }
     }
     
+
     if (blackBoxes.size()){
        // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
         // Draw black boxes
@@ -517,10 +391,13 @@ void testApp::draw(){
         }
     }
    
-//    }
+   
+    // DRAW BODIES 
+    if(pBodies.size()) drawPolygonBodies();
     
+
     
-    // LaserPointTracking point
+    // SHOW LaserPointTracking point
     if (shotPointTest){
         ofPushStyle();
         ofSetColor(255, 0, 0);
@@ -533,6 +410,7 @@ void testApp::draw(){
     }
     
     shotPointTest = false;
+
     
 	// finally, a report
     if (info){
@@ -553,29 +431,7 @@ void testApp::draw(){
 
 //    touchingCheck();
     
-    
-    if (inTitle){
-//        printf("inTitle true.\n");
-        movShow = false;
-        blobShow = false;
-        grayShow = false;
-        
-        title.draw(
-                   ofGetWidth()/2.f - title.width/2.f,
-                   ofGetHeight()/2.f-title.height/2.f);
-    }
-    
-    if (blackout) {
-        ofSetColor(0);
-        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-        oscSendI("/blackout", 1);
-        for (int i = 1; i < STAGE_NUM - 1; i++) {
-            movie[i].setVolume(0.f);
-            movie[i].stop();
-        }
-//        printf("blackout!\n");
-    }
- 
+
     
     
     
@@ -644,6 +500,27 @@ void testApp::draw(){
         }
     }
 
+    // Draw grayimage.
+    if (grayShow){
+        grayImage.draw(movDrawPosX, movDrawPosY);
+    }
+ 
+    // Draw contourFinder
+    if (blobShow){
+        ofPushStyle();
+        ofPushMatrix();
+        ofTranslate(movDrawPosX, movDrawPosY);
+        ofSetLineWidth(2.0);
+        
+        for (int i = 0; i < contourFinder.nBlobs; i++){
+            // contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
+            contourFinder.blobs[i].draw(0, 0);
+            
+        }
+        ofPopMatrix();
+        ofPopStyle();
+    }
+ 
     //AUDIO - visualize
     ofSetColor(245, 58, 135);
     ofFill();       
@@ -663,6 +540,28 @@ void testApp::draw(){
         }
     }
     
+     
+    if (inTitle){
+//        printf("inTitle true.\n");
+        movShow = false;
+        blobShow = false;
+        grayShow = false;
+        
+        title.draw(
+        ofGetWidth()/4.f - title.width/2.f,
+        ofGetHeight()/2.f-title.height/2.f);
+    }
+    
+    if (blackout) {
+        ofSetColor(0);
+        ofRect(0, 0, ofGetWidth(), ofGetHeight());
+        oscSendI("/blackout", 1);
+        for (int i = 1; i < STAGE_NUM - 1; i++) {
+            movie[i].setVolume(0.f);
+            movie[i].stop();
+        }
+//        printf("blackout!\n");
+    }
     
 }
 
@@ -720,7 +619,6 @@ bool testApp::slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe)
 void testApp::drawPolygonBodies(){
     
 //    cout << "num of pbodies: " << pBodies.size() << endl;
-    
     
     for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
         
@@ -1308,10 +1206,15 @@ void testApp::keyPressed(int key){
         case '1':
             inTitle = false;
             grayShow = false;
-            movShow = true;
-            
+            movShow = false;
+            blobShow = true;
+
             if (curMovie != 0) movie[curMovie].stop();
             curMovie = 1;
+
+            movDrawPosX = (ofGetWidth()/4.f) - (movie[curMovie].width/2.f);
+            movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
+  
             movie[curMovie].play();
             movie[curMovie].setVolume(movAmp[curMovie]);
             break;
@@ -1675,7 +1578,8 @@ void testApp::keyPressed(int key){
         case 's': //video stop
           
             inTitle = false;
-            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f);
+            //0x00000111(7)
+            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f, 0x0007, 0x0007);
             boxes.push_back(bBox);
             // cout << "size of boxes after construct" << boxes.size() << endl;
             break;

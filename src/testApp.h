@@ -133,7 +133,6 @@ class testApp : public ofBaseApp{
         ofFile              fileToRead;
         
         //MOVIE, VIDEO
-        ofVideoGrabber 		vidGrabber;
         ofVideoPlayer 		movie[MOVNUM];
         ofVec2f             movRes[MOVNUM];
         float               movAmp[MOVNUM];

@@ -12,8 +12,10 @@
 
 // ----Birth & Death----
 
-Box::Box(b2World* aWorld, float x, float y)
+Box::Box(b2World* aWorld, float x, float y, int catBit, int maskBit)
 {
+
+    normalColor = ofColor(255, 255, 255);
 
     ofTrueTypeFont::setGlobalDpi(72);
     verdana14.loadFont("verdana.ttf", 40, true, true);
@@ -47,6 +49,10 @@ Box::Box(b2World* aWorld, float x, float y)
 	myPolygonShape.SetAsBox(_toWorldScale(size)/2.f, _toWorldScale(size)/2.f);
 	
 	b2FixtureDef myFixtureDef;
+
+    myFixtureDef.filter.categoryBits = catBit;
+    myFixtureDef.filter.maskBits = maskBit;
+  
 	myFixtureDef.shape = &myPolygonShape;
 	myFixtureDef.density = 20.f;
     myFixtureDef.restitution = 0.8f;
@@ -174,13 +180,11 @@ Box::renderAtBodyPosition()
 {
     
     if (isThereMbodybool){
-
         
         b2Vec2 pos = mBody->GetPosition();
         
         ofPushStyle();
         
-    //    float alpha = (255 - age);
         float alpha = 255;
 
         ofPushMatrix();
@@ -188,16 +192,18 @@ Box::renderAtBodyPosition()
         ofSetRectMode(OF_RECTMODE_CENTER);
 
         if (toBlack){
+            //Rect for edge line
             ofSetColor(255, 255, 255, 255);
             ofRect(0, 0, size+4, size+4);
             
-            ofSetColor(0, 0, 0, MAX(0, alpha));
-            ofRect(0, 0, size, size);
+            normalColor = ofColor(0, 0, 0, MAX(0, alpha));
             
-        }else{
-            ofSetColor(255, 255, 255, MAX(0, alpha));
-            ofRect(0, 0, size, size);
         }
+        // else{normalColor = ofColor(255, 255, 255, MAX(0, alpha)); }
+
+        ofSetColor(normalColor);
+        ofRect(0, 0, size, size);
+
         ofPopMatrix();
         ofPopStyle();
     }else{
@@ -212,13 +218,23 @@ void
 Box::update()
 {
     if (isThereMbodybool){
-        string touchCnt = ofToString(countTouch());
-        
+
+        int tCount = countTouch();
+
+        if (tCount > kCONTACT_LIMIT){
+            // cout << "Reached Contact Limit!!" << endl;
+            normalColor = ofColor(0, 50, 120);
+        }else{
+            normalColor = ofColor(255, 255, 255);
+        }
+
+        // Draw string
+        string touchCnt = ofToString(tCount);
         b2Vec2 pos = mBody->GetPosition();
-        
         ofSetColor(255, 0, 0);
         verdana14.drawString(touchCnt, _toPixelX(pos.x) - 20, _toPixelY(pos.y) + 10);
         // cout << "GetPosX: " << _toPixelX(pos.x) << " / " << _toPixelY(pos.y) << endl;
+
     }
 
 //    age++;

@@ -81,6 +81,11 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices, int pbIdx, int
 	b2FixtureDef myFixtureDef;
 	myFixtureDef.shape = &triangle;
 	myFixtureDef.density = 0.5f;
+
+    //00000010(2) : not to collide with darkbox
+    myFixtureDef.filter.categoryBits = 0x0002;
+    myFixtureDef.filter.maskBits = 0x0002;
+
 //    myFixtureDef.restitution = 0.01f;
 //    myFixtureDef.friction = 0.7f;
     mBody->CreateFixture(&myFixtureDef);

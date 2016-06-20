@@ -47,6 +47,7 @@ public:
     Wall();
 //    Wall(b2World* aWorld, b2Vec2 beginPoint, b2Vec2 endPoint, float length);
     Wall(b2World* aWorld, int x, int y, float w, float h);
+    Wall(b2World* aWorld, int x, int y, float w, float h, int cBit, int mBit);
     
     ~Wall();
     
