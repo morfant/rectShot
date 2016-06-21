@@ -183,11 +183,35 @@ void testApp::setup(){
     oscSendI("/title", 1);
     
 
-    //AUDIO - for get 'amp'
-    soundPlayer.loadSound(ofToDataPath("pp.wav"));
-    soundPlayer.setLoop(true);
-    // soundPlayer.play();
-    nBandsToGet = 1;
+    //AUDIO - Active mic input interation
+    // 0 output channels, 
+    // 2 input channels
+    // 44100 samples per second
+    // 256 samples per buffer
+    // 4 num buffers (latency)
+    
+    soundStream.listDevices();
+    
+    //if you want to set a different device id 
+    //soundStream.setDeviceID(0); //bear in mind the device id corresponds to all audio devices, including  input-only and output-only devices.
+    
+    int bufferSize = 256;
+    
+    leftSig.assign(bufferSize, 0.0);
+    rightSig.assign(bufferSize, 0.0);
+    
+    bufferCounter   = 0;
+    smoothedVol     = 0.0;
+    scaledVol       = 0.0;
+
+    soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+
+
+    //AUDIO - for get 'amp' from file
+    // soundPlayer.loadSound(ofToDataPath("pp.wav"));
+    // soundPlayer.setLoop(true);
+    // // soundPlayer.play();
+    // nBandsToGet = 1;
   
 
 }
@@ -195,12 +219,15 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 
+    //AUDIO
+    //lets scale the vol up to a 0-1 range 
+    scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
 
     //GET FFT just 1 band = approximately getting 'amp'.
-    ofSoundUpdate();
-    float * val = ofSoundGetSpectrum(nBandsToGet);
-    fftSmoothed *= 0.96f;
-    if (fftSmoothed < val[0]) fftSmoothed = val[0];
+    // ofSoundUpdate();
+    // float * val = ofSoundGetSpectrum(nBandsToGet);
+    // fftSmoothed *= 0.96f;
+    // if (fftSmoothed < val[0]) fftSmoothed = val[0];
     
     
     if(!inTitle){
@@ -236,6 +263,25 @@ void testApp::update(){
             cvBlobNum = blobsVec.size();
         }
 
+
+        //OSC - num of boxes
+        int curNumBoxes = boxes.size();
+        if (numBoxes != curNumBoxes){
+            oscSendI("/boxNum", curNumBoxes);
+
+            numBoxes = curNumBoxes;
+        }
+
+        //OSC - canBeHit status
+        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            if ( (*iter)->getIsThereMBody() ){
+                bool hittable = (*iter)->getCanBeHitUpdated();
+                if (hittable){
+                    oscSendII("/canHit", (*iter)->getIndex(), (int)(*iter)->getCanBeHit());
+                }
+            }
+        }
+            
 
         // Previous superball shooting check
         if(shotBallMade){
@@ -369,8 +415,13 @@ void testApp::draw(){
         for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
             (*iter)->renderAtBodyPosition();
             // (*iter)->update();
-            (*iter)->getBody()->ApplyForce(b2Vec2(fftSmoothed * mulForce, fftSmoothed * mulForce), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+            // (*iter)->getBody()->ApplyForce(b2Vec2(fftSmoothed * mulForce, fftSmoothed * mulForce), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
             // (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(fftSmoothed, fftSmoothed), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+
+            // (*iter)->getBody()->ApplyForce(b2Vec2(scaledVol * mulForce, scaledVol * mulForce),
+                // b2Vec2(ofGetWidth()/4, ofGetHeight()/2));
+            (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(scaledVol, scaledVol),
+                b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
   
         }
     }
@@ -460,6 +511,7 @@ void testApp::draw(){
         for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
+                delete (*iter);
                 pBodies.erase(iter);
                 cout << "size of pBodies after erase: " << pBodies.size() << endl;
             }else{
@@ -472,6 +524,7 @@ void testApp::draw(){
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
+                delete (*iter);
                 boxes.erase(iter);
                 cout << "size of boxes after erase: " << boxes.size() << endl;
             }else{
@@ -484,6 +537,7 @@ void testApp::draw(){
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
+                delete (*iter);
                 blackBoxes.erase(iter);
                 cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
             }else{
@@ -496,6 +550,7 @@ void testApp::draw(){
         for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
+                delete (*iter);
                 darkBoxes.erase(iter);
                 cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
             }else{
@@ -528,7 +583,8 @@ void testApp::draw(){
     //AUDIO - visualize
     ofSetColor(245, 58, 135);
     ofFill();       
-    ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
+    // ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
+    ofCircle(ofGetWidth() - 200, 200, scaledVol * 300.0f);
 
 
     //WINDOW SLIDE
@@ -570,6 +626,36 @@ void testApp::draw(){
 }
 
 /* ================ FUNCTIONS ================ */
+void testApp::audioIn(float * input, int bufferSize, int nChannels){
+    
+    float curVol = 0.0;
+    
+    // samples are "interleaved"
+    int numCounted = 0; 
+
+    //lets go through each sample and calculate the root mean square which is a rough way to calculate volume   
+    for (int i = 0; i < bufferSize; i++){
+        leftSig[i]     = input[i*2]*0.5;
+        rightSig[i]    = input[i*2+1]*0.5;
+
+        curVol += leftSig[i] * leftSig[i];
+        curVol += rightSig[i] * rightSig[i];
+        numCounted+=2;
+    }
+    
+    //this is how we get the mean of rms :) 
+    curVol /= (float)numCounted;
+    
+    // this is how we get the root of rms :) 
+    curVol = sqrt( curVol );
+
+    smoothedVol *= 0.93;
+    smoothedVol += 0.07 * curVol;
+    
+    bufferCounter++;
+    
+}
+
 
 bool testApp::slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe)
 {
@@ -1472,13 +1558,19 @@ void testApp::keyPressed(int key){
             
                 // box
                 for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()) iWorld->DestroyBody((*iter)->getBody());
+                    if ((*iter)->getIsThereMBody()){
+                        iWorld->DestroyBody((*iter)->getBody());
+                        delete (*iter);
+                    }
                 }
                 boxes.clear();
             
                 // blackbox
                 for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()) iWorld->DestroyBody((*iter)->getBody());
+                    if ((*iter)->getIsThereMBody()){
+                        iWorld->DestroyBody((*iter)->getBody());
+                        delete (*iter);
+                    } 
                 }
                 blackBoxes.clear();
             
@@ -1586,8 +1678,9 @@ void testApp::keyPressed(int key){
             inTitle = false;
             //0x00000111(7)
             bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f,
-                BOX_CATE_BIT, BOX_MASK_BIT);
+                BOX_CATE_BIT, BOX_MASK_BIT, boxIdx);
             boxes.push_back(bBox);
+            boxIdx++;
             // cout << "size of boxes after construct" << boxes.size() << endl;
             break;
             

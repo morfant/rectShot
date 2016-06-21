@@ -63,10 +63,20 @@ class testApp : public ofBaseApp{
 		
 
         //AUDIO
-        ofSoundPlayer   soundPlayer;
-        float 				fftSmoothed = 0;
-        int                 nBandsToGet;
+        // ofSoundPlayer   soundPlayer;
+        // float 				fftSmoothed = 0;
+        // int                 nBandsToGet;
+
+        void audioIn(float * input, int bufferSize, int nChannels);
     
+        vector <float> leftSig;
+        vector <float> rightSig;
+        
+        int     bufferCounter;
+        float   smoothedVol;
+        float   scaledVol;
+        
+        ofSoundStream soundStream;
 
     
 		void keyPressed(int key);
@@ -167,6 +177,7 @@ class testApp : public ofBaseApp{
         Box*                    bBox;
         Ball*                   aBall;
         int                     pBodyIdx;
+        int                     boxIdx;
         bool                    touched;
         float                   sumOfArea;
     
@@ -210,6 +221,7 @@ class testApp : public ofBaseApp{
         ofxOscSender            sender;
         ofxOscReceiver          receiver;
         bool                    blobsSynMade;
+        int                     numBoxes = 0;
 
     
         // container

@@ -41,6 +41,7 @@ enum {
 
 };
 
+
 enum { //box2d Userdata
     BALL = 1,
     SUPER_BALL = 11,
@@ -65,6 +66,10 @@ enum {
 #include "ofMain.h"
 #include "ofxOsc.h"
 
+#define HOST "localhost"
+//#define HOST "192.168.1.103" //supercollider HOST
+#define PORT 57120
+#define RECV_PORT 20000
 
 
 // ----Define----
@@ -86,3 +91,5 @@ enum {
 #define _tovPixelY(y)	(480.f / 2.f - (BOX2D_SCALE * y))
 #define _tovWorldX(x)	(_round2(((720.f / 2.f) - x) / BOX2D_SCALE) * -1.f)
 #define _tovWorldY(y)	(_round2(((480.f / 2.f) - y) / BOX2D_SCALE))
+
+

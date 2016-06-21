@@ -12,8 +12,72 @@
 
 // ----Birth & Death----
 
+
+Box::Box(b2World* aWorld, float x, float y, int catBit, int maskBit, int idx)
+{
+
+    // open an outgoing connection to HOST:PORT
+    // sender.setup(HOST, PORT);
+
+    normalColor = ofColor(255, 255, 255);
+
+    index = idx;
+
+    ofTrueTypeFont::setGlobalDpi(72);
+    verdana14.loadFont("verdana.ttf", 40, true, true);
+    
+    mWorld = aWorld;
+    posX = x;
+    posY = y;
+    // cout << "origin pos X / Y: " << posX << " / " << posY << endl;
+    
+    isThereMbodybool = true;
+    
+    fragLifeTimeBySec = 2.0f;
+    fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
+    
+    
+//    posX = ofGetWidth()/2;
+//    posY = ofGetHeight()/2;
+    
+    b2BodyDef myBodyDef;
+    // myBodyDef.type = b2_staticBody;
+    myBodyDef.type = b2_dynamicBody;
+    myBodyDef.position.Set(_toWorldX(posX), _toWorldY(posY));
+    // cout << "world pos X / Y: " << _toWorldX(posX) << " / " << _toWorldY(posY) << endl;
+
+    mBody = mWorld -> CreateBody(&myBodyDef);
+    
+//    cout << "addr of aWorld in Box: " << aWorld << endl;
+
+    
+    b2PolygonShape myPolygonShape;
+    myPolygonShape.SetAsBox(_toWorldScale(size)/2.f, _toWorldScale(size)/2.f);
+    
+    b2FixtureDef myFixtureDef;
+
+    myFixtureDef.filter.categoryBits = catBit;
+    myFixtureDef.filter.maskBits = maskBit;
+  
+    myFixtureDef.shape = &myPolygonShape;
+    myFixtureDef.density = 20.f;
+    myFixtureDef.restitution = 0.8f;
+//    myFixtureDef.isSensor = true;
+    mBody->CreateFixture(&myFixtureDef);
+
+    
+    // Frag setting
+    fragOutlineColor = ofColor(255);
+    fragFillColor = ofColor(0, 50, 120);
+    
+}
+
+
 Box::Box(b2World* aWorld, float x, float y, int catBit, int maskBit)
 {
+
+    // open an outgoing connection to HOST:PORT
+    // sender.setup(HOST, PORT);
 
     normalColor = ofColor(255, 255, 255);
 
@@ -68,9 +132,10 @@ Box::Box(b2World* aWorld, float x, float y, int catBit, int maskBit)
 
 Box::~Box()
 {
-    if (isThereMbodybool){
-        mWorld->DestroyBody(mBody);
-    }
+    // if (isThereMbodybool){
+    //     mWorld->DestroyBody(mBody);
+    // }
+
 }
 
 
@@ -115,6 +180,25 @@ Box::renderFrags()
 
 
 // getter & setter
+
+int
+Box::getIndex()
+{
+    return index;
+}
+
+bool
+Box::getCanBeHit()
+{
+    return canBeHit;
+}
+
+bool
+Box::getCanBeHitUpdated()
+{
+    return canBeHitUpdated;
+}
+
 
 bool
 Box::getIsThereMBody()
@@ -217,6 +301,9 @@ Box::renderAtBodyPosition()
 void
 Box::update()
 {
+
+    canBeHitUpdated = false;
+
     if (isThereMbodybool){
 
         int tCount = countTouch();
@@ -224,8 +311,21 @@ Box::update()
         if (tCount > kCONTACT_LIMIT){
             // cout << "Reached Contact Limit!!" << endl;
             normalColor = ofColor(0, 50, 120);
+
+            // if (canBeHit == false) oscSendI("/canHit", 1);
+            if (canBeHit == false){
+                canBeHitUpdated = true;
+                canBeHit = true;
+            }            
+
         }else{
             normalColor = ofColor(255, 255, 255);
+
+            // if (canBeHit == true) oscSendI("/canHit", 0);
+            if (canBeHit == true){
+                canBeHitUpdated = true;
+                canBeHit = false;
+            }
         }
 
         // Draw string
@@ -587,4 +687,27 @@ Box::pushForce(float x, float y)
     }
     
 }
+
+
+
+
+// void
+// Box::oscSendI(string addr, int i)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     sender.sendMessage(m);
+// }
+
+
+// void
+// Box::oscSendII(string addr, int i, int j)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     m.addIntArg(j);
+//     sender.sendMessage(m);
+// }
 

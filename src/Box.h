@@ -23,7 +23,10 @@
 // ----Class definition----
 class Box{
 protected:
-    
+
+    // OSC
+    // ofxOscSender            sender;
+ 
     // Position
     float   posX;
     float   posY;
@@ -53,6 +56,9 @@ protected:
     float       fragLifeTime;
     
     bool    toBlack = false;
+    bool    canBeHit = false;
+    bool    canBeHitUpdated = false;
+    int     index;
     ofColor         normalColor;
     
     
@@ -67,10 +73,16 @@ public:
     
     // FUNCTION
     // Birth and Death
-    Box(b2World* world, float x, float y, int cbit, int mbit);
+    Box(b2World* world, float x, float y,
+    int cbit, int mbit);
+    Box(b2World* world, float x, float y,
+        int cbit, int mbit, int idx);
     ~Box();
     
     // Getter
+    int     getIndex();
+    bool    getCanBeHit();
+    bool    getCanBeHitUpdated();
     bool    getIsThereMBody();
     bool    getFragsRemain();
     
@@ -112,6 +124,9 @@ public:
     void    clearFrags();
     
 
+    //OSC
+    void    oscSendI(string addr, int i);
+    void    oscSendII(string addr, int i, int j);
     
     
     
