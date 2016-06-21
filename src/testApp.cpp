@@ -161,15 +161,15 @@ void testApp::setup(){
     
   
     //PREPARE DARK BOXES!
-    // for (int i = 0; i < 8; i++){
-    //     for (int j = 0; j < 6; j++){
-    //         //00000001(1)
-    //         Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
-    //             DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
-    //         darkBox->setToBlack(true);
-    //         darkBoxes.push_back(darkBox);
-    //     }
-    // }
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 6; j++){
+            //00000001(1)
+            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
+                DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
+            darkBox->setToBlack(true);
+            darkBoxes.push_back(darkBox);
+        }
+    }
 
 
     //FRAG
@@ -305,6 +305,7 @@ void testApp::update(){
                         int faceLife = (*iter)->getLife();
                         if (faceLife > 0) (*iter)->shot();
                         else (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        // else (*iter)->breakBody(shot_X, shot_Y);
                         
                         //Make forec at shot position
                         bodyHit = true;
@@ -321,6 +322,7 @@ void testApp::update(){
                         cout << "hit Box!" << endl;
 
                         (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        // (*iter)->breakBody(shot_X, shot_Y);
                         bodyHit = true;
                     }
                 }
@@ -344,8 +346,8 @@ void testApp::update(){
             if(!bodyHit){
             
                 cout << "No hit!" << endl;
-                // aBall = new Ball(iWorld, shot_X, shot_Y, true);
-                aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), true);
+                aBall = new Ball(iWorld, shot_X, shot_Y, true);
+                // aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), true);
 
                 // b2Body* ballBody = aBall->getBody();
                 // ballBody->ApplyLinearImpulse(b2Vec2(-200.f, -200.f),

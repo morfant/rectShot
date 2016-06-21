@@ -277,8 +277,8 @@ Box::renderAtBodyPosition()
 
         if (toBlack){
             //Rect for edge line
-            ofSetColor(255, 255, 255, 255);
-            ofRect(0, 0, size+4, size+4);
+            // ofSetColor(255, 255, 255, 255);
+            // ofRect(0, 0, size+4, size+4);
             
             normalColor = ofColor(0, 0, 0, MAX(0, alpha));
             
@@ -329,10 +329,10 @@ Box::update()
         }
 
         // Draw string
-        string touchCnt = ofToString(tCount);
-        b2Vec2 pos = mBody->GetPosition();
-        ofSetColor(255, 0, 0);
-        verdana14.drawString(touchCnt, _toPixelX(pos.x) - 20, _toPixelY(pos.y) + 10);
+        // string touchCnt = ofToString(tCount);
+        // b2Vec2 pos = mBody->GetPosition();
+        // ofSetColor(255, 0, 0);
+        // verdana14.drawString(touchCnt, _toPixelX(pos.x) - 20, _toPixelY(pos.y) + 10);
         // cout << "GetPosX: " << _toPixelX(pos.x) << " / " << _toPixelY(pos.y) << endl;
 
     }
@@ -583,7 +583,7 @@ Box::countTouch()
 
     for (b2ContactEdge* ce = mBody->GetContactList(); ce; ce = ce->next)
     {
-        b2Contact* c = ce->contact;
+//        b2Contact* c = ce->contact;
         touchCount++;
     }
 
