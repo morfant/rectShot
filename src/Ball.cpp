@@ -54,9 +54,9 @@ Ball::Ball(b2World* aWorld, float x, float y, bool isSuper)
 
     if (superBall){
         
-        myFixtureDef.density = 100.f;
-        myFixtureDef.restitution = 0.01f;
-        myFixtureDef.friction = 0.7f;
+        myFixtureDef.density = 100000.f;
+        myFixtureDef.restitution = 100000.f;
+        myFixtureDef.friction = 1.f;
         
     }else{
         
@@ -65,6 +65,8 @@ Ball::Ball(b2World* aWorld, float x, float y, bool isSuper)
         myFixtureDef.friction = 0.7f;
     }
 
+    myFixtureDef.filter.categoryBits = BALL_CATE_BIT;
+    myFixtureDef.filter.maskBits = BALL_MASK_BIT;
     
     mBody->CreateFixture(&myFixtureDef);
 

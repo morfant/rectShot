@@ -177,7 +177,7 @@ class testApp : public ofBaseApp{
         Box*                    bBox;
         Ball*                   aBall;
         int                     pBodyIdx;
-        int                     boxIdx;
+        int                     boxIdx = 0;
         bool                    touched;
         float                   sumOfArea;
     

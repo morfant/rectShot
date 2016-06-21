@@ -161,15 +161,15 @@ void testApp::setup(){
     
   
     //PREPARE DARK BOXES!
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 6; j++){
-            //00000001(1)
-            Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
-                DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
-            darkBox->setToBlack(true);
-            darkBoxes.push_back(darkBox);
-        }
-    }
+    // for (int i = 0; i < 8; i++){
+    //     for (int j = 0; j < 6; j++){
+    //         //00000001(1)
+    //         Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
+    //             DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
+    //         darkBox->setToBlack(true);
+    //         darkBoxes.push_back(darkBox);
+    //     }
+    // }
 
 
     //FRAG
@@ -286,6 +286,7 @@ void testApp::update(){
         // Previous superball shooting check
         if(shotBallMade){
             delete aBall;
+            balls.clear();
             shotBallMade = false;
         }
         
@@ -345,6 +346,13 @@ void testApp::update(){
                 cout << "No hit!" << endl;
                 // aBall = new Ball(iWorld, shot_X, shot_Y, true);
                 aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), true);
+
+                // b2Body* ballBody = aBall->getBody();
+                // ballBody->ApplyLinearImpulse(b2Vec2(-200.f, -200.f),
+                //     b2Vec2(ofGetMouseX(), ofGetMouseY()));
+
+                // balls.push_back(aBall);
+
                 shotBallMade = true;
             }
             

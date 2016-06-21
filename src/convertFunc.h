@@ -37,7 +37,12 @@ enum {
     //FRAG FROM POLYGON BODY
     //0011 0000
     FRAG2_CATE_BIT = 0x0030,
-    FRAG2_MASK_BIT = 0x0030
+    FRAG2_MASK_BIT = 0x0030,
+
+    //BALL
+    //0111 1000
+    BALL_CATE_BIT = 0x0078,
+    BALL_MASK_BIT = 0x0078
 
 };
 
