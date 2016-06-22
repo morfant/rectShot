@@ -845,6 +845,7 @@ void
 Faces::clearFrags()
 {
     if(!isThereMbodybool){
+        cout << "Faces clearFrags()" << endl;
         for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
             delete (*iter);
         }

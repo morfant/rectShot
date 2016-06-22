@@ -54,8 +54,8 @@ Ball::Ball(b2World* aWorld, float x, float y, bool isSuper)
 
     if (superBall){
         
-        myFixtureDef.density = 100000.f;
-        myFixtureDef.restitution = 100000.f;
+        myFixtureDef.density = 100.f;
+        myFixtureDef.restitution = 100.f;
         myFixtureDef.friction = 1.f;
         
     }else{

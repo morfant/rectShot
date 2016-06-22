@@ -142,7 +142,9 @@ Box::~Box()
 void
 Box::clearFrags()
 {
+
     if(!isThereMbodybool){
+        cout << "box clearFrags()" << endl;
         for (vector<Frag*>::iterator iter = mFrags.begin(); iter != mFrags.end(); iter++) {
             delete (*iter);
         }
@@ -277,8 +279,8 @@ Box::renderAtBodyPosition()
 
         if (toBlack){
             //Rect for edge line
-            // ofSetColor(255, 255, 255, 255);
-            // ofRect(0, 0, size+4, size+4);
+            ofSetColor(255, 255, 255, 255);
+            ofRect(0, 0, size+4, size+4);
             
             normalColor = ofColor(0, 0, 0, MAX(0, alpha));
             

@@ -347,7 +347,15 @@ void testApp::update(){
             if(!bodyHit){
             
                 cout << "No hit!" << endl;
-                aBall = new Ball(iWorld, shot_X, shot_Y, true);
+
+                if (darkBoxes.size()){
+                    for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+                        (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                    }
+                }
+      
+
+                // aBall = new Ball(iWorld, shot_X, shot_Y, true);
                 // aBall = new Ball(iWorld, ofGetMouseX(), ofGetMouseY(), true);
 
                 // b2Body* ballBody = aBall->getBody();
@@ -356,7 +364,7 @@ void testApp::update(){
 
                 // balls.push_back(aBall);
 
-                shotBallMade = true;
+                // shotBallMade = true;
             }
             
             // Reset booleans
@@ -1569,8 +1577,11 @@ void testApp::keyPressed(int key){
             
                 // box
                 for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()){
+                    if ((*iter)->getIsThereMBody()){//not broken
                         iWorld->DestroyBody((*iter)->getBody());
+                        delete (*iter);
+                    }else{ //broken
+                        (*iter)->clearFrags();
                         delete (*iter);
                     }
                 }
@@ -1578,10 +1589,13 @@ void testApp::keyPressed(int key){
             
                 // blackbox
                 for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()){
+                    if ((*iter)->getIsThereMBody()){//not broken
                         iWorld->DestroyBody((*iter)->getBody());
                         delete (*iter);
-                    } 
+                    }else{ //broken
+                        (*iter)->clearFrags();
+                        delete (*iter);
+                    }
                 }
                 blackBoxes.clear();
             
