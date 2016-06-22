@@ -322,6 +322,7 @@ void testApp::update(){
                         cout << "hit Box!" << endl;
 
                         (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        oscSendI("/brkBox", (*iter)->getIndex());
                         // (*iter)->breakBody(shot_X, shot_Y);
                         bodyHit = true;
                     }

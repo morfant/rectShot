@@ -1,7 +1,7 @@
 (
 //SynthDef
 SynthDef(\bufRead,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 1, trig = 1 |
+	{| freq = 1, bufnum = 0, gate = 1, amp = 1, pan = 0, rate = 1, loop = 1, trig = 1 |
 		var sig;
 		sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)*rate, trigger: trig, loop: loop, doneAction: 2);
 	Out.ar(0, Pan2.ar(sig, pan, amp));
@@ -9,21 +9,33 @@ SynthDef(\bufRead,
 ) //Synthdef END
 
 
-f = "/Users/giy/Desktop/rectShot/wav/MIX.wav";
-b = Buffer.read(s, f);
-b.play;
+
+(// Audio buffers
+
+~mainMixBuf = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/MIX.wav");
+
+~voiceBuf = Array.newClear(20);
+~voiceBuf[0] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/youWillBeShot.wav");
+~voiceBuf[1] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/portraitRightWarning.wav");
+~voiceBuf[2] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/publicService.wav");
+~voiceBuf[3] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/underBus.wav");
+~voiceBuf[4] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/mySon.wav");
+~voiceBuf[5] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild2.wav");
+~voiceBuf[6] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild.wav");
+~voiceBuf[7] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/theyAreWatching.wav");
+)
 
 
 //Main
 (
 //Oscfuncs
-var mainMixSyn, mainMixBuf,
-voiceSyn, voiceBuf,
+var mainMixSyn, voiceSyn,
 ofAddr, oscfn, titleBuf, soundBuf, buf, syn, synFrag, synBlobs, len, lenDiv, lenDivSec,
 fragContNum,
-maxBox;
+maxBox, mainAmpLimit;
 
-maxBox = 40;
+maxBox = 80;
+mainAmpLimit = 0.6;
 
 fragContNum = Array.newClear(10);
 10.do{|i| fragContNum[i] = 0};
@@ -33,7 +45,7 @@ ofAddr = NetAddr("127.0.0.1", 20000); // oF addr
 oscfn = Array.newClear(10);
 
 voiceSyn = Array.newClear(20);
-voiceBuf = Array.newClear(20);
+// voiceBuf = Array.newClear(20);
 
 soundBuf = Array.newClear(10);
 buf = Array.newClear(10);
@@ -46,27 +58,8 @@ lenDiv = Array.newClear(6);
 lenDivSec = Array.newClear(6);
 
 
-// Audio buffers
-mainMixBuf = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/MIX.wav");
-
-voiceBuf[0] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/youWillBeShot.wav");
-voiceBuf[1] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/portraitRightWarning.wav");
-voiceBuf[2] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/publicService.wav");
-voiceBuf[3] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/underBus.wav");
-voiceBuf[4] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/mySon.wav");
-voiceBuf[5] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild2.wav");
-voiceBuf[6] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild.wav");
-voiceBuf[7] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/theyAreWatching.wav");
 
 
-voiceSyn[0] = Synth(\bufRead, [\bufnum, voiceBuf[0].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[1] = Synth(\bufRead, [\bufnum, voiceBuf[1].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[2] = Synth(\bufRead, [\bufnum, voiceBuf[2].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[3] = Synth(\bufRead, [\bufnum, voiceBuf[3].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[4] = Synth(\bufRead, [\bufnum, voiceBuf[4].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[5] = Synth(\bufRead, [\bufnum, voiceBuf[5].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[6] = Synth(\bufRead, [\bufnum, voiceBuf[6].bufnum, \trig, 0, \rate, 0]);
-voiceSyn[7] = Synth(\bufRead, [\bufnum, voiceBuf[7].bufnum, \trig, 0, \rate, 0]);
 
 // titleBuf = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/title.wav");
 // buf[0] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/aya.wav");
@@ -75,7 +68,19 @@ voiceSyn[7] = Synth(\bufRead, [\bufnum, voiceBuf[7].bufnum, \trig, 0, \rate, 0])
 // buf[3] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/park.wav");
 
 
-mainMixSyn = Synth(\bufRead, [\amp, 0]);
+mainMixSyn = Synth(\bufRead, [\bufnum, ~mainMixBuf.bufnum, \amp, 0]);
+
+voiceSyn[0] = Synth(\bufRead, [\bufnum, ~voiceBuf[0].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[1] = Synth(\bufRead, [\bufnum, ~voiceBuf[1].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[2] = Synth(\bufRead, [\bufnum, ~voiceBuf[2].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[3] = Synth(\bufRead, [\bufnum, ~voiceBuf[3].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[4] = Synth(\bufRead, [\bufnum, ~voiceBuf[4].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[5] = Synth(\bufRead, [\bufnum, ~voiceBuf[5].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[6] = Synth(\bufRead, [\bufnum, ~voiceBuf[6].bufnum, \trig, 0, \rate, 0]);
+voiceSyn[7] = Synth(\bufRead, [\bufnum, ~voiceBuf[7].bufnum, \trig, 0, \rate, 0]);
+
+
+
 
 //MainMix
 oscfn[0] = OSCFunc({|msg, time, addr, recvPort|
@@ -83,22 +88,24 @@ oscfn[0] = OSCFunc({|msg, time, addr, recvPort|
 
 	//msg[1] : number of box
 
-	var relAmp = msg[1]/maxBox;
+	var mainAmp = msg[1]/maxBox;
+	if (mainAmp >= mainAmpLimit, {mainAmp = mainAmpLimit;}); //Maximum amp limit
+	("mainAmp: " + mainAmp).postln;
 
-	mainMixSyn.set(\amp, relAmp);
+	mainMixSyn.set(\amp, mainAmp);
 
 }, '/boxNum');
 
 
 oscfn[1] = OSCFunc({|msg, time, addr, recvPort|
-	// msg.postln;
 
     var idx;
-
+	msg.postln;
 
 	//msg[1] : box idx
 	//msg[2] : true/false
-    idx = msg[1];
+    idx = msg[1] % 8;
+	("idx: " + idx).postln;
 
 	if (msg[2] == 1,
 		{
@@ -112,11 +119,16 @@ oscfn[1] = OSCFunc({|msg, time, addr, recvPort|
 }, '/canHit');
 
 oscfn[2] = OSCFunc({|msg, time, addr, recvPort|
-	// msg.postln;
 
-	syn[msg[1], msg[2]].free;
+    var idx;
+	msg.postln;
 
-}, '/pbDest');
+	//msg[1] : box idx
+    idx = msg[1] % 8;
+
+	voiceSyn[idx].set(\rate, 0);
+
+}, '/brkBox');
 
 
 
@@ -247,7 +259,7 @@ oscfn[8] = OSCFunc({|msg, time, addr, recvPort|
 CmdPeriod.doOnce{
 	10.do{|i| oscfn[i].free;};
 
-	20.do{|i| voiceBuf[i].free; voiceSyn[i].free;};
+	20.do{|i| voiceSyn[i].free;};
 
 
 
