@@ -1,17 +1,36 @@
-(
-//SynthDef
+(//SynthDef
 SynthDef(\bufRead,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 1, pan = 0, rate = 1, loop = 1, trig = 1 |
+	{| bufnum = 0, gate = 1, amp = 1, pan = 0, rate = 1, loop = 1, trig = 1 |
 		var sig;
 		sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)*rate, trigger: trig, loop: loop, doneAction: 2);
 	Out.ar(0, Pan2.ar(sig, pan, amp));
 }).add;
-) //Synthdef END
+
+SynthDef(\gunShot,
+	{| bufnum = 0, gate = 1, amp = 1, pan = 0, rate = 1, loop = 0, trig = 1 |
+		var sig;
+		sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(bufnum)*rate, trigger: trig, loop: loop, doneAction: 2);
+	Out.ar(0, Pan2.ar(sig, pan, amp));
+}).add;
+
+
+);//Synthdef END
 
 
 
 (// Audio buffers
 
+//------------------------ bomb & gun ------------------------//
+~bombBuf = Buffer.read(s, "/Users/giy/Desktop/rectShot/gunShotSound/explosion.wav");
+
+~gunBuf = Array.newClear(4);
+~gunBuf[0] = Buffer.read(s, "/Users/giy/Desktop/rectShot/gunShotSound/shot_1.wav");
+~gunBuf[1] = Buffer.read(s, "/Users/giy/Desktop/rectShot/gunShotSound/shot_2.wav");
+~gunBuf[2] = Buffer.read(s, "/Users/giy/Desktop/rectShot/gunShotSound/shot_3.wav");
+~gunBuf[3] = Buffer.read(s, "/Users/giy/Desktop/rectShot/gunShotSound/shot_4.wav"); // laser
+
+
+//------------------------ voices ------------------------//
 ~mainMixBuf = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/MIX.wav");
 
 ~voiceBuf = Array.newClear(20);
@@ -29,7 +48,7 @@ SynthDef(\bufRead,
 //Main
 (
 //Oscfuncs
-var mainMixSyn, voiceSyn,
+var mainMixSyn, voiceSyn, gunSyn, bombSyn,
 ofAddr, oscfn, titleBuf, soundBuf, buf, syn, synFrag, synBlobs, len, lenDiv, lenDivSec,
 fragContNum,
 maxBox, mainAmpLimit;
@@ -45,6 +64,7 @@ ofAddr = NetAddr("127.0.0.1", 20000); // oF addr
 oscfn = Array.newClear(10);
 
 voiceSyn = Array.newClear(20);
+gunSyn = Array.newClear(4);
 // voiceBuf = Array.newClear(20);
 
 soundBuf = Array.newClear(10);
@@ -79,6 +99,12 @@ voiceSyn[5] = Synth(\bufRead, [\bufnum, ~voiceBuf[5].bufnum, \trig, 0, \rate, 0]
 voiceSyn[6] = Synth(\bufRead, [\bufnum, ~voiceBuf[6].bufnum, \trig, 0, \rate, 0]);
 voiceSyn[7] = Synth(\bufRead, [\bufnum, ~voiceBuf[7].bufnum, \trig, 0, \rate, 0]);
 
+
+/*bombSyn = Synth(\gunShot, [\bufnum, ~bombBuf.bufnum, \amp, 0]);
+gunSyn[0] = Synth(\gunShot, [\bufnum, ~gunBuf[0].bufnum]);
+gunSyn[1] = Synth(\gunShot, [\bufnum, ~gunBuf[1].bufnum]);
+gunSyn[2] = Synth(\gunShot, [\bufnum, ~gunBuf[2].bufnum]);
+gunSyn[3] = Synth(\gunShot, [\bufnum, ~gunBuf[3].bufnum]);*/
 
 
 
@@ -115,8 +141,8 @@ oscfn[1] = OSCFunc({|msg, time, addr, recvPort|
 			voiceSyn[idx].set(\rate, 0);
         });
 
-
 }, '/canHit');
+
 
 oscfn[2] = OSCFunc({|msg, time, addr, recvPort|
 
@@ -132,59 +158,28 @@ oscfn[2] = OSCFunc({|msg, time, addr, recvPort|
 
 
 
-//Fragments
+//SHOT
 oscfn[3] = OSCFunc({|msg, time, addr, recvPort|
+	//msg[1] = 1 ~ 4 : choose gun sound 1 ~ 4
+
+	var idx;
 	// msg.postln;
+	idx = msg[1] - 1; //1 ~ 4 to 0 ~ 3
 
-	/*
-	msg[1] = polygonBodyIdx
-	msg[2] = fragIdx
-	*/
+	gunSyn[idx] = Synth(\gunShot, [\bufnum, ~gunBuf[idx].bufnum, \amp, 0.2]);
 
-	if (msg[1] < 4, {
-
-	len[msg[1]] = buf[msg[1]].numFrames;
-	lenDiv[msg[1]] = len[msg[1]]/100;
-	lenDivSec[msg[1]] = lenDiv[msg[1]]/s.sampleRate;
-
-	Synth(\bufFrag, [\bufnum, buf[msg[1]], \amp, 0.1, \sp, msg[2]*lenDiv[msg[1]], \len, lenDivSec[msg[1]]]);
-	// synFrag[msg[2]] = Synth(\bufFragLoop, [\bufnum, buf[msg[1]], \sp, msg[2]*lenDiv[msg[1]],
-	// \freq, lenDivSec[msg[1]].reciprocal]);
-		});
-
-}, '/fgBorn');
+}, '/gunShot');
 
 
+//EXPLOSION
 oscfn[4] = OSCFunc({|msg, time, addr, recvPort|
-	// msg.postln;
+	//msg[1] = 1
 
-	/*
-	msg[1] = polygonBodyIdx
-	msg[2] = fragIdx
-	*/
+	bombSyn = Synth(\gunShot, [\bufnum, ~bombBuf.bufnum]);
 
-	len[msg[1]] = soundBuf[msg[1]].numFrames;
-	lenDiv[msg[1]] = len[msg[1]]/100;
-	lenDivSec[msg[1]] = lenDiv[msg[1]]/s.sampleRate;
-
-	// synFrag[msg[2]].free;
+}, '/explo');
 
 
-
-	// Synth(\bufFrag, [\bufnum, buf[msg[1]], \sp, msg[2]*lenDiv[msg[1]], \len, lenDivSec[msg[1]]]);
-	Synth(\bufFrag, [\bufnum, soundBuf[msg[1]], \amp, 0.05, \sp, fragContNum[msg[1]]*lenDiv[msg[1]], \len, lenDivSec[msg[1]]]);
-	fragContNum[msg[1]] = fragContNum[msg[1]] + 1;
-
-	if (fragContNum[msg[1]] == 100, {
-		fragContNum[msg[1]] = 0;
-	});
-
-	// fragContNum[msg[1]].postln;
-
-
-
-
-}, '/fgCont');
 
 oscfn[5] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;

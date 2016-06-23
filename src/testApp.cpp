@@ -303,8 +303,12 @@ void testApp::update(){
 
                         // Consider 'life' of face object
                         int faceLife = (*iter)->getLife();
-                        if (faceLife > 0) (*iter)->shot();
-                        else (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        if (faceLife > 0){
+                            (*iter)->shot();
+                        } else{
+                            oscSendI("/explo", 1); //Trigger Explosion sound
+                            (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        }
                         // else (*iter)->breakBody(shot_X, shot_Y);
                         
                         //Make forec at shot position
@@ -1059,6 +1063,9 @@ void testApp::oscRecv()
 		receiver.getNextMessage(&m);
         
 		if(m.getAddress() == "/laserPos"){
+
+            oscSendI("/gunShot", 1); //send to SC, int set kind of gun shot sound.
+
 			shot_X = m.getArgAsFloat(0);
 			shot_Y = m.getArgAsFloat(1);
             
@@ -1656,6 +1663,14 @@ void testApp::keyPressed(int key){
              
         case 'q':
             isShot = true;
+            oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
+  
+            if (darkBoxes.size()){
+                for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+                    (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                }
+            }
+
             break;
             
         case 'h': //simulaton 'h'itting body
@@ -1664,6 +1679,7 @@ void testApp::keyPressed(int key){
                 cout << "Hit a pBody!" << endl;
                 for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
+                        oscSendI("/explo", 1); //Trigger Explosion sound
                         (*iter)->breakBody();
                         break;
                     }
