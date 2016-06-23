@@ -60,7 +60,7 @@ void testApp::setup(){
     shotBallMade = false;
     isShot = false;
     butPressed = false;
-    bodyHit = false;
+    // bodyHit = false;
     
 
     // MOVIE
@@ -154,7 +154,10 @@ void testApp::setup(){
     //speziell
     center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight(),
         CENTERWALL_CATE_BIT, CENTERWALL_MASK_BIT);
-    
+
+    hardCenter = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2,
+        thickness/2, ofGetHeight());
+      
     // vector init
     blobsPts.clear();
     blobsPtsDiv.clear();
@@ -230,7 +233,7 @@ void testApp::update(){
     // if (fftSmoothed < val[0]) fftSmoothed = val[0];
     
     
-    if(!inTitle){
+    // if(!inTitle){
         // Box2D world update
         float32 timeStep = 1.0f / 60.0f;
         int32 velocityIterations = 6;
@@ -263,34 +266,6 @@ void testApp::update(){
         //     cvBlobNum = blobsVec.size();
         // }
 
-
-        //OSC - num of boxes
-        int curNumBoxes = boxes.size();
-        if (numBoxes != curNumBoxes){
-            oscSendI("/boxNum", curNumBoxes);
-
-            numBoxes = curNumBoxes;
-        }
-
-        //OSC - canBeHit status
-        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-            if ( (*iter)->getIsThereMBody() ){
-                bool hittable = (*iter)->getCanBeHitUpdated();
-                if (hittable){
-                    oscSendII("/canHit", (*iter)->getIndex(), (int)(*iter)->getCanBeHit());
-                }
-            }
-        }
-            
-
-        // Previous superball shooting check
-        // if(shotBallMade){
-        //     delete aBall;
-        //     balls.clear();
-        //     shotBallMade = false;
-        // }
-        
-        
         //MAKE BOX PERIODICALLY
         curTime = (int)ofGetElapsedTimef();
         if (makeBox && (curTime - lastTime) > kBOX_MAKE_TIME){
@@ -308,6 +283,48 @@ void testApp::update(){
             lastTime = curTime;
         }
 
+
+        //CHEKC BOX NUM
+        boxNum = boxes.size();
+        if (boxNum > kENDING_BOX_LIMIT && isInEnding == false){
+            isInEnding = true;
+            oscSendI("/goEnding", 1);
+            makeBox = false;
+
+        }
+
+        //OSC - num of boxes
+        int curNumBoxes = boxNum;
+        if (numBoxes != curNumBoxes){
+            oscSendI("/boxNum", curNumBoxes);
+            numBoxes = curNumBoxes;
+        }
+
+        //OSC - canBeHit status
+        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            if ( (*iter)->getIsThereMBody() ){
+                bool hittable = (*iter)->getCanBeHitUpdated();
+                int idx = (*iter)->getIndex();
+                curFace = (idx % 7) + 1;
+                if (hittable){
+                    oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
+                }
+            }
+        }
+            
+
+        // Previous superball shooting check
+        // if(shotBallMade){
+        //     delete aBall;
+        //     balls.clear();
+        //     shotBallMade = false;
+        // }
+        
+        
+
+        // OSC
+        oscRecv();
+  
         //SHOOTING CHECK
         if (isShot){
             
@@ -329,7 +346,7 @@ void testApp::update(){
                         // else (*iter)->breakBody(shot_X, shot_Y);
                         
                         //Make forec at shot position
-                        bodyHit = true;
+                        // bodyHit = true;
                     }
                 }
             }
@@ -345,29 +362,29 @@ void testApp::update(){
                         (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         oscSendI("/brkBox", (*iter)->getIndex());
                         // (*iter)->breakBody(shot_X, shot_Y);
-                        bodyHit = true;
+                        // bodyHit = true;
                     }
                 }
             }
             
             
-            for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-                if ( (*iter)->getIsThereMBody() ){
-                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+            // for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+            //     if ( (*iter)->getIsThereMBody() ){
+            //         // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+            //         if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 
-                        cout << "hit Black Box!" << endl;
+            //             cout << "hit Black Box!" << endl;
 
-                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
-                        bodyHit = true;
-                    }
-                }
-            }
+            //             (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+            //             bodyHit = true;
+            //         }
+            //     }
+            // }
             
             
-            if(!bodyHit){
+            // if(!bodyHit){
             
-                cout << "No hit!" << endl;
+            //     cout << "No hit!" << endl;
 
                 // if (darkBoxes.size()){
                 //     for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
@@ -386,17 +403,15 @@ void testApp::update(){
                 // balls.push_back(aBall);
 
                 // shotBallMade = true;
-            }
+            // }
             
             // Reset booleans
             isShot = false;
-            bodyHit = false;
+            // bodyHit = false;
         }
         
 
-        // OSC
-        oscRecv();
-        
+      
         // if(OriginDestroyed){
         //     if(!blobsSynMade){
         //         oscSendI("/creatBlobSyn", blobsVec.size());
@@ -405,7 +420,7 @@ void testApp::update(){
         //     sendBlobsOSC();
         // }
         
-    }
+    // }
     
 
 
@@ -422,6 +437,10 @@ void testApp::draw(){
     floor->renderAtBodyPosition();
     ceil->renderAtBodyPosition();
     center->renderAtBodyPosition();
+
+    if (isInEnding){
+        hardCenter->renderAtBodyPosition();
+    }
 
 
     ofBackground(0, 0, 0);
@@ -469,27 +488,23 @@ void testApp::draw(){
 
 
     // Draw boxes
-    if (boxes.size()){
        // cout << "size of boxes: " << boxes.size() << endl;
-        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
-            (*iter)->renderAtBodyPosition();
-            (*iter)->update();
-        }
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+        (*iter)->update();
     }
     
 
-    if (blackBoxes.size()){
-       // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
-        // Draw black boxes
-        for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-            (*iter)->renderAtBodyPosition();
-            (*iter)->update();
-        }
+   // cout << "size of BLACK boxes: " << blackBoxes.size() << endl;
+    // Draw black boxes
+    for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+        (*iter)->renderAtBodyPosition();
+        (*iter)->update();
     }
    
 
     // DRAW BODIES 
-    if(pBodies.size()) drawPolygonBodies();
+    drawPolygonBodies();
     
 
     //KILL ALL
@@ -549,7 +564,7 @@ void testApp::draw(){
    
     
     // Clear no Frags bodies
-    if (pBodies.size()){
+    // if (pBodies.size()){
         for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
@@ -560,9 +575,9 @@ void testApp::draw(){
                 iter++;
             }
         }
-    }
+    // }
 
-    if (boxes.size()){
+    // if (boxes.size()){
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
@@ -573,9 +588,9 @@ void testApp::draw(){
                 iter++;
             }
         }
-    }
+    // }
     
-    if (blackBoxes.size()){
+    // if (blackBoxes.size()){
         for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
@@ -586,9 +601,9 @@ void testApp::draw(){
                 iter++;
             }
         }
-    }
+    // }
     
-    if (darkBoxes.size()){
+    // if (darkBoxes.size()){
         for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); ) {
             bool hasFrags = (*iter)->getFragsRemain();
             if (!hasFrags){
@@ -599,7 +614,7 @@ void testApp::draw(){
                 iter++;
             }
         }
-    }
+    // }
 
     // Draw grayimage.
     // if (grayShow){
@@ -752,106 +767,106 @@ void testApp::drawPolygonBodies(){
     
 //    cout << "num of pbodies: " << pBodies.size() << endl;
     
-    for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end();) {
+    for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
         
-        bool pBodyIsAlive = (*iter)->getIsAlive();
-        int pidx = (*iter)->getIndex();
-        int dupIdx = (*iter)->getDupIndex();
-        bool pBodyIsOriginal = (*iter)->getIsOriginal();
+        // bool pBodyIsAlive = (*iter)->getIsAlive();
+        // int pidx = (*iter)->getIndex();
+        // int dupIdx = (*iter)->getDupIndex();
+        // bool pBodyIsOriginal = (*iter)->getIsOriginal();
         
 //        cout << "idx: " << pidx << " pBodyIsAlive: " << pBodyIsAlive << endl;
         
-        if (!pBodyIsAlive) { // When dying
+//         if (!pBodyIsAlive) { // When dying
 
-            if(pBodyIsOriginal){
-                videoEnd();
-                OriginDestroyed = true;
+//             if(pBodyIsOriginal){
+//                 videoEnd();
+//                 OriginDestroyed = true;
                 
-            }
+//             }
             
-            delete (*iter);
-            oscSendII("/pbDest", pidx, dupIdx);
+//             delete (*iter);
+//             oscSendII("/pbDest", pidx, dupIdx);
             
-            iter = pBodies.erase(iter);
-            float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
-            oscSendF("/fgArea", fragAreaPercent);
+//             iter = pBodies.erase(iter);
+//             float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
+//             oscSendF("/fgArea", fragAreaPercent);
 
-            if(inLastScene){
-                if(fragAreaPercent < 1) kBLOBNUM = 0;
-                else kBLOBNUM = 4;
+//             if(inLastScene){
+//                 if(fragAreaPercent < 1) kBLOBNUM = 0;
+//                 else kBLOBNUM = 4;
 
-                //cam ths adjust
-                threshold[0] = 130*(fragAreaPercent/100.f);
+//                 //cam ths adjust
+//                 threshold[0] = 130*(fragAreaPercent/100.f);
                 
-                if (fragAreaPercent > 25) {
-                    movShow = true;
-                }else{
-                    movShow = false;
-                }
-            }
+//                 if (fragAreaPercent > 25) {
+//                     movShow = true;
+//                 }else{
+//                     movShow = false;
+//                 }
+//             }
             
             
             
-//            cout << "pbodies size: " << pBodies.size() << endl;
-//            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
+// //            cout << "pbodies size: " << pBodies.size() << endl;
+// //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
             
-        }else{ // When alive
+//         }else{ // When alive
             
-            if(!pBodyIsOriginal){
-                bool pbIsBorn = (*iter)->getIsNewBorn();
-                if(pbIsBorn){
-                    oscSendIIFF("/pbBorn", pidx, dupIdx, cvBlobPos.x, cvBlobPos.y);
-                    (*iter)->setIsNewBorn(false);
-                }
-            }
+//             if(!pBodyIsOriginal){
+//                 bool pbIsBorn = (*iter)->getIsNewBorn();
+//                 if(pbIsBorn){
+//                     oscSendIIFF("/pbBorn", pidx, dupIdx, cvBlobPos.x, cvBlobPos.y);
+//                     (*iter)->setIsNewBorn(false);
+//                 }
+//             }
 
             (*iter)->renderAtBodyPosition();
             (*iter)->update();
             
-            if ( !(*iter)->getIsThereMBody() && !(*iter)->getIsBreaked()){
-//                cout << "pidx: " << pidx << " dupIdx: "<< dupIdx << " is breaked and disappearing" << endl;
-                oscSendII("/pbBrek", pidx, dupIdx);
-                float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
-                oscSendF("/fgArea", fragAreaPercent);
+//             if ( !(*iter)->getIsThereMBody() && !(*iter)->getIsBreaked()){
+// //                cout << "pidx: " << pidx << " dupIdx: "<< dupIdx << " is breaked and disappearing" << endl;
+//                 oscSendII("/pbBrek", pidx, dupIdx);
+//                 float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
+//                 oscSendF("/fgArea", fragAreaPercent);
                 
-                if(inLastScene){
+//                 if(inLastScene){
                     
-                    if(fragAreaPercent < 1) kBLOBNUM = 0;
-                    else kBLOBNUM = 4;
+//                     if(fragAreaPercent < 1) kBLOBNUM = 0;
+//                     else kBLOBNUM = 4;
                     
-                    //cam ths adjust
-                    threshold[0] = 130*(fragAreaPercent/100.f);
+//                     //cam ths adjust
+//                     threshold[0] = 130*(fragAreaPercent/100.f);
 
-                    if (fragAreaPercent > 25) {
-                        movShow = true;
-                    }else{
-                        movShow = false;
-                    }
+//                     if (fragAreaPercent > 25) {
+//                         movShow = true;
+//                     }else{
+//                         movShow = false;
+//                     }
                     
-                }
+//                 }
 
-                (*iter)->setIsBreaked(true);
+//                 (*iter)->setIsBreaked(true);
                 
-                vector<Frag*>frags = *(*iter)->getFrags();
-//                cout << "frags size: " << frags.size() << endl;
+//                 vector<Frag*>frags = *(*iter)->getFrags();
+// //                cout << "frags size: " << frags.size() << endl;
                 
                 
-                for (vector<Frag*>::iterator jter = frags.begin(); jter != frags.end(); jter++){
+//                 for (vector<Frag*>::iterator jter = frags.begin(); jter != frags.end(); jter++){
                     
-                    bool fragIsBorn = (*jter)->getIsNewBorn();
+//                     bool fragIsBorn = (*jter)->getIsNewBorn();
                     
-                    if(fragIsBorn){
-                        int fragIdx = (*jter)->getIndex();
-//                        cout << "fragidx: " << fragIdx << endl;
-                        oscSendII("/fgBorn", pidx, fragIdx);
-                        (*jter)->setIsNewBorn(false);
-                    }
-                }
-            }
+//                     if(fragIsBorn){
+//                         int fragIdx = (*jter)->getIndex();
+// //                        cout << "fragidx: " << fragIdx << endl;
+//                         oscSendII("/fgBorn", pidx, fragIdx);
+//                         (*jter)->setIsNewBorn(false);
+//                     }
+//                 }
+//             }
             
             
-            iter++;
-        }
+            // iter++;
+        // }
     }
 }
 
@@ -1127,9 +1142,29 @@ void testApp::oscRecv()
             }
             
         }else if(m.getAddress() == "/gunButPressed"){
-			butMsg = m.getArgAsInt32(0);
-            if (butMsg){
-          }
+            if (boxes.size() > kENDING_BOX_LIMIT){
+                //GO ENDING SEQUENCE
+                makeBox = false;
+
+
+            }else{
+                if (isLeft){
+                    makeBodyFromFile("vertices/"+ofToString(curFace)+".txt",
+                        ofGetWidth()*3/4, ofGetHeight()*2/5);
+
+                    oscSendI("/slideScreen", 1);
+                    // ofSetWindowPosition(1440, 0);
+                    ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+                    isLeft = false;
+                    makeBox = false;
+                } else {
+                    oscSendI("/slideScreen", 0);
+                    // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+                    ofSetWindowPosition(1440 - ofGetWidth(), 0);
+                    isLeft = true;
+                    makeBox = true;
+                }
+            }
 		}
         
         else{
@@ -1505,7 +1540,7 @@ void testApp::keyPressed(int key){
             
         // Toggle original movie play full screen
 		case 'm':
-        
+
             for (int i = 0; i < 8; i++){
                 for (int j = 0; j < 6; j++){
                     //00000001(1)

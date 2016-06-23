@@ -42,52 +42,32 @@ SynthDef(\gunShot,
 ~voiceBuf[5] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild2.wav");
 ~voiceBuf[6] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/dogChild.wav");
 ~voiceBuf[7] = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/theyAreWatching.wav");
+
+//------------------------ ending ------------------------//
+~endingMixBuf = Buffer.read(s, "/Users/giy/Desktop/rectShot/wav/ENDING_MIX.wav");
+
 )
 
 
-//Main
-(
-//Oscfuncs
-var mainMixSyn, voiceSyn, gunSyn, bombSyn,
-ofAddr, oscfn, titleBuf, soundBuf, buf, syn, synFrag, synBlobs, len, lenDiv, lenDivSec,
-fragContNum,
-maxBox, mainAmpLimit;
 
+(//Main
+var mainMixSyn, voiceSyn, gunSyn, bombSyn, endingSyn,
+ofAddr, oscfn,
+maxBox, mainAmpLimit,
+inEnding;
+
+//Declare
+inEnding = 0;
 maxBox = 80;
 mainAmpLimit = 0.6;
 
-fragContNum = Array.newClear(10);
-10.do{|i| fragContNum[i] = 0};
-
 ofAddr = NetAddr("127.0.0.1", 20000); // oF addr
-
 oscfn = Array.newClear(10);
 
 voiceSyn = Array.newClear(20);
 gunSyn = Array.newClear(4);
-// voiceBuf = Array.newClear(20);
 
-soundBuf = Array.newClear(10);
-buf = Array.newClear(10);
-// syn = Array.newClear(10);
-syn = Array2D.new(10, 10);
-synFrag = Array.newClear(100);
-synBlobs = Array.newClear(20);
-len = Array.newClear(6);
-lenDiv = Array.newClear(6);
-lenDivSec = Array.newClear(6);
-
-
-
-
-
-// titleBuf = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/title.wav");
-// buf[0] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/aya.wav");
-// buf[1] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/han.wav");
-// buf[2] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/sewol.wav");
-// buf[3] = Buffer.read(s, "/Users/teum11/Desktop/lonewolf_sound/park.wav");
-
-
+//Synth pre run
 mainMixSyn = Synth(\bufRead, [\bufnum, ~mainMixBuf.bufnum, \amp, 0]);
 
 voiceSyn[0] = Synth(\bufRead, [\bufnum, ~voiceBuf[0].bufnum, \trig, 0, \rate, 0]);
@@ -99,12 +79,7 @@ voiceSyn[5] = Synth(\bufRead, [\bufnum, ~voiceBuf[5].bufnum, \trig, 0, \rate, 0]
 voiceSyn[6] = Synth(\bufRead, [\bufnum, ~voiceBuf[6].bufnum, \trig, 0, \rate, 0]);
 voiceSyn[7] = Synth(\bufRead, [\bufnum, ~voiceBuf[7].bufnum, \trig, 0, \rate, 0]);
 
-
-/*bombSyn = Synth(\gunShot, [\bufnum, ~bombBuf.bufnum, \amp, 0]);
-gunSyn[0] = Synth(\gunShot, [\bufnum, ~gunBuf[0].bufnum]);
-gunSyn[1] = Synth(\gunShot, [\bufnum, ~gunBuf[1].bufnum]);
-gunSyn[2] = Synth(\gunShot, [\bufnum, ~gunBuf[2].bufnum]);
-gunSyn[3] = Synth(\gunShot, [\bufnum, ~gunBuf[3].bufnum]);*/
+endingSyn = Synth(\bufRead, [\bufnum, ~endingMixBuf.bufnum, \rate, 0, \amp, 0.8, \loop, 0]);
 
 
 
@@ -115,10 +90,18 @@ oscfn[0] = OSCFunc({|msg, time, addr, recvPort|
 	//msg[1] : number of box
 
 	var mainAmp = msg[1]/maxBox;
-	if (mainAmp >= mainAmpLimit, {mainAmp = mainAmpLimit;}); //Maximum amp limit
 	("mainAmp: " + mainAmp).postln;
 
+	if (mainAmp >= mainAmpLimit, {mainAmp = mainAmpLimit;}); //Maximum amp limit
+
+	//MainMix
 	mainMixSyn.set(\amp, mainAmp);
+
+	//EndingMix
+	if (inEnding == 1, {
+		endingSyn.set(\amp, mainAmp);
+	});
+
 
 }, '/boxNum');
 
@@ -181,14 +164,14 @@ oscfn[4] = OSCFunc({|msg, time, addr, recvPort|
 
 
 
-oscfn[5] = OSCFunc({|msg, time, addr, recvPort|
+/*oscfn[5] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
 
 	if(msg[1] == 1, {
 		titleBuf.play;
 	});
 
-}, '/title');
+}, '/title');*/
 
 
 oscfn[6] = OSCFunc({|msg, time, addr, recvPort|
@@ -219,27 +202,21 @@ oscfn[6] = OSCFunc({|msg, time, addr, recvPort|
 
 oscfn[7] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
-
-	/*
-	msg[1] = blob num
-	*/
-
-	if(msg[1] == 0,
-		{
-			10.do{|i| synBlobs[i].release(2)};
-			10.do{|i|10.do{|j| syn[i,j].free;};
-
-			};
-
-		},
-		{ msg[1].do{|i| synBlobs[i] = Synth(\liedR, [\amp, 0.1]);};}
-
-	);
-
-}, '/creatBlobSyn');
+	//msg[1] = 1
 
 
-oscfn[8] = OSCFunc({|msg, time, addr, recvPort|
+	endingSyn = Synth(\bufRead, [\bufnum, ~endingMixBuf.bufnum, \rate, 1, \trig, 1, \loop, 0]);
+	inEnding = 1;
+
+	mainMixSyn.free;
+	20.do{|i| voiceSyn[i].free;};
+
+
+
+}, '/goEnding');
+
+
+/*oscfn[8] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
 
 	/*
@@ -258,7 +235,7 @@ oscfn[8] = OSCFunc({|msg, time, addr, recvPort|
 		};
 	});
 
-}, '/blackout');
+}, '/blackout');*/
 
 
 

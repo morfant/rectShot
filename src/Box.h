@@ -18,7 +18,7 @@
 #include "convertFunc.h"
 
 #define N_VERTICE 4 //for Rectangle.
-#define N_FRAGS 12
+#define N_FRAGS 24 
 
 // ----Class definition----
 class Box{

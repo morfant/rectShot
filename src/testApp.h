@@ -50,8 +50,9 @@ enum {
     CV_CAM_HEIGHT = 480,
     kMIN_BLOBAREA = 200,
 
-    kBOX_MAKE_TIME = 12,
-    kBLUE_BOX_IDX = 20
+    kBOX_MAKE_TIME = 3,
+    kBLUE_BOX_IDX = 20,
+    kENDING_BOX_LIMIT = 60
 };
 
 
@@ -151,6 +152,7 @@ class testApp : public ofBaseApp{
 
         int                 lastTime = 0;
         int                 curTime = 0;
+        bool                isInEnding = false;
     
         //FILE
         ofFile              fileToRead;
@@ -185,12 +187,13 @@ class testApp : public ofBaseApp{
         //Box2d
         World*                  aWorld;
         b2World*                iWorld; //aWorld -> getWorld()
-        Wall                    *left, *right, *floor, *ceil, *center;
+        Wall                    *left, *right, *floor, *ceil, *center, *hardCenter;
         Box*                    aBox;
         Box*                    bBox;
         Ball*                   aBall;
         int                     pBodyIdx;
         int                     boxIdx = 0;
+        int                     boxNum = 0;
         bool                    touched;
         float                   sumOfArea;
     
@@ -221,7 +224,7 @@ class testApp : public ofBaseApp{
         float                   shot_X;
         float                   shot_Y;
         bool                    butPressed;
-        int                     butMsg;
+        // int                     butMsg;
     
         //STAGING
         bool        isFirstShot[STAGE_NUM];
