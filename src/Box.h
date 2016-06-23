@@ -56,6 +56,7 @@ protected:
     float       fragLifeTime;
     
     bool    toBlack = false;
+    bool    toBlue = false;
     bool    canBeHit = false;
     bool    canBeHitUpdated = false;
     int     index;
@@ -95,6 +96,7 @@ public:
     
     // Setter
     void    setToBlack(bool makeBlack);
+    void    setToBlue(bool makeBlue);
     void    setX(float posX);
     void    setY(float posY);
         

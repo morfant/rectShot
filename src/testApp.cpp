@@ -72,65 +72,65 @@ void testApp::setup(){
     blobShow = false;
 
 
-    for (int i = 1; i < MOVNUM; i++){
-        if (i == 7 || i == 9){
-            movie[i].loadMovie("movies/" + ofToString(i) + ".mov");
-        }else{
-            movie[i].loadMovie("movies/" + ofToString(i) + ".mp4");
-        }
-    };
+   //  for (int i = 1; i < MOVNUM; i++){
+   //      if (i == 7 || i == 9){
+   //          movie[i].loadMovie("movies/" + ofToString(i) + ".mov");
+   //      }else{
+   //          movie[i].loadMovie("movies/" + ofToString(i) + ".mp4");
+   //      }
+   //  };
 
-   // movie[11].loadMovie("movies/01.mp4");
+   // // movie[11].loadMovie("movies/01.mp4");
 
   
-    movAmp[1] = 1.0f;
-    movAmp[2] = 0.1f;
-    movAmp[3] = 0.1f;
-    movAmp[4] = 0.2f;
-    movAmp[5] = 0.5f;
+   //  movAmp[1] = 1.0f;
+   //  movAmp[2] = 0.1f;
+   //  movAmp[3] = 0.1f;
+   //  movAmp[4] = 0.2f;
+   //  movAmp[5] = 0.5f;
 
-    movDrawPosX = (ofGetWidth()/4.f) - (movie[curMovie].width/2.f);
-    movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
+   //  movDrawPosX = (ofGetWidth()/4.f) - (movie[curMovie].width/2.f);
+   //  movDrawPosY = (ofGetHeight()/2.f) - (movie[curMovie].height/2.f);
     
-    curMovie = 1; // 0 means using vidGrabber.
-    movie[curMovie].stop();
-    
-    
-    // Get movie Width / Height
-    for (int i = 1; i < MOVNUM; i++){
-        movRes[i].x = movie[i].getWidth();
-        movRes[i].y = movie[i].getHeight();
-    }
+   //  curMovie = 1; // 0 means using vidGrabber.
+   //  movie[curMovie].stop();
     
     
-    // CV
-    // Threshold inverting setting.
-    inverting[0] = true; // for vidGrabber
-    for (int i = 1; i < MOVNUM; i++) {
-        inverting[i] = false;
-    }
+   //  // Get movie Width / Height
+   //  for (int i = 1; i < MOVNUM; i++){
+   //      movRes[i].x = movie[i].getWidth();
+   //      movRes[i].y = movie[i].getHeight();
+   //  }
     
-    ofSetLogLevel(OF_LOG_VERBOSE);
     
-    // Using movie files
-    colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
-    grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
-    grayBg.allocate(movRes[curMovie].x, movRes[curMovie].y);
-    grayDiff.allocate(movRes[curMovie].x, movRes[curMovie].y);
+   //  // CV
+   //  // Threshold inverting setting.
+   //  inverting[0] = true; // for vidGrabber
+   //  for (int i = 1; i < MOVNUM; i++) {
+   //      inverting[i] = false;
+   //  }
     
-    // Set cv threshold
-    threshold[0] = TH_CAM;
-    threshold[1] = TH_1;
-    threshold[2] = TH_2;
-    threshold[3] = TH_3;
-    threshold[4] = TH_4;
-    threshold[5] = TH_5;
-    threshold[6] = TH_6;
-    threshold[7] = TH_7;
-    threshold[8] = TH_8;
-    threshold[9] = TH_9;
-    threshold[10] = TH_10;
-    threshold[11] = TH_11;
+   //  ofSetLogLevel(OF_LOG_VERBOSE);
+    
+   //  // Using movie files
+   //  colorImg.allocate(movRes[curMovie].x, movRes[curMovie].y);
+   //  grayImage.allocate(movRes[curMovie].x, movRes[curMovie].y);
+   //  grayBg.allocate(movRes[curMovie].x, movRes[curMovie].y);
+   //  grayDiff.allocate(movRes[curMovie].x, movRes[curMovie].y);
+    
+   //  // Set cv threshold
+   //  threshold[0] = TH_CAM;
+   //  threshold[1] = TH_1;
+   //  threshold[2] = TH_2;
+   //  threshold[3] = TH_3;
+   //  threshold[4] = TH_4;
+   //  threshold[5] = TH_5;
+   //  threshold[6] = TH_6;
+   //  threshold[7] = TH_7;
+   //  threshold[8] = TH_8;
+   //  threshold[9] = TH_9;
+   //  threshold[10] = TH_10;
+   //  threshold[11] = TH_11;
 
     
     // Box2D
@@ -239,29 +239,29 @@ void testApp::update(){
         
         
         // opencv update
-        bool bNewFrame = false;
+        // bool bNewFrame = false;
 
-        //cam
-        movie[curMovie].update();
-        bNewFrame = movie[curMovie].isFrameNew();
+        // //cam
+        // movie[curMovie].update();
+        // bNewFrame = movie[curMovie].isFrameNew();
 
-        if (bNewFrame){
+        // if (bNewFrame){
 
-            // Resize allocated images.
-            colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
-            grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
+        //     // Resize allocated images.
+        //     colorImg.resize(movRes[curMovie].x, movRes[curMovie].y);
+        //     grayImage.resize(movRes[curMovie].x, movRes[curMovie].y);
         
-            movie[curMovie].update();
-            colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
-            grayImage.setFromColorImage(colorImg);
-            grayImage.threshold(threshold[curMovie], inverting[curMovie]);
+        //     movie[curMovie].update();
+        //     colorImg.setFromPixels(movie[curMovie].getPixels(), movRes[curMovie].x, movRes[curMovie].y);
+        //     grayImage.setFromColorImage(colorImg);
+        //     grayImage.threshold(threshold[curMovie], inverting[curMovie]);
             
-            contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
+        //     contourFinder.findContours(grayImage, kMIN_BLOBAREA, (movRes[curMovie].x * movRes[curMovie].y)/3, kBLOBNUM, true);
 
-            blobsVec.clear(); //Init containers with clearing.
-            blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
-            cvBlobNum = blobsVec.size();
-        }
+        //     blobsVec.clear(); //Init containers with clearing.
+        //     blobsVec = contourFinder.blobs; //Get vector<ofxCvBlob>
+        //     cvBlobNum = blobsVec.size();
+        // }
 
 
         //OSC - num of boxes
@@ -284,13 +284,30 @@ void testApp::update(){
             
 
         // Previous superball shooting check
-        if(shotBallMade){
-            delete aBall;
-            balls.clear();
-            shotBallMade = false;
+        // if(shotBallMade){
+        //     delete aBall;
+        //     balls.clear();
+        //     shotBallMade = false;
+        // }
+        
+        
+        //MAKE BOX PERIODICALLY
+        curTime = (int)ofGetElapsedTimef();
+        if (makeBox && (curTime - lastTime) > kBOX_MAKE_TIME){
+
+            bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f,
+                BOX_CATE_BIT, BOX_MASK_BIT, boxIdx);
+
+            if (boxIdx == kBLUE_BOX_IDX) {
+                bBox->setToBlue(true);
+            }
+
+            boxes.push_back(bBox);
+            boxIdx++;
+
+            lastTime = curTime;
         }
-        
-        
+
         //SHOOTING CHECK
         if (isShot){
             
@@ -352,11 +369,11 @@ void testApp::update(){
             
                 cout << "No hit!" << endl;
 
-                if (darkBoxes.size()){
-                    for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
-                        (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
-                    }
-                }
+                // if (darkBoxes.size()){
+                //     for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+                //         (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                //     }
+                // }
       
 
                 // aBall = new Ball(iWorld, shot_X, shot_Y, true);
@@ -380,13 +397,13 @@ void testApp::update(){
         // OSC
         oscRecv();
         
-        if(OriginDestroyed){
-            if(!blobsSynMade){
-                oscSendI("/creatBlobSyn", blobsVec.size());
-                blobsSynMade = true;
-            }
-            sendBlobsOSC();
-        }
+        // if(OriginDestroyed){
+        //     if(!blobsSynMade){
+        //         oscSendI("/creatBlobSyn", blobsVec.size());
+        //         blobsSynMade = true;
+        //     }
+        //     sendBlobsOSC();
+        // }
         
     }
     
@@ -416,19 +433,19 @@ void testApp::draw(){
     
    
     // Draw movie.
-    if (movShow){
-      movie[curMovie].draw(movDrawPosX, movDrawPosY);
-        // movie[curMovie].draw(0, 0);
+    // if (movShow){
+    //   movie[curMovie].draw(movDrawPosX, movDrawPosY);
+    //     // movie[curMovie].draw(0, 0);
 
-    }
+    // }
     
 
     
     
     // Draw ball
-    for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
-        (*iter)->renderAtBodyPosition();
-    }
+    // for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
+    //     (*iter)->renderAtBodyPosition();
+    // }
 
     // Like a darkmaterial in the outer space
     if (darkBoxes.size()){
@@ -443,7 +460,8 @@ void testApp::draw(){
 
             // (*iter)->getBody()->ApplyForce(b2Vec2(scaledVol * mulForce, scaledVol * mulForce),
                 // b2Vec2(ofGetWidth()/4, ofGetHeight()/2));
-            (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(scaledVol, scaledVol),
+            (*iter)->getBody()->ApplyLinearImpulse(
+                b2Vec2(scaledVol*ampMul, scaledVol*ampMul),
                 b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
   
         }
@@ -474,6 +492,9 @@ void testApp::draw(){
     if(pBodies.size()) drawPolygonBodies();
     
 
+    //KILL ALL
+    if (killSwitch) killAll();
+
     
     // SHOW LaserPointTracking point
     if (shotPointTest){
@@ -495,14 +516,12 @@ void testApp::draw(){
         ofPushStyle();
         ofSetHexColor(0x00ffaa);
         stringstream reportStr;
-        reportStr << "Mov : " << curMovie << endl
-        << "threshold " << threshold[curMovie] << " (press: +/-)" << endl
-        << "press ' ' to invert" << endl
-        << "num blobs found " << contourFinder.nBlobs << endl
-        << "num polygonBodies " << pBodies.size() << endl
-        << "aforce: " << aforce << endl
-        << "FPS: " << ofGetFrameRate() << endl
-        << "Sum of Area: " << (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f << endl;
+        reportStr
+        << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
+        << "BOX born after: " << kBOX_MAKE_TIME - (curTime - lastTime) << endl
+        << "Num boxes " << boxes.size() << endl
+        << "killSwitch: " << killSwitch << endl
+        << "FPS: " << ofGetFrameRate() << endl;
         ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
     }
@@ -514,19 +533,19 @@ void testApp::draw(){
     
     
     //TEST POINTS
-    ofSetColor(0, 255, 0);
-    ofCircle(500, 500, 5);
+    // ofSetColor(0, 255, 0);
+    // ofCircle(500, 500, 5);
     
-    ofCircle(1000, 500, 5);
+    // ofCircle(1000, 500, 5);
     
-    ofSetColor(255, 0, 0);
-    ofCircle(400, 300, 5);
+    // ofSetColor(255, 0, 0);
+    // ofCircle(400, 300, 5);
 
 
     //CENTER LINE
-    ofSetLineWidth(2.0);
-    ofSetColor(255);
-    ofLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+    // ofSetLineWidth(2.0);
+    // ofSetColor(255);
+    // ofLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
    
     
     // Clear no Frags bodies
@@ -583,25 +602,25 @@ void testApp::draw(){
     }
 
     // Draw grayimage.
-    if (grayShow){
-        grayImage.draw(movDrawPosX, movDrawPosY);
-    }
+    // if (grayShow){
+    //     grayImage.draw(movDrawPosX, movDrawPosY);
+    // }
  
-    // Draw contourFinder
-    if (blobShow){
-        ofPushStyle();
-        ofPushMatrix();
-        ofTranslate(movDrawPosX, movDrawPosY);
-        ofSetLineWidth(2.0);
+    // // Draw contourFinder
+    // if (blobShow){
+    //     ofPushStyle();
+    //     ofPushMatrix();
+    //     ofTranslate(movDrawPosX, movDrawPosY);
+    //     ofSetLineWidth(2.0);
         
-        for (int i = 0; i < contourFinder.nBlobs; i++){
-            // contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
-            contourFinder.blobs[i].draw(0, 0);
+    //     for (int i = 0; i < contourFinder.nBlobs; i++){
+    //         // contourFinder.blobs[i].draw(movDrawPosX, movDrawPosY);
+    //         contourFinder.blobs[i].draw(0, 0);
             
-        }
-        ofPopMatrix();
-        ofPopStyle();
-    }
+    //     }
+    //     ofPopMatrix();
+    //     ofPopStyle();
+    // }
  
     //AUDIO - visualize
     ofSetColor(245, 58, 135);
@@ -611,40 +630,40 @@ void testApp::draw(){
 
 
     //WINDOW SLIDE
-    if (slideRight){
-        if (slideWindowInTime(ofPoint(ofGetWidth()/2, 0), ofPoint(ofGetWidth(), 0), 20)){
-            cout << windowPosition.x << endl;
-            slideRight = false;
-        }
-    }else if (slideLeft){
-        if (slideWindowInTime(ofPoint(ofGetWidth(), 0), ofPoint(ofGetWidth()/2, 0), 20)){
-            cout << windowPosition.x << endl;
-            slideLeft = false;
-        }
-    }
+    // if (slideRight){
+    //     if (slideWindowInTime(ofPoint(ofGetWidth()/2, 0), ofPoint(ofGetWidth(), 0), 20)){
+    //         cout << windowPosition.x << endl;
+    //         slideRight = false;
+    //     }
+    // }else if (slideLeft){
+    //     if (slideWindowInTime(ofPoint(ofGetWidth(), 0), ofPoint(ofGetWidth()/2, 0), 20)){
+    //         cout << windowPosition.x << endl;
+    //         slideLeft = false;
+    //     }
+    // }
     
      
-    if (inTitle){
-//        printf("inTitle true.\n");
-        movShow = false;
-        blobShow = false;
-        grayShow = false;
+//     if (inTitle){
+// //        printf("inTitle true.\n");
+//         movShow = false;
+//         blobShow = false;
+//         grayShow = false;
         
-        title.draw(
-        ofGetWidth()/4.f - title.width/2.f,
-        ofGetHeight()/2.f-title.height/2.f);
-    }
+//         title.draw(
+//         ofGetWidth()/4.f - title.width/2.f,
+//         ofGetHeight()/2.f-title.height/2.f);
+//     }
     
-    if (blackout) {
-        ofSetColor(0);
-        ofRect(0, 0, ofGetWidth(), ofGetHeight());
-        oscSendI("/blackout", 1);
-        for (int i = 1; i < STAGE_NUM - 1; i++) {
-            movie[i].setVolume(0.f);
-            movie[i].stop();
-        }
-//        printf("blackout!\n");
-    }
+//     if (blackout) {
+//         ofSetColor(0);
+//         ofRect(0, 0, ofGetWidth(), ofGetHeight());
+//         oscSendI("/blackout", 1);
+//         for (int i = 1; i < STAGE_NUM - 1; i++) {
+//             movie[i].setVolume(0.f);
+//             movie[i].stop();
+//         }
+// //        printf("blackout!\n");
+//     }
     
 }
 
@@ -1011,6 +1030,26 @@ void testApp::resetFaces(){
 }
 
 
+void testApp::killAll()
+{
+
+    //CLEAR DARK BOXES
+    for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+        iWorld->DestroyBody((*iter)->getBody());
+        delete (*iter);
+    }
+    darkBoxes.clear();
+
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        if ((*iter)->getIsThereMBody()) {
+            (*iter)->breakBody();
+            break;
+        }
+    }
+
+}
+
+
 /* ================================ UTIL ================================ */
 
 float testApp::ofToFloat(string str) {
@@ -1066,6 +1105,13 @@ void testApp::oscRecv()
 
             oscSendI("/gunShot", 1); //send to SC, int set kind of gun shot sound.
 
+            //shake
+            if (darkBoxes.size()){
+                for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
+                    (*iter)->getBody()->ApplyLinearImpulse(b2Vec2(4.f, 4.f), b2Vec2(ofGetWidth()/2, ofGetHeight()/2));
+                }
+            }
+
 			shot_X = m.getArgAsFloat(0);
 			shot_Y = m.getArgAsFloat(1);
             
@@ -1083,14 +1129,7 @@ void testApp::oscRecv()
         }else if(m.getAddress() == "/gunButPressed"){
 			butMsg = m.getArgAsInt32(0);
             if (butMsg){
-                if(!OriginDestroyed){
-                    if(isFirstShot[curStage] == true) {
-                        isFirstShot[curStage] = false;
-                    }
-                }else{
-                    tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
-                }
-            }
+          }
 		}
         
         else{
@@ -1466,13 +1505,25 @@ void testApp::keyPressed(int key){
             
         // Toggle original movie play full screen
 		case 'm':
-//            if(!REALTIME){
-                if (movShow) movShow = false;
-                else{
-                    grayShow = false;
-                    movShow = true;
+        
+            for (int i = 0; i < 8; i++){
+                for (int j = 0; j < 6; j++){
+                    //00000001(1)
+                    Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
+                        DARKBOX_CATE_BIT, DARKBOX_MASK_BIT);
+                    darkBox->setToBlack(true);
+                    darkBoxes.push_back(darkBox);
                 }
-//            }
+            }
+
+            if (!makeBox) makeBox = true;
+//            if(!REALTIME){
+//                 if (movShow) movShow = false;
+//                 else{
+//                     grayShow = false;
+//                     movShow = true;
+//                 }
+// //            }
 			break;
             
             
@@ -1528,8 +1579,17 @@ void testApp::keyPressed(int key){
             break;
 
         case 'y':
-            slideLeft = true;
-            slideRight = false;
+            // slideLeft = true;
+            // slideRight = false;
+            if (isLeft){
+                oscSendI("/slideScreen", 1);
+                ofSetWindowPosition(1440, 0);
+                isLeft = false;
+            } else {
+                oscSendI("/slideScreen", 0);
+                ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+                isLeft = true;
+            }
             break;
 
         case 'u':
@@ -1579,6 +1639,7 @@ void testApp::keyPressed(int key){
                 // ball
                 for (vector<Ball*>::iterator iter = balls.begin(); iter != balls.end(); iter++) {
                     iWorld->DestroyBody((*iter)->getBody());
+                    delete (*iter);
                 }
                 balls.clear();
             
@@ -1673,6 +1734,16 @@ void testApp::keyPressed(int key){
 
             break;
             
+        case 'k': 
+            if (!killSwitch){
+                makeBox = false;
+                killSwitch = true;
+            } else {
+                killSwitch = false;
+            }
+
+            break;
+
         case 'h': //simulaton 'h'itting body
             
             if (pBodies.size()){
@@ -1685,7 +1756,6 @@ void testApp::keyPressed(int key){
                     }
                 }
             }
-            
  
             if (boxes.size() > 0){
                 cout << "Hit a box!" << endl;

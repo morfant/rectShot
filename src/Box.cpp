@@ -247,6 +247,11 @@ Box::setToBlack(bool makeBlack)
     toBlack = makeBlack;
 }
 
+void
+Box::setToBlue(bool makeBlue)
+{
+    toBlue = makeBlue;
+}
 
 void
 Box::setX(float _posX)
@@ -279,12 +284,16 @@ Box::renderAtBodyPosition()
 
         if (toBlack){
             //Rect for edge line
-            ofSetColor(255, 255, 255, 255);
-            ofRect(0, 0, size+4, size+4);
+            // ofSetColor(255, 255, 255, 255);
+            // ofRect(0, 0, size+4, size+4);
             
             normalColor = ofColor(0, 0, 0, MAX(0, alpha));
             
         }
+        if (toBlue){
+            normalColor = ofColor(0, 50, 120);
+        }
+  
         // else{normalColor = ofColor(255, 255, 255, MAX(0, alpha)); }
 
         ofSetColor(normalColor);

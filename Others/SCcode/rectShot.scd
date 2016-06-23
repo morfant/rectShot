@@ -194,17 +194,28 @@ oscfn[5] = OSCFunc({|msg, time, addr, recvPort|
 oscfn[6] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
 
-	/*
-	msg[1] = blobs order
-	msg[2] = centroid.x
-	msg[3] = centroid.y
-	msg[4] = blobs area
-	*/
+	//msg[1] = 0 / 1
+	//0 : slide to Left Screen (boxes scene)
+	//1 : slide to Right Screen (polygon bodie scene)
 
-	synBlobs[msg[1]].set(\freq, msg[3], \pan, msg[2].linlin(0, 1200, -1, 1), \amp, msg[4].linlin(0, 60000, 0.0, 0.2));
+	var idx;
+	idx = msg[1];
 
+	if (idx == 1,
+		{
+			//Mute
+			20.do{|i| voiceSyn[i].set(\rate, 0);};
+			mainMixSyn.set(\rate, 0);
+		},
+		{
+			//Unmute
+			20.do{|i| voiceSyn[i].set(\rate, 1);};
+			mainMixSyn.set(\rate, 1);
+		}
+	);
 
-}, '/blobs');
+}, '/slideScreen');
+
 
 oscfn[7] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;

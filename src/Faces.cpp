@@ -147,7 +147,7 @@ Faces::Faces(b2World* aWorld, b2Vec2* vertices,
     isBreaked = false;
     isReal = true;
     
-    fragLifeTimeBySec = 12.0f;
+    fragLifeTimeBySec = 14.0f; // 0 means no dying.
     fragLifeTime = fragLifeTimeBySec * ofGetFrameRate();
     
     

@@ -61,9 +61,9 @@ enum { //box2d Userdata
 
 
 enum {
-    kCONTACT_LIMIT = 20,
+    kCONTACT_LIMIT = 25,
     kMAX_VERTICES = 200,
-    kSAMPLING_INTV = 10 //Fewer value makes more frags
+    kSAMPLING_INTV = 5 //Fewer value makes more frags
 };
 
 
