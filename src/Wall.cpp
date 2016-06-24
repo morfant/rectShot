@@ -203,8 +203,8 @@ Wall::renderAtBodyPosition()
     
     ofPushStyle();
     ofSetRectMode(OF_RECTMODE_CENTER);
-//    ofSetColor(100, 200, 200); // Wall color
-    ofSetColor(0, 0, 0); // Wall color
+    ofSetColor(100, 200, 200); // Wall color
+    // ofSetColor(0, 0, 0); // Wall color
     ofFill();
     ofPushMatrix();
     ofTranslate(_toPixelX(pos.x), _toPixelY(pos.y));

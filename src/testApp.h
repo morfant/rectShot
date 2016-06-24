@@ -199,6 +199,7 @@ class testApp : public ofBaseApp{
         int                     boxNum = 0;
         bool                    touched;
         float                   sumOfArea;
+        int                     thickness;
     
 
 

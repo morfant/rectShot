@@ -149,7 +149,7 @@ void testApp::setup(){
     iWorld = aWorld -> getWorld();
 
     // Wall - box
-    int thickness = 20.f;
+    thickness = 20.f;
     left = new Wall(iWorld, 0 - thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
     right = new Wall(iWorld, ofGetWidth() + thickness/2, ofGetHeight()/2, thickness, ofGetHeight());
     floor = new Wall(iWorld, ofGetWidth()/2, ofGetHeight() + thickness/2, ofGetWidth(), thickness);
@@ -159,8 +159,7 @@ void testApp::setup(){
     center = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2, thickness/2, ofGetHeight(),
         CENTERWALL_CATE_BIT, CENTERWALL_MASK_BIT);
 
-    hardCenter = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2,
-        thickness/2, ofGetHeight());
+    
       
     // vector init
     // blobsPts.clear();
@@ -281,21 +280,19 @@ void testApp::update(){
                 bBox->setToBlue(true);
             }
 
-            if (isInPreEnding && isInEnding == false){
-                slideScreen(1);
-            }
-
             boxes.push_back(bBox);
             boxIdx++;
+            boxNum = boxes.size();
+
+            if (isInPreEnding && boxNum <= kENDING_BOX_LIMIT){
+                slideScreen(1);
+            }
 
             lastTime = curTime;
         }
 
 
-        //CHEKC BOX NUM
-        boxNum = boxes.size();
-
-        //PRE-ENDING
+        //check PRE-ENDING
         if (boxNum > kPRE_ENDING_BOX_LIMIT && isInPreEnding == false){ 
             isInPreEnding = true;
             fragLife = 1;
@@ -303,11 +300,14 @@ void testApp::update(){
             slideScreen(1);
         }
 
-        //ENDING
+        //check ENDING
         if (boxNum > kENDING_BOX_LIMIT && isInEnding == false){
             oscSendI("/goEnding", 1);
             isInEnding = true;
             makeBox = false;
+
+            hardCenter = new Wall(iWorld, ofGetWidth()/2, ofGetHeight()/2,
+                thickness/2, ofGetHeight());
         }
 
         //OSC - num of boxes
@@ -353,18 +353,17 @@ void testApp::update(){
                         cout << "hit Face!" << endl;
 
                         // Consider 'life' of face object
-                        int faceLife = (*iter)->getLife();
-                        if (faceLife > 0){
-                            (*iter)->shot();
-                        } else{
+                        (*iter)->shot();
+
+                        if ((*iter)->getLife() <= 0){
                             oscSendI("/explo", 1); //Trigger Explosion sound
                             (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
 
                            if (isInPreEnding && isInEnding == false){
                                 slideScreen(0);
                             }
-
                         }
+
 
                                              // else (*iter)->breakBody(shot_X, shot_Y);
                         
@@ -464,16 +463,11 @@ void testApp::draw(){
 
 
     // Draw Box2D walls
-    left->renderAtBodyPosition();
-    right->renderAtBodyPosition();
-    floor->renderAtBodyPosition();
-    ceil->renderAtBodyPosition();
-    center->renderAtBodyPosition();
-
-    if (isInEnding){
-        hardCenter->renderAtBodyPosition();
-    }
-
+    // left->renderAtBodyPosition();
+    // right->renderAtBodyPosition();
+    // floor->renderAtBodyPosition();
+    // ceil->renderAtBodyPosition();
+    // center->renderAtBodyPosition();
 
     
        
@@ -560,7 +554,7 @@ void testApp::draw(){
         stringstream reportStr;
         reportStr
 
-        << boxes.size() << " / " << "KillSwitch " << killSwitch << endl
+        << boxes.size() << " | " << "KillSwitch " << (bool)killSwitch << endl
 
         << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
         << "BOX born after: " << boxMakingTime - (curTime - lastTime) << endl
@@ -749,6 +743,7 @@ void testApp::slideScreen(bool showRight)
 
         if (isInPreEnding && isInEnding == false){
             curFace = boxNum - kPRE_ENDING_BOX_LIMIT;
+            // cout << "boxNum: " << boxNum << " curFace: " << curFace << endl;
         }
 
         makeBodyFromFile("vertices/"+ofToString(curFace)+".txt",
@@ -769,6 +764,8 @@ void testApp::slideScreen(bool showRight)
         ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
         isLeft = true;
         makeBox = true;
+        //Reset Time interval
+        lastTime = curTime;
 
     }
 

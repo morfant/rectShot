@@ -759,7 +759,7 @@ Faces::shot()
 {
     if (life){
         life--;
-        cout << "face life: " << life << endl;
+        // cout << "face life: " << life << endl;
         //Change normalColor as Hittingcolor
         ofColor hittingColor = ofColor(200, 50, 20);
         normalColor = hittingColor;
