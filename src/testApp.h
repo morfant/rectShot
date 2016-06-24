@@ -50,8 +50,8 @@ enum {
     CV_CAM_HEIGHT = 480,
     kMIN_BLOBAREA = 200,
 
-    kBOX_MAKE_TIME = 3,
     kBLUE_BOX_IDX = 20,
+    kPRE_ENDING_BOX_LIMIT = 53, //kENDING_BOX_LIMIT - FACENUM
     kENDING_BOX_LIMIT = 60
 };
 
@@ -134,6 +134,7 @@ class testApp : public ofBaseApp{
         bool slideRight = false;
         bool slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe);
         void touchingCheck();
+        void slideScreen(bool toLeft);
 
 
         void killAll();
@@ -146,6 +147,7 @@ class testApp : public ofBaseApp{
         /*--------------------VARIABLE--------------------*/
 
         //WINDOW
+        int                 boxMakingTime;
         float               ampMul = 1.0f;
         ofPoint             windowPosition;
         bool                isLeft = true;
@@ -153,7 +155,8 @@ class testApp : public ofBaseApp{
         int                 lastTime = 0;
         int                 curTime = 0;
         bool                isInEnding = false;
-    
+        bool                isInPreEnding = false; 
+
         //FILE
         ofFile              fileToRead;
         

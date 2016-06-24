@@ -13,4 +13,6 @@ n.sendMsg("/lasernPos", 139, 624);
 
 
 
-n.sendMsg("/button", 1);
+n.sendMsg("/gunButPressed", 1);
+
+

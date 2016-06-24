@@ -12,7 +12,7 @@ void testApp::setup(){
 
     //File
     // fileToRead = ofToDataPath("file.txt");
-    fileToRead = ofToDataPath("verticeData.txt");
+    // fileToRead = ofToDataPath("verticeData.txt");
 
     //Set projection width / height
     int pjW = 1920;
@@ -21,6 +21,10 @@ void testApp::setup(){
     float winPosX = (pjW - ofGetWidth())/2.f;
     float winPosY = (pjH - ofGetHeight())/2.f;
     
+
+    //alle 12 seconden
+    boxMakingTime = 12;
+
     if (REALTIME){
 //        ofSetWindowPosition(winPosX + 1440, winPosY - 90); //Extended desktop
         
@@ -29,9 +33,9 @@ void testApp::setup(){
         
 
         info = false;
-        inTitle = false;
-        inLastScene = false;
-        blackout = false;
+        // inTitle = false;
+        // inLastScene = false;
+        // blackout = false;
     }else{
         
         windowPosition = ofPoint(0, 0);
@@ -43,9 +47,9 @@ void testApp::setup(){
 //        ofSetWindowPosition(0, 0);
         // ofSetWindowPosition((1440-800)/2, (900-600)/2);
         info = true;
-        inTitle = false;
-        inLastScene = false;
-        blackout = false;
+        // inTitle = false;
+        // inLastScene = false;
+        // blackout = false;
     }
     
   
@@ -55,21 +59,21 @@ void testApp::setup(){
 	receiver.setup(RECV_PORT);
     ofSetFrameRate(60.f);
     
-    title.loadImage("img/lonewolf_title.jpg");
+    // title.loadImage("img/lonewolf_title.jpg");
 
-    shotBallMade = false;
+    // shotBallMade = false;
     isShot = false;
     butPressed = false;
     // bodyHit = false;
     
 
     // MOVIE
-    curMoviePlaying = true;
+    // curMoviePlaying = true;
     
     // Playing source select
-    movShow = false;
-    grayShow = false;
-    blobShow = false;
+    // movShow = false;
+    // grayShow = false;
+    // blobShow = false;
 
 
    //  for (int i = 1; i < MOVNUM; i++){
@@ -134,11 +138,11 @@ void testApp::setup(){
 
     
     // Box2D
-    aforce = 0.3f;
-    touched = false;
+    // aforce = 0.3f;
+    // touched = false;
     balls.clear();
     pBodies.clear();
-    pBodyIdx = 0;
+    // pBodyIdx = 0;
     
     // World
     aWorld = new World();
@@ -159,8 +163,8 @@ void testApp::setup(){
         thickness/2, ofGetHeight());
       
     // vector init
-    blobsPts.clear();
-    blobsPtsDiv.clear();
+    // blobsPts.clear();
+    // blobsPtsDiv.clear();
     
   
     //PREPARE DARK BOXES!
@@ -175,15 +179,15 @@ void testApp::setup(){
     }
 
 
-    //FRAG
+    //FRAG - frags of pBodies
     fragColor = ofColor(70, 140, 60);
 
     
     // OSC
-    blobsSynMade = false;
+    // blobsSynMade = false;
     
     //to play title music
-    oscSendI("/title", 1);
+    // oscSendI("/title", 1);
     
 
     //AUDIO - Active mic input interation
@@ -268,13 +272,17 @@ void testApp::update(){
 
         //MAKE BOX PERIODICALLY
         curTime = (int)ofGetElapsedTimef();
-        if (makeBox && (curTime - lastTime) > kBOX_MAKE_TIME){
+        if (makeBox && (curTime - lastTime) > boxMakingTime){
 
             bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f,
                 BOX_CATE_BIT, BOX_MASK_BIT, boxIdx);
 
             if (boxIdx == kBLUE_BOX_IDX) {
                 bBox->setToBlue(true);
+            }
+
+            if (isInPreEnding && isInEnding == false){
+                slideScreen(1);
             }
 
             boxes.push_back(bBox);
@@ -286,11 +294,20 @@ void testApp::update(){
 
         //CHEKC BOX NUM
         boxNum = boxes.size();
-        if (boxNum > kENDING_BOX_LIMIT && isInEnding == false){
-            isInEnding = true;
-            oscSendI("/goEnding", 1);
-            makeBox = false;
 
+        //PRE-ENDING
+        if (boxNum > kPRE_ENDING_BOX_LIMIT && isInPreEnding == false){ 
+            isInPreEnding = true;
+            fragLife = 1;
+            boxMakingTime = 1;
+            slideScreen(1);
+        }
+
+        //ENDING
+        if (boxNum > kENDING_BOX_LIMIT && isInEnding == false){
+            oscSendI("/goEnding", 1);
+            isInEnding = true;
+            makeBox = false;
         }
 
         //OSC - num of boxes
@@ -342,8 +359,14 @@ void testApp::update(){
                         } else{
                             oscSendI("/explo", 1); //Trigger Explosion sound
                             (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+
+                           if (isInPreEnding && isInEnding == false){
+                                slideScreen(0);
+                            }
+
                         }
-                        // else (*iter)->breakBody(shot_X, shot_Y);
+
+                                             // else (*iter)->breakBody(shot_X, shot_Y);
                         
                         //Make forec at shot position
                         // bodyHit = true;
@@ -431,6 +454,15 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
+    //BACKGROUND
+    ofBackground(0, 0, 0);
+
+    //BACKGROUND OF RIGHT SIDE
+    ofSetColor(148, 211, 230);
+    ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+    
+
+
     // Draw Box2D walls
     left->renderAtBodyPosition();
     right->renderAtBodyPosition();
@@ -443,14 +475,8 @@ void testApp::draw(){
     }
 
 
-    ofBackground(0, 0, 0);
     
-    //RIGHT SIDE OF SCREEN
-    ofSetColor(148, 211, 230);
-    // ofSetColor(10, 10, 10);
-    ofRect(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
-    
-   
+       
     // Draw movie.
     // if (movShow){
     //   movie[curMovie].draw(movDrawPosX, movDrawPosY);
@@ -521,19 +547,23 @@ void testApp::draw(){
         ofEllipse(0, 0, 20, 20);
         ofPopMatrix();
         ofPopStyle();
-    }
-    
-    shotPointTest = false;
 
+    }
+
+    shotPointTest = false;
     
+
 	// finally, a report
     if (info){
         ofPushStyle();
         ofSetHexColor(0x00ffaa);
         stringstream reportStr;
         reportStr
+
+        << boxes.size() << " / " << "KillSwitch " << killSwitch << endl
+
         << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
-        << "BOX born after: " << kBOX_MAKE_TIME - (curTime - lastTime) << endl
+        << "BOX born after: " << boxMakingTime - (curTime - lastTime) << endl
         << "Num boxes " << boxes.size() << endl
         << "killSwitch: " << killSwitch << endl
         << "FPS: " << ofGetFrameRate() << endl;
@@ -591,29 +621,29 @@ void testApp::draw(){
     // }
     
     // if (blackBoxes.size()){
-        for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); ) {
-            bool hasFrags = (*iter)->getFragsRemain();
-            if (!hasFrags){
-                delete (*iter);
-                blackBoxes.erase(iter);
-                cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
-            }else{
-                iter++;
-            }
-        }
+        // for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); ) {
+        //     bool hasFrags = (*iter)->getFragsRemain();
+        //     if (!hasFrags){
+        //         delete (*iter);
+        //         blackBoxes.erase(iter);
+        //         cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
+        //     }else{
+        //         iter++;
+        //     }
+        // }
     // }
     
     // if (darkBoxes.size()){
-        for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); ) {
-            bool hasFrags = (*iter)->getFragsRemain();
-            if (!hasFrags){
-                delete (*iter);
-                darkBoxes.erase(iter);
-                cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
-            }else{
-                iter++;
-            }
-        }
+        // for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); ) {
+        //     bool hasFrags = (*iter)->getFragsRemain();
+        //     if (!hasFrags){
+        //         delete (*iter);
+        //         darkBoxes.erase(iter);
+        //         cout << "size of blackBoxes after erase: " << blackBoxes.size() << endl;
+        //     }else{
+        //         iter++;
+        //     }
+        // }
     // }
 
     // Draw grayimage.
@@ -711,6 +741,37 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
     
     bufferCounter++;
     
+}
+
+void testApp::slideScreen(bool showRight)
+{
+    if (showRight){
+
+        if (isInPreEnding && isInEnding == false){
+            curFace = boxNum - kPRE_ENDING_BOX_LIMIT;
+        }
+
+        makeBodyFromFile("vertices/"+ofToString(curFace)+".txt",
+                    ofGetWidth()*3/4, ofGetHeight()*2/5);
+
+        //slide to show RIGHT side
+        oscSendI("/slideScreen", 1);
+        // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+        ofSetWindowPosition(1440 - ofGetWidth(), 0);
+        isLeft = false;
+        makeBox = false;
+
+    }else{
+
+        //slide to show LEFT side
+        oscSendI("/slideScreen", 0);
+        // ofSetWindowPosition(1440, 0);
+        ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+        isLeft = true;
+        makeBox = true;
+
+    }
+
 }
 
 
@@ -1142,27 +1203,21 @@ void testApp::oscRecv()
             }
             
         }else if(m.getAddress() == "/gunButPressed"){
-            if (boxes.size() > kENDING_BOX_LIMIT){
-                //GO ENDING SEQUENCE
-                makeBox = false;
 
+            if (isInEnding){
+                //ENDING - Destroy all boxes
+                killSwitch = true;
 
             }else{
-                if (isLeft){
-                    makeBodyFromFile("vertices/"+ofToString(curFace)+".txt",
-                        ofGetWidth()*3/4, ofGetHeight()*2/5);
 
-                    oscSendI("/slideScreen", 1);
-                    // ofSetWindowPosition(1440, 0);
-                    ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
-                    isLeft = false;
-                    makeBox = false;
+                if (isLeft){
+
+                    slideScreen(1);
+                    // makeBox = false;
                 } else {
-                    oscSendI("/slideScreen", 0);
-                    // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
-                    ofSetWindowPosition(1440 - ofGetWidth(), 0);
-                    isLeft = true;
-                    makeBox = true;
+                    // oscSendI("/slideScreen", 0);
+                    slideScreen(0);
+                    // makeBox = true;
                 }
             }
 		}
@@ -1617,13 +1672,11 @@ void testApp::keyPressed(int key){
             // slideLeft = true;
             // slideRight = false;
             if (isLeft){
-                oscSendI("/slideScreen", 1);
-                ofSetWindowPosition(1440, 0);
-                isLeft = false;
+                // oscSendI("/slideScreen", 1);
+                slideScreen(1);
             } else {
-                oscSendI("/slideScreen", 0);
-                ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
-                isLeft = true;
+                // oscSendI("/slideScreen", 0);
+                slideScreen(0);
             }
             break;
 
