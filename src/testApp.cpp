@@ -347,8 +347,8 @@ void testApp::update(){
             
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
-                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    // if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 
                         cout << "hit Face!" << endl;
 
@@ -357,7 +357,8 @@ void testApp::update(){
 
                         if ((*iter)->getLife() <= 0){
                             oscSendI("/explo", 1); //Trigger Explosion sound
-                            (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                            // (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                            (*iter)->breakBody(shot_X, shot_Y);
 
                            if (isInPreEnding && isInEnding == false){
                                 slideScreen(0);
@@ -376,14 +377,14 @@ void testApp::update(){
             
             for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
-                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                    if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    // if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 
                         cout << "hit Box!" << endl;
 
-                        (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
                         oscSendI("/brkBox", (*iter)->getIndex());
-                        // (*iter)->breakBody(shot_X, shot_Y);
+                        // (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                        (*iter)->breakBody(shot_X, shot_Y);
                         // bodyHit = true;
                     }
                 }
@@ -1106,6 +1107,9 @@ void testApp::resetFaces(){
 void testApp::killAll()
 {
 
+    if (!isLeft) slideScreen(0);
+    makeBox = false;
+
     //CLEAR DARK BOXES
     for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
         iWorld->DestroyBody((*iter)->getBody());
@@ -1187,17 +1191,14 @@ void testApp::oscRecv()
 
 			shot_X = m.getArgAsFloat(0);
 			shot_Y = m.getArgAsFloat(1);
-            
-            // check first shot
-            if(isFirstShot[curStage] == false) {
-                isFirstShot[curStage] = true;
-                firstShotCheck(curStage);
-            }else{
+            // shot_X = m.getArgAsInt32(0);
+            // shot_Y = m.getArgAsInt32(1);
+
+            if (!isLeft) shot_X += ofGetWidth()/2;
                 
 //                cout << "laserPoint_X: " << shot_X << " / laserPoint_Y: " << shot_Y << endl;
-                isShot = true;
-                shotPointTest = true;
-            }
+            isShot = true;
+            shotPointTest = true;
             
         }else if(m.getAddress() == "/gunButPressed"){
 
