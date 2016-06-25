@@ -18,7 +18,7 @@
 #include "convertFunc.h"
 
 #define N_VERTICE 4 //for Rectangle.
-#define N_FRAGS 24 
+#define N_FRAGS 24 //num of frags
 
 // ----Class definition----
 class Box{
@@ -44,6 +44,7 @@ protected:
     b2Vec2 mVertice[N_FRAGS];
     b2Vec2 mVerticeDiv[N_FRAGS];
     b2Vec2 tVertice[N_VERTICE];
+
     
     
     ofColor fragOutlineColor;
@@ -54,6 +55,7 @@ protected:
     bool                    isOriginal;
     float       fragLifeTimeBySec;
     float       fragLifeTime;
+    bool        isNextTarget = false;
     
     bool    toBlack = false;
     bool    toBlue = false;
@@ -95,6 +97,8 @@ public:
     b2Body*     getBody();
     
     // Setter
+
+    void    setNextTarget(bool target);
     void    setToBlack(bool makeBlack);
     void    setToBlue(bool makeBlue);
     void    setX(float posX);

@@ -15,8 +15,8 @@ void testApp::setup(){
     // fileToRead = ofToDataPath("verticeData.txt");
 
     //Set projection width / height
-    int pjW = 1920;
-    int pjH = 1080;
+    int pjW = 1024;
+    int pjH = 768;
     
     float winPosX = (pjW - ofGetWidth())/2.f;
     float winPosY = (pjH - ofGetHeight())/2.f;
@@ -38,6 +38,7 @@ void testApp::setup(){
         // blackout = false;
     }else{
         
+        // windowPosition = ofPoint(1440, 0); //for realtime
         windowPosition = ofPoint(0, 0);
         ofSetWindowPosition(windowPosition.x, windowPosition.y);
 
@@ -167,7 +168,7 @@ void testApp::setup(){
     
   
     //PREPARE DARK BOXES!
-    for (int i = 0; i < 8; i++){
+    for (int i = 0; i < 10; i++){
         for (int j = 0; j < 6; j++){
             //00000001(1)
             Box* darkBox = new Box(iWorld, 64*(i+1), 64*(j+1),
@@ -278,6 +279,13 @@ void testApp::update(){
 
             if (boxIdx == kBLUE_BOX_IDX) {
                 bBox->setToBlue(true);
+                boxMakingTime = 34;
+            }
+
+
+            if (boxIdx > kBLUE_BOX_IDX &&
+                isInEnding == false && isInPreEnding == false){
+                boxMakingTime = 12;
             }
 
             boxes.push_back(bBox);
@@ -329,6 +337,16 @@ void testApp::update(){
             }
         }
             
+        //HITTABLE BOXES
+        // for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        //     if ( (*iter)->getIsThereMBody() ){
+        //         bool isHittable = (*iter)->getCanBeHit();
+        //         if (isHittable){
+        //             hittableBoxes.push_back((*iter));
+        //         }
+        //     }
+        // }
+  
 
         // Previous superball shooting check
         // if(shotBallMade){
@@ -344,49 +362,78 @@ void testApp::update(){
   
         //SHOOTING CHECK
         if (isShot){
-            
             for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
-                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
-                    // if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 
-                        cout << "hit Face!" << endl;
+                    //Always hit
+                    if (!isLeft){
 
                         // Consider 'life' of face object
                         (*iter)->shot();
 
                         if ((*iter)->getLife() <= 0){
                             oscSendI("/explo", 1); //Trigger Explosion sound
-                            // (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
-                            (*iter)->breakBody(shot_X, shot_Y);
+                            (*iter)->breakBody();
 
                            if (isInPreEnding && isInEnding == false){
                                 slideScreen(0);
                             }
                         }
-
-
-                                             // else (*iter)->breakBody(shot_X, shot_Y);
-                        
-                        //Make forec at shot position
-                        // bodyHit = true;
                     }
+
+                //     // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                //     if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
+
+                //         cout << "hit Face!" << endl;
+
+                //         // Consider 'life' of face object
+                //         (*iter)->shot();
+
+                //         if ((*iter)->getLife() <= 0){
+                //             oscSendI("/explo", 1); //Trigger Explosion sound
+                //             (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                //             // (*iter)->breakBody(shot_X, shot_Y);
+
+                //            if (isInPreEnding && isInEnding == false){
+                //                 slideScreen(0);
+                //             }
+                //         }
+
+
+                //                              // else (*iter)->breakBody(shot_X, shot_Y);
+                        
+                //         //Make forec at shot position
+                //         // bodyHit = true;
+                //     }
+
                 }
             }
 
             
             for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                 if ( (*iter)->getIsThereMBody() ){
-                    if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    // if ( (*iter)->IsInside(b2Vec2(shot_X, shot_Y)) ){
+                    if (isLeft){
+
+                        int idx = (*iter)->getIndex();
+                        if (idx == targetIdx){
+                            oscSendI("/brkBox", idx);
+                            (*iter)->breakBody();
+                            break;
+                        }
+
+                    }
+
                     // if ( (*iter)->IsInside(b2Vec2(ofGetMouseX(), ofGetMouseY())) ){
 
-                        cout << "hit Box!" << endl;
+                    //     cout << "hit Box!" << endl;
 
-                        oscSendI("/brkBox", (*iter)->getIndex());
-                        // (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
-                        (*iter)->breakBody(shot_X, shot_Y);
-                        // bodyHit = true;
-                    }
+                    //     oscSendI("/brkBox", (*iter)->getIndex());
+                    //     (*iter)->breakBody(ofGetMouseX(), ofGetMouseY());
+                    //     // (*iter)->breakBody(shot_X, shot_Y);
+                    //     // bodyHit = true;
+                    // }
+
                 }
             }
             
@@ -513,6 +560,17 @@ void testApp::draw(){
     for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
         (*iter)->renderAtBodyPosition();
         (*iter)->update();
+        (*iter)->setNextTarget(false);
+    }
+
+    // Set next target
+    for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+        if ((*iter)->getCanBeHit()){
+            // cout << "get can be hit" << endl;
+            (*iter)->setNextTarget(true);
+            targetIdx = (*iter)->getIndex();
+            break;
+        }
     }
     
 
@@ -555,12 +613,13 @@ void testApp::draw(){
         stringstream reportStr;
         reportStr
 
-        << boxes.size() << " | " << "KillSwitch " << (bool)killSwitch << endl
 
         << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
         << "BOX born after: " << boxMakingTime - (curTime - lastTime) << endl
         << "Num boxes " << boxes.size() << endl
         << "killSwitch: " << killSwitch << endl
+        // << "\n\n\n\n" << endl
+        << boxes.size() << " | " << "KillSwitch " << (bool)killSwitch << endl
         << "FPS: " << ofGetFrameRate() << endl;
         ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
@@ -752,7 +811,7 @@ void testApp::slideScreen(bool showRight)
 
         //slide to show RIGHT side
         oscSendI("/slideScreen", 1);
-        // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+        // ofSetWindowPosition(1440 - ofGetWidth()/2, 0); //for realtime
         ofSetWindowPosition(1440 - ofGetWidth(), 0);
         isLeft = false;
         makeBox = false;
@@ -761,12 +820,20 @@ void testApp::slideScreen(bool showRight)
 
         //slide to show LEFT side
         oscSendI("/slideScreen", 0);
-        // ofSetWindowPosition(1440, 0);
+        // ofSetWindowPosition(1440, 0); //for realtime
         ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
         isLeft = true;
         makeBox = true;
         //Reset Time interval
         lastTime = curTime;
+
+        //restore bluebox sounding
+        for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
+            if ( (*iter)->getIsThereMBody() ){
+                int idx = (*iter)->getIndex();
+                    oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
+            }
+        }
 
     }
 
@@ -1832,35 +1899,40 @@ void testApp::keyPressed(int key){
 
         case 'h': //simulaton 'h'itting body
             
-            if (pBodies.size()){
-                cout << "Hit a pBody!" << endl;
-                for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()) {
-                        oscSendI("/explo", 1); //Trigger Explosion sound
-                        (*iter)->breakBody();
-                        break;
-                    }
-                }
-            }
+            // if (pBodies.size()){
+            //     cout << "Hit a pBody!" << endl;
+            //     for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
+            //         if ((*iter)->getIsThereMBody()) {
+            //             oscSendI("/explo", 1); //Trigger Explosion sound
+            //             (*iter)->breakBody();
+            //             break;
+            //         }
+            //     }
+            // }
  
             if (boxes.size() > 0){
-                cout << "Hit a box!" << endl;
+                isShot = true;
+                oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
+
                 for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
+                        int idx = (*iter)->getIndex();
+                        oscSendI("/brkBox", idx);
                         (*iter)->breakBody();
                         break;
                     }
                 }
                 
-            }else if (blackBoxes.size() > 0) {
-                cout << "Hit a blackBox!" << endl;
-                for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
-                    if ((*iter)->getIsThereMBody()) {
-                        (*iter)->breakBody();
-                        break;
-                    }
-                }
-            }            
+            }
+            // else if (blackBoxes.size() > 0) {
+            //     cout << "Hit a blackBox!" << endl;
+            //     for (vector<Box*>::iterator iter = blackBoxes.begin(); iter != blackBoxes.end(); iter++) {
+            //         if ((*iter)->getIsThereMBody()) {
+            //             (*iter)->breakBody();
+            //             break;
+            //         }
+            //     }
+            // }            
             
             break;
             

@@ -50,7 +50,7 @@ enum {
     CV_CAM_HEIGHT = 480,
     kMIN_BLOBAREA = 200,
 
-    kBLUE_BOX_IDX = 20,
+    kBLUE_BOX_IDX = 10,
     kPRE_ENDING_BOX_LIMIT = 53, //kENDING_BOX_LIMIT - FACENUM
     kENDING_BOX_LIMIT = 60
 };
@@ -200,11 +200,12 @@ class testApp : public ofBaseApp{
         bool                    touched;
         float                   sumOfArea;
         int                     thickness;
+        int                     targetIdx;
     
 
 
         //Frag
-        int                     fragLife = 3;
+        int                     fragLife = 8;
         ofColor                 fragColor;
     
         //TARGET MAKER
@@ -250,6 +251,7 @@ class testApp : public ofBaseApp{
         vector<Box*>            boxes;
         vector<Box*>            blackBoxes;
         vector<Box*>            darkBoxes;
+        vector<Box*>            hittableBoxes;
         vector<Faces*>          pBodies;
         vector<ofxCvBlob>       blobsVec;
         vector<ofPoint>         blobsPts;

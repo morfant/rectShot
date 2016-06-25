@@ -241,6 +241,13 @@ Box::getBody()
 }
 
 
+
+void
+Box::setNextTarget(bool markTarget)
+{
+    isNextTarget = markTarget;
+}
+
 void
 Box::setToBlack(bool makeBlack)
 {
@@ -291,6 +298,12 @@ Box::renderAtBodyPosition()
             
         }
         if (toBlue){
+            if (isNextTarget){
+                cout << "next target box" << endl;
+                ofSetColor(255, 5, 5, 255);
+                ofRect(0, 0, size+4, size+4);
+            }
+
             normalColor = ofColor(0, 50, 120);
         }
   
@@ -327,6 +340,7 @@ Box::update()
             if (canBeHit == false){
                 canBeHitUpdated = true;
                 canBeHit = true;
+                toBlue = true;
             }            
 
         }else{
@@ -336,6 +350,8 @@ Box::update()
             if (canBeHit == true){
                 canBeHitUpdated = true;
                 canBeHit = false;
+                toBlue = false;
+                isNextTarget = false;
             }
         }
 

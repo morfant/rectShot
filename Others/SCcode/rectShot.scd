@@ -68,7 +68,7 @@ voiceSyn = Array.newClear(20);
 gunSyn = Array.newClear(4);
 
 //Synth pre run
-mainMixSyn = Synth(\bufRead, [\bufnum, ~mainMixBuf.bufnum, \amp, 0]);
+mainMixSyn = Synth(\bufRead, [\bufnum, ~mainMixBuf.bufnum, \amp, 0, \trig, 0, \rate, 0]);
 
 voiceSyn[0] = Synth(\bufRead, [\bufnum, ~voiceBuf[0].bufnum, \trig, 0, \rate, 0]);
 voiceSyn[1] = Synth(\bufRead, [\bufnum, ~voiceBuf[1].bufnum, \trig, 0, \rate, 0]);
@@ -95,7 +95,7 @@ oscfn[0] = OSCFunc({|msg, time, addr, recvPort|
 	if (mainAmp >= mainAmpLimit, {mainAmp = mainAmpLimit;}); //Maximum amp limit
 
 	//MainMix
-	mainMixSyn.set(\amp, mainAmp);
+	mainMixSyn.set(\amp, mainAmp, \trig, 1, \rate, 1);
 
 	//EndingMix
 	if (inEnding == 1, {
@@ -149,7 +149,7 @@ oscfn[3] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
 	idx = msg[1] - 1; //1 ~ 4 to 0 ~ 3
 
-	gunSyn[idx] = Synth(\gunShot, [\bufnum, ~gunBuf[idx].bufnum, \amp, 0.2]);
+	gunSyn[idx] = Synth(\gunShot, [\bufnum, ~gunBuf[idx].bufnum, \amp, 0.4]);
 
 }, '/gunShot');
 
@@ -192,7 +192,7 @@ oscfn[6] = OSCFunc({|msg, time, addr, recvPort|
 		},
 		{
 			//Unmute
-			20.do{|i| voiceSyn[i].set(\rate, 1);};
+			// 20.do{|i| voiceSyn[i].set(\rate, 1);};
 			mainMixSyn.set(\rate, 1);
 		}
 	);
@@ -243,6 +243,12 @@ CmdPeriod.doOnce{
 	10.do{|i| oscfn[i].free;};
 
 	20.do{|i| voiceSyn[i].free;};
+
+	mainMixSyn.set(\trig, 0);
+	mainMixSyn.free;
+	endingSyn.set(\trig, 0);
+	endingSyn.free;
+
 
 
 
