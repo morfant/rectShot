@@ -15,6 +15,7 @@
 #include "ofMain.h"
 #include "Box2D.h"
 #include "convertFunc.h"
+#include "OSCFunc.h"
 
 
 

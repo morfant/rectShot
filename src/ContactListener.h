@@ -23,7 +23,7 @@ class ContactListener : public b2ContactListener{
 protected:
 
     // OSC
-    ofxOscSender            sender;
+//    ofxOscSender            sender;
     float                   forceMul;
     // Pushing force of virtual bullet
 
@@ -33,6 +33,9 @@ protected:
     int     fragIdxInContact;
     
 public:
+
+//    OSCFunc*        oscFunc;
+
     // Birth and Death
     ContactListener();
     ~ContactListener();
@@ -50,11 +53,11 @@ public:
     
     
     // osc
-    void    oscSendII(string addr, int i, int j);
+    // void    oscSendII(string addr, int i, int j);
     
-    void    oscSendIFF(string addr, int i, float a, float b);
-    void    oscSendIF(string addr, int i, float a);
-    void    oscSendIIFF(string addr, int i, int j, float a, float b);
+    // void    oscSendIFF(string addr, int i, float a, float b);
+    // void    oscSendIF(string addr, int i, float a);
+    // void    oscSendIIFF(string addr, int i, int j, float a, float b);
     
     
     

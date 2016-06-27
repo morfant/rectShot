@@ -17,10 +17,9 @@
 #include "World.h"
 #include "Ball.h"
 #include "Wall.h"
-//#include "Faces.h"
 #include "Box.h"
-//#include "ofxOsc.h"
-#include "Tm.h"
+#include "OSCFunc.h"
+#include "Faces.h"
 
 
 
@@ -46,8 +45,6 @@ enum {
     TH_10 = 111, //meÍ
     TH_11 = 111, //meÍ
 
-    CV_CAM_WIDTH = 720,
-    CV_CAM_HEIGHT = 480,
     kMIN_BLOBAREA = 200,
 
     kBLUE_BOX_IDX = 10,
@@ -67,10 +64,6 @@ class testApp : public ofBaseApp{
 		
 
         //AUDIO
-        // ofSoundPlayer   soundPlayer;
-        // float 				fftSmoothed = 0;
-        // int                 nBandsToGet;
-
         void audioIn(float * input, int bufferSize, int nChannels);
     
         vector <float> leftSig;
@@ -81,6 +74,10 @@ class testApp : public ofBaseApp{
         float   scaledVol;
         
         ofSoundStream soundStream;
+    
+    
+        //OSCFunc
+        OSCFunc*             oscFunc;
 
     
 		void keyPressed(int key);
@@ -94,7 +91,6 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
         // CV
-        void sendBlobsOSC();
         void makeFaceAt(float posX, float posY);
         void makeBodyAt(float posX, float posY); 
         
@@ -114,26 +110,16 @@ class testApp : public ofBaseApp{
     
         // OSC
         void oscRecv();
-        void oscSendIIFF(string addr, int i, int j, float a, float b);
-        void oscSendIFF(string addr, int i, float a, float b);
-        void oscSendIF(string addr, int i, float a);
-        void oscSendII(string addr, int i, int j);
-        void oscSendF(string addr, float i);
-        void oscSendI(string addr, int i);
+
     
     
         // Staging
-        void nextStage();
-        void nextStage(unsigned long long time, bool enable);
         void videoEnd();
-        void tmEnable(int tNum, unsigned long long lifetime);
-        void firstShotCheck(int curStage);
     
         // UI
         bool slideLeft = false;
         bool slideRight = false;
         bool slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe);
-        void touchingCheck();
         void slideScreen(bool toLeft);
 
 
@@ -146,14 +132,16 @@ class testApp : public ofBaseApp{
     
         /*--------------------VARIABLE--------------------*/
 
+
         //WINDOW
+        int                 lastTime = 0;
+        int                 curTime = 0;
         int                 boxMakingTime;
         float               ampMul = 2.0f;
         ofPoint             windowPosition;
-        bool                isLeft = true;
 
-        int                 lastTime = 0;
-        int                 curTime = 0;
+
+        bool                isLeft = true;
         bool                isInEnding = false;
         bool                isInPreEnding = false; 
 
@@ -209,20 +197,23 @@ class testApp : public ofBaseApp{
         ofColor                 fragColor;
     
         //TARGET MAKER
-        ofColor     pBodyOutlineColor[STAGE_NUM];
-        int         targetNum[STAGE_NUM];
-        unsigned long long fragLifeTime[STAGE_NUM];
-        Tm*         tMan;
-        bool        tmOpen;
-        bool        randFace;
-        int         curStage;
-        unsigned long long stageStartTime;
-        ofImage     title;
-        bool        inTitle;
-        bool        inLastScene;
-        bool        blackout;
-        bool        OriginDestroyed;
-        bool        nextStageReady;
+        // ofColor     pBodyOutlineColor[STAGE_NUM];
+        // int         targetNum[STAGE_NUM];
+        // unsigned long long fragLifeTime[STAGE_NUM];
+        // Tm*         tMan;
+        // bool        tmOpen;
+        // bool        randFace;
+        // int         curStage;
+        // unsigned long long stageStartTime;
+        // ofImage     title;
+        // bool        inTitle;
+        // bool        inLastScene;
+        // bool        blackout;
+        // bool        OriginDestroyed;
+        // bool        nextStageReady;
+
+       
+
         bool                    bodyHit;
         bool                    shotBallMade;
         bool                    isShot;
@@ -237,16 +228,13 @@ class testApp : public ofBaseApp{
         bool        shotPointTest;
     
     
-    
-        //OSC
-        ofxOscSender            sender;
-        ofxOscReceiver          receiver;
+        void                    sendBlobsOSC();
         bool                    blobsSynMade;
         int                     numBoxes = 0;
 
     
         // container
-        Faces       pBodiesOriginalCopy[STAGE_NUM];
+        // Faces       pBodiesOriginalCopy[STAGE_NUM];
         vector<Ball*>           balls;
         vector<Box*>            boxes;
         vector<Box*>            blackBoxes;

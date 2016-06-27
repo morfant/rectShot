@@ -92,8 +92,6 @@ Frag::Frag(b2World* aWorld, float mx, float my, b2Vec2* vertices,
 //    myFixtureDef.friction = 0.7f;
     mBody->CreateFixture(&myFixtureDef);
     mBody->SetUserData((void*)fragUserData);
-    
-//    oscSendIIFF("/fgBorn", pBodyIndex, index, posX, posY);
 
     
     isNewBorn = true;
@@ -400,49 +398,6 @@ Frag::draw()
 {
     
     
-    
-}
-
-
-//osc
-
-void
-Frag::oscSendIFF(string addr, int i, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
-    
-//    sender.sendMessage(m);
-    
-}
-
-
-void
-Frag::oscSendIF(string addr, int i, float a)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    
-//    sender.sendMessage(m);
-    
-}
-
-void
-Frag::oscSendIIFF(string addr, int i, int j, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addIntArg(j);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
-    
-//    sender.sendMessage(m);
     
 }
 

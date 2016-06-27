@@ -17,8 +17,8 @@ ContactListener::ContactListener()
     // Adjust pushing force of virtual bullet
     forceMul = 1000.f;
 
-	// open an outgoing connection to HOST:PORT
-	sender.setup(HOST, PORT);
+	// // open an outgoing connection to HOST:PORT
+	// sender.setup(HOST, PORT);
     
 }
 
@@ -45,11 +45,12 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureA()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
             }
                 break;
@@ -60,11 +61,11 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureA()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
                 // Make pushing force
                 b2Body* self = contact->GetFixtureA()->GetBody();
@@ -143,7 +144,7 @@ ContactListener::BeginContact(b2Contact* contact)
                 
                 fragIdxInContact = fragIdx;
                 
-                oscSendII("/fgCont", pBodyIdx, fragIdx);
+                // oscSendII("/fgCont", pBodyIdx, fragIdx);
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();
@@ -201,11 +202,11 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureB()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
             }
                 break;
@@ -216,11 +217,11 @@ ContactListener::BeginContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureB()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
                 
                 // Make pushing force
@@ -336,11 +337,11 @@ ContactListener::EndContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureA()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
             }
                 break;
@@ -351,11 +352,11 @@ ContactListener::EndContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureA()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
                 // Make pushing force
                 b2Body* self = contact->GetFixtureA()->GetBody();
@@ -434,7 +435,7 @@ ContactListener::EndContact(b2Contact* contact)
                 
                 fragIdxInContact = -1;
                 
-                oscSendII("/fgCont", pBodyIdx, fragIdx);
+                // oscSendII("/fgCont", pBodyIdx, fragIdx);
                 
                 b2Body* self = contact->GetFixtureA()->GetBody();
                 b2Body* other = contact->GetFixtureB()->GetBody();
@@ -492,11 +493,11 @@ ContactListener::EndContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureB()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
             }
                 break;
@@ -507,11 +508,11 @@ ContactListener::EndContact(b2Contact* contact)
                 b2Body* ball = contact->GetFixtureB()->GetBody();
                 b2Vec2 pos = ball->GetPosition();
                 
-                ofxOscMessage m;
-                m.setAddress("/fromOF_Ball");
-                m.addFloatArg(_toPixelX(pos.x));
-                m.addFloatArg(_toPixelY(pos.y));
-                sender.sendMessage(m);
+                // ofxOscMessage m;
+                // m.setAddress("/fromOF_Ball");
+                // m.addFloatArg(_toPixelX(pos.x));
+                // m.addFloatArg(_toPixelY(pos.y));
+                // sender.sendMessage(m);
                 
                 
                 // Make pushing force
@@ -637,55 +638,55 @@ ContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
 
 //osc
 
-void
-ContactListener::oscSendIFF(string addr, int i, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
+// void
+// ContactListener::oscSendIFF(string addr, int i, float a, float b)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     m.addFloatArg(a);
+//     m.addFloatArg(b);
     
-    sender.sendMessage(m);
+//     sender.sendMessage(m);
     
-}
+// }
 
 
-void
-ContactListener::oscSendII(string addr, int i, int j)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addIntArg(j);
+// void
+// ContactListener::oscSendII(string addr, int i, int j)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     m.addIntArg(j);
     
-    sender.sendMessage(m);
+//     sender.sendMessage(m);
     
-}
+// }
 
 
-void
-ContactListener::oscSendIF(string addr, int i, float a)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
+// void
+// ContactListener::oscSendIF(string addr, int i, float a)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     m.addFloatArg(a);
     
-    sender.sendMessage(m);
+//     sender.sendMessage(m);
     
-}
+// }
 
-void
-ContactListener::oscSendIIFF(string addr, int i, int j, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addIntArg(j);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
+// void
+// ContactListener::oscSendIIFF(string addr, int i, int j, float a, float b)
+// {
+//     ofxOscMessage m;
+//     m.setAddress(addr);
+//     m.addIntArg(i);
+//     m.addIntArg(j);
+//     m.addFloatArg(a);
+//     m.addFloatArg(b);
     
-    sender.sendMessage(m);
+//     sender.sendMessage(m);
     
-}
+// }

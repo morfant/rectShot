@@ -3,12 +3,15 @@
 void testApp::exit()
 {
     cout << "exiting.." << endl;
+    delete oscFunc;
     
 }
 
 //--------------------------------------------------------------
 void testApp::setup(){
 
+    //OSC
+    oscFunc = new OSCFunc();
 
     //File
     // fileToRead = ofToDataPath("file.txt");
@@ -38,8 +41,8 @@ void testApp::setup(){
         // blackout = false;
     }else{
         
-        windowPosition = ofPoint(1440, 0); //for realtime
-        // windowPosition = ofPoint(0, 0);
+//        windowPosition = ofPoint(1440, 0); //for realtime
+         windowPosition = ofPoint(0, 0);
         ofSetWindowPosition(windowPosition.x, windowPosition.y);
 
         // cout << ofGetWidth() << endl;
@@ -55,9 +58,6 @@ void testApp::setup(){
     
   
 
-    //OSC
-	sender.setup(HOST, PORT);
-	receiver.setup(RECV_PORT);
     ofSetFrameRate(60.f);
     
     // title.loadImage("img/lonewolf_title.jpg");
@@ -310,7 +310,7 @@ void testApp::update(){
 
         //check ENDING
         if (boxNum > kENDING_BOX_LIMIT && isInEnding == false){
-            oscSendI("/goEnding", 1);
+            oscFunc->oscSendI("/goEnding", 1);
             isInEnding = true;
             makeBox = false;
 
@@ -321,7 +321,7 @@ void testApp::update(){
         //OSC - num of boxes
         int curNumBoxes = boxNum;
         if (numBoxes != curNumBoxes){
-            oscSendI("/boxNum", curNumBoxes);
+            oscFunc->oscSendI("/boxNum", curNumBoxes);
             numBoxes = curNumBoxes;
         }
 
@@ -332,7 +332,7 @@ void testApp::update(){
                 int idx = (*iter)->getIndex();
                 curFace = (idx % 7) + 1;
                 if (hittable){
-                    oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
+                    oscFunc->oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
                 }
             }
         }
@@ -358,7 +358,7 @@ void testApp::update(){
         
 
         // OSC
-        oscRecv();
+//        oscRecv();
   
         //SHOOTING CHECK
         if (isShot){
@@ -372,7 +372,7 @@ void testApp::update(){
                         (*iter)->shot();
 
                         if ((*iter)->getLife() <= 0){
-                            oscSendI("/explo", 1); //Trigger Explosion sound
+                            oscFunc->oscSendI("/explo", 1); //Trigger Explosion sound
                             (*iter)->breakBody();
 
                            if (isInPreEnding && isInEnding == false){
@@ -417,7 +417,7 @@ void testApp::update(){
 
                         int idx = (*iter)->getIndex();
                         if (idx == targetIdx){
-                            oscSendI("/brkBox", idx);
+                            oscFunc->oscSendI("/brkBox", idx);
                             (*iter)->breakBody();
                             break;
                         }
@@ -479,18 +479,6 @@ void testApp::update(){
             isShot = false;
             // bodyHit = false;
         }
-        
-
-      
-        // if(OriginDestroyed){
-        //     if(!blobsSynMade){
-        //         oscSendI("/creatBlobSyn", blobsVec.size());
-        //         blobsSynMade = true;
-        //     }
-        //     sendBlobsOSC();
-        // }
-        
-    // }
     
 
 
@@ -788,7 +776,7 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
     curVol /= (float)numCounted;
     
     // this is how we get the root of rms :) 
-    curVol = sqrt( curVol );
+curVol = sqrt( curVol );
 
     smoothedVol *= 0.93;
     smoothedVol += 0.07 * curVol;
@@ -810,7 +798,7 @@ void testApp::slideScreen(bool showRight)
                     ofGetWidth()*3/4, ofGetHeight()*2/5);
 
         //slide to show RIGHT side
-        oscSendI("/slideScreen", 1);
+        oscFunc->oscSendI("/slideScreen", 1);
         ofSetWindowPosition(1440 - ofGetWidth()/2, 0); //for realtime
         // ofSetWindowPosition(1440 - ofGetWidth(), 0);
         isLeft = false;
@@ -819,7 +807,7 @@ void testApp::slideScreen(bool showRight)
     }else{
 
         //slide to show LEFT side
-        oscSendI("/slideScreen", 0);
+        oscFunc->oscSendI("/slideScreen", 0);
         ofSetWindowPosition(1440, 0); //for realtime
         // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
         isLeft = true;
@@ -831,7 +819,7 @@ void testApp::slideScreen(bool showRight)
         for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
             if ( (*iter)->getIsThereMBody() ){
                 int idx = (*iter)->getIndex();
-                    oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
+                   oscFunc->oscSendII("/canHit", idx, (int)(*iter)->getCanBeHit());
             }
         }
 
@@ -892,107 +880,9 @@ bool testApp::slideWindowInTime(ofPoint bPos, ofPoint ePos, float nframe)
 void testApp::drawPolygonBodies(){
     
 //    cout << "num of pbodies: " << pBodies.size() << endl;
-    
     for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-        
-        // bool pBodyIsAlive = (*iter)->getIsAlive();
-        // int pidx = (*iter)->getIndex();
-        // int dupIdx = (*iter)->getDupIndex();
-        // bool pBodyIsOriginal = (*iter)->getIsOriginal();
-        
-//        cout << "idx: " << pidx << " pBodyIsAlive: " << pBodyIsAlive << endl;
-        
-//         if (!pBodyIsAlive) { // When dying
-
-//             if(pBodyIsOriginal){
-//                 videoEnd();
-//                 OriginDestroyed = true;
-                
-//             }
-            
-//             delete (*iter);
-//             oscSendII("/pbDest", pidx, dupIdx);
-            
-//             iter = pBodies.erase(iter);
-//             float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
-//             oscSendF("/fgArea", fragAreaPercent);
-
-//             if(inLastScene){
-//                 if(fragAreaPercent < 1) kBLOBNUM = 0;
-//                 else kBLOBNUM = 4;
-
-//                 //cam ths adjust
-//                 threshold[0] = 130*(fragAreaPercent/100.f);
-                
-//                 if (fragAreaPercent > 25) {
-//                     movShow = true;
-//                 }else{
-//                     movShow = false;
-//                 }
-//             }
-            
-            
-            
-// //            cout << "pbodies size: " << pBodies.size() << endl;
-// //            cout << "pbodiesCopy size: " << pBodiesOriginalCopy.size() << endl;
-            
-//         }else{ // When alive
-            
-//             if(!pBodyIsOriginal){
-//                 bool pbIsBorn = (*iter)->getIsNewBorn();
-//                 if(pbIsBorn){
-//                     oscSendIIFF("/pbBorn", pidx, dupIdx, cvBlobPos.x, cvBlobPos.y);
-//                     (*iter)->setIsNewBorn(false);
-//                 }
-//             }
-
-            (*iter)->renderAtBodyPosition();
-            (*iter)->update();
-            
-//             if ( !(*iter)->getIsThereMBody() && !(*iter)->getIsBreaked()){
-// //                cout << "pidx: " << pidx << " dupIdx: "<< dupIdx << " is breaked and disappearing" << endl;
-//                 oscSendII("/pbBrek", pidx, dupIdx);
-//                 float fragAreaPercent = (getFragsArea()/(ofGetWidth()*ofGetHeight()))*100.f;
-//                 oscSendF("/fgArea", fragAreaPercent);
-                
-//                 if(inLastScene){
-                    
-//                     if(fragAreaPercent < 1) kBLOBNUM = 0;
-//                     else kBLOBNUM = 4;
-                    
-//                     //cam ths adjust
-//                     threshold[0] = 130*(fragAreaPercent/100.f);
-
-//                     if (fragAreaPercent > 25) {
-//                         movShow = true;
-//                     }else{
-//                         movShow = false;
-//                     }
-                    
-//                 }
-
-//                 (*iter)->setIsBreaked(true);
-                
-//                 vector<Frag*>frags = *(*iter)->getFrags();
-// //                cout << "frags size: " << frags.size() << endl;
-                
-                
-//                 for (vector<Frag*>::iterator jter = frags.begin(); jter != frags.end(); jter++){
-                    
-//                     bool fragIsBorn = (*jter)->getIsNewBorn();
-                    
-//                     if(fragIsBorn){
-//                         int fragIdx = (*jter)->getIndex();
-// //                        cout << "fragidx: " << fragIdx << endl;
-//                         oscSendII("/fgBorn", pidx, fragIdx);
-//                         (*jter)->setIsNewBorn(false);
-//                     }
-//                 }
-//             }
-            
-            
-            // iter++;
-        // }
+        (*iter)->renderAtBodyPosition();
+        (*iter)->update();
     }
 }
 
@@ -1240,14 +1130,16 @@ float testApp::getFragsArea(){
 void testApp::oscRecv()
 {
     // check for waiting messages
-	while(receiver.hasWaitingMessages()){
+    ofxOscReceiver* receiver = oscFunc->getReceiver();
+    
+	while((*receiver).hasWaitingMessages()){
 		// get the next message
 		ofxOscMessage m;
-		receiver.getNextMessage(&m);
+		(*receiver).getNextMessage(&m);
         
 		if(m.getAddress() == "/laserPos"){
 
-            oscSendI("/gunShot", 1); //send to SC, int set kind of gun shot sound.
+            oscFunc->oscSendI("/gunShot", 1); //send to SC, int set kind of gun shot sound.
 
             //shake
             if (darkBoxes.size()){
@@ -1317,177 +1209,17 @@ void testApp::sendBlobsOSC()
     int i = 0;
     for(vector<ofxCvBlob>::iterator iter = blobsVec.begin(); iter != blobsVec.end(); iter++){
         
-        ofxOscMessage m;
-        m.setAddress("/blobs");
-        m.addFloatArg(i);
-        m.addFloatArg(iter->centroid.x);
-        m.addFloatArg(iter->centroid.y);
-        m.addFloatArg(iter->area);
-        sender.sendMessage(m);
+        
+        float cx = iter->centroid.x;
+        float cy = iter->centroid.y;
+        float area = iter->area;
+        
+        oscFunc->oscSendIFFF("/blobs", i, cx, cy, area);
+        
         i++;
     }
 }
 
-
-void
-testApp::oscSendIIFF(string addr, int i, int j, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addIntArg(j);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
-    sender.sendMessage(m);
-}
-
-
-void
-testApp::oscSendIFF(string addr, int i, float a, float b)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    m.addFloatArg(b);
-    sender.sendMessage(m);
-}
-
-
-void
-testApp::oscSendIF(string addr, int i, float a)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addFloatArg(a);
-    sender.sendMessage(m);
-}
-
-
-void
-testApp::oscSendII(string addr, int i, int j)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    m.addIntArg(j);
-    sender.sendMessage(m);
-}
-
-
-void
-testApp::oscSendF(string addr, float i)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addFloatArg(i);
-    sender.sendMessage(m);
-}
-
-
-void
-testApp::oscSendI(string addr, int i)
-{
-    ofxOscMessage m;
-    m.setAddress(addr);
-    m.addIntArg(i);
-    sender.sendMessage(m);
-}
-
-
-// UI
-void testApp::touchingCheck()
-{
-    // Touching check
-    if (boxes.size() != 0){
-        b2ContactEdge* contact = aBox->getBody()->GetContactList();
-        
-        if (contact) {
-            b2Body* other = aBox->getBody()->GetContactList()->other;
-            
-            for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
-                if ((*iter)->getIsThereMBody()){
-                    
-                    bool isSelect = (*iter)->getSelectState();
-                    if ((*iter)->getBody() == other && touched == false){
-                        
-                        if (isSelect) (*iter)->setSelectState(false);
-                        else (*iter)->setSelectState(true);
-                        
-                        // Latch
-                        touched = true;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-// CONDITION
-void testApp::firstShotCheck(int curStage)
-{
-    if (isFirstShot[curStage]) {
-        cout << "first shot! of " << curStage << " !!" << endl;
-        
-        movie[curMovie].setVolume(0.0f); // Mute sound of movie.
-        
-        shot_X = bornPoint[curStage].x;
-        shot_Y = bornPoint[curStage].y;
-        
-        makeFaceAt(shot_X, shot_Y);
-    }
-}
-
-// STAGING
-void testApp::nextStage()
-{
-    cout << "NEXT stage" << endl;
-    tmOpen = false;
-    //            resetFaces();
-    
-    if (curMovie < MOVNUM - 1){
-        curMovie++;
-        movie[curMovie].play();
-        movie[curMovie].setVolume(movAmp[curMovie]);
-        
-    }
-
-    if (curStage < STAGE_NUM){
-        curStage++;
-    }
-
-    movShow = true;
-    blobShow = false;
-    
-    resetFaces();
-}
-
-
-void testApp::nextStage(unsigned long long time, bool enable) //NOT USING
-{
-    if (enable){
-        unsigned long long curTime = ofGetElapsedTimeMillis();
-        //    cout << "curTime: " << curTime << endl;
-        
-        if ((curTime - stageStartTime) > time){
-            
-            stageStartTime = curTime;
-            
-            cout << "NEXT stage" << endl;
-            tmOpen = false;
-            //            resetFaces();
-            curMovie++;
-            movie[curMovie].play();
-            curStage++;
-            movShow = true;
-            blobShow = false;
-            
-            enable = false;
-        }
-    }
-}
 
 void testApp::videoEnd()
 {
@@ -1500,23 +1232,12 @@ void testApp::videoEnd()
             
 }
 
-void testApp::tmEnable(int tNum, unsigned long long lifetime)
-{
-    cout << "target enabled, curStage: " << curStage << endl;
-    tMan->setPbody(&pBodiesOriginalCopy[curStage]);
-    tMan->setDupNum(tNum);
-    tMan->setFragLifeTime(lifetime);
-//    tMan->start();
-    tmOpen = true;
-}
 
-
-//--------------------------------------------------------------
+/* ================================ KEY & MOUSE ================================ */
 void testApp::keyPressed(int key){
 
 	switch (key){
         case '1':
-            inTitle = false;
             grayShow = false;
             movShow = false;
             blobShow = true;
@@ -1737,10 +1458,10 @@ void testApp::keyPressed(int key){
             // slideLeft = true;
             // slideRight = false;
             if (isLeft){
-                // oscSendI("/slideScreen", 1);
+//                 oscSendI("/slideScreen", 1);
                 slideScreen(1);
             } else {
-                // oscSendI("/slideScreen", 0);
+//                 oscSendI("/slideScreen", 0);
                 slideScreen(0);
             }
             break;
@@ -1877,7 +1598,7 @@ void testApp::keyPressed(int key){
              
         case 'q':
             isShot = true;
-            oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
+            oscFunc->oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
   
             if (darkBoxes.size()){
                 for (vector<Box*>::iterator iter = darkBoxes.begin(); iter != darkBoxes.end(); iter++) {
@@ -1903,7 +1624,7 @@ void testApp::keyPressed(int key){
             //     cout << "Hit a pBody!" << endl;
             //     for (vector<Faces*>::iterator iter = pBodies.begin(); iter != pBodies.end(); iter++) {
             //         if ((*iter)->getIsThereMBody()) {
-            //             oscSendI("/explo", 1); //Trigger Explosion sound
+                        // oscFunc->oscSendI("/explo", 1); //Trigger Explosion sound
             //             (*iter)->breakBody();
             //             break;
             //         }
@@ -1912,12 +1633,12 @@ void testApp::keyPressed(int key){
  
             if (boxes.size() > 0){
                 isShot = true;
-                oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
+                oscFunc->oscSendI("/gunShot", 2); //send to SC, int set kind of gun shot sound.
 
                 for (vector<Box*>::iterator iter = boxes.begin(); iter != boxes.end(); iter++) {
                     if ((*iter)->getIsThereMBody()) {
                         int idx = (*iter)->getIndex();
-                        oscSendI("/brkBox", idx);
+                        oscFunc->oscSendI("/brkBox", idx);
                         (*iter)->breakBody();
                         break;
                     }
@@ -1944,7 +1665,6 @@ void testApp::keyPressed(int key){
 
         case 's': //video stop
           
-            inTitle = false;
             //0x00000111(7)
             bBox = new Box(iWorld, ofGetWidth()*1/4, ofGetHeight()/2.f,
                 BOX_CATE_BIT, BOX_MASK_BIT, boxIdx);
@@ -1985,71 +1705,20 @@ void testApp::keyPressed(int key){
             
         case 'j':
             
-            blackout = true;
             
             break;
           
             
-        case 'o': //Make targets
-            //            if(OriginDestroyed){
-            tmEnable(targetNum[curStage], fragLifeTime[curStage]); // int target num
-            //            }
-            
-            break;
-            
-            
-        case 'n': //next step
-            
-            // Free previous blobs synths.
-            oscSendI("/creatBlobSyn", 0);
-            
-            OriginDestroyed = false;
-            blobsSynMade = false;
-            blobShow = false;
-            
-            
-            
-            
-            if (!inTitle){
-                
-                if(nextStageReady && curStage < STAGE_NUM - 2){
-                    nextStage();
-                    nextStageReady = false;
-                    
-                }else if(nextStageReady && curStage == STAGE_NUM - 2){
-                    
-                    if (curMovie != 0) movie[curMovie].stop();
-                    curStage++;
-                    curMovie = 0;
-                    movShow = true;
-                    blobShow = true;
-                }
-            }
-            
-            
-            break;
-            
-            
         case 'r':
-            randFace = !randFace;
             
-            // Free previous blobs synths.
-            oscSendI("/creatBlobSyn", 0);
             
-            if (!inLastScene) inLastScene = true;
             
             if (curMovie != 0) movie[curMovie].stop();
             curMovie = 0;
             movShow = false;
             
-            OriginDestroyed = true;
             blobsSynMade = false;
             
-            
-            
-            if (randFace) printf("RandFace - ON!\n");
-            else printf("RandFace - OFF!\n");
-
             break;
             
             

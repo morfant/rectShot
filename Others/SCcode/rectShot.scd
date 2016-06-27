@@ -85,11 +85,12 @@ endingSyn = Synth(\bufRead, [\bufnum, ~endingMixBuf.bufnum, \rate, 0, \amp, 0.8,
 
 //MainMix
 oscfn[0] = OSCFunc({|msg, time, addr, recvPort|
-	// msg.postln;
+
 
 	//msg[1] : number of box
 
 	var mainAmp = msg[1]/maxBox;
+	msg.postln;
 	("mainAmp: " + mainAmp).postln;
 
 	if (mainAmp >= mainAmpLimit, {mainAmp = mainAmpLimit;}); //Maximum amp limit

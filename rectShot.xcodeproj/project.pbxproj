@@ -60,6 +60,7 @@
 		67347D7F17D171A00023B9AE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67347D7917D171A00023B9AE /* main.cpp */; };
 		67347D8017D171A00023B9AE /* testApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67347D7A17D171A00023B9AE /* testApp.cpp */; };
 		67347D8117D171A00023B9AE /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67347D7C17D171A00023B9AE /* World.cpp */; };
+		67521C741D20D814003ED066 /* OSCFunc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67521C721D20D814003ED066 /* OSCFunc.cpp */; };
 		6758AA5917D386670078FA56 /* Box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6758AA5717D386670078FA56 /* Box.cpp */; };
 		67660D691C34F2C500982FFF /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67660D431C34F2C500982FFF /* IpEndpointName.cpp */; };
 		67660D6A1C34F2C500982FFF /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67660D481C34F2C500982FFF /* NetworkingUtils.cpp */; };
@@ -273,6 +274,8 @@
 		67347D7B17D171A00023B9AE /* testApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testApp.h; sourceTree = "<group>"; };
 		67347D7C17D171A00023B9AE /* World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = World.cpp; sourceTree = "<group>"; };
 		67347D7D17D171A00023B9AE /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = World.h; sourceTree = "<group>"; };
+		67521C721D20D814003ED066 /* OSCFunc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OSCFunc.cpp; sourceTree = "<group>"; };
+		67521C751D20E153003ED066 /* OSCFunc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSCFunc.h; sourceTree = "<group>"; };
 		6758AA5717D386670078FA56 /* Box.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Box.cpp; sourceTree = "<group>"; };
 		6758AA5817D386670078FA56 /* Box.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Box.h; sourceTree = "<group>"; };
 		67660D431C34F2C500982FFF /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
@@ -914,6 +917,8 @@
 				67AC82C21C1AF46500F7A687 /* Tm.cpp */,
 				6768AA031BDA689A00BEA93C /* ContactListener.h */,
 				6768AA021BDA689A00BEA93C /* ContactListener.cpp */,
+				67521C751D20E153003ED066 /* OSCFunc.h */,
+				67521C721D20D814003ED066 /* OSCFunc.cpp */,
 			);
 			name = class;
 			sourceTree = "<group>";
@@ -1308,6 +1313,7 @@
 				6720A8F917CF9C2500669E43 /* b2ContactManager.cpp in Sources */,
 				6720A8FA17CF9C2500669E43 /* b2Fixture.cpp in Sources */,
 				6720A8FB17CF9C2500669E43 /* b2Island.cpp in Sources */,
+				67521C741D20D814003ED066 /* OSCFunc.cpp in Sources */,
 				67660D731C34F2C500982FFF /* ofxOscMessage.cpp in Sources */,
 				67660D6E1C34F2C500982FFF /* OscOutboundPacketStream.cpp in Sources */,
 				6720A8FC17CF9C2500669E43 /* b2World.cpp in Sources */,
