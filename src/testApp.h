@@ -148,7 +148,7 @@ class testApp : public ofBaseApp{
 
         //WINDOW
         int                 boxMakingTime;
-        float               ampMul = 1.0f;
+        float               ampMul = 2.0f;
         ofPoint             windowPosition;
         bool                isLeft = true;
 
@@ -205,7 +205,7 @@ class testApp : public ofBaseApp{
 
 
         //Frag
-        int                     fragLife = 8;
+        int                     fragLife = 5;
         ofColor                 fragColor;
     
         //TARGET MAKER

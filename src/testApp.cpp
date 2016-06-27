@@ -38,8 +38,8 @@ void testApp::setup(){
         // blackout = false;
     }else{
         
-        // windowPosition = ofPoint(1440, 0); //for realtime
-        windowPosition = ofPoint(0, 0);
+        windowPosition = ofPoint(1440, 0); //for realtime
+        // windowPosition = ofPoint(0, 0);
         ofSetWindowPosition(windowPosition.x, windowPosition.y);
 
         // cout << ofGetWidth() << endl;
@@ -614,13 +614,13 @@ void testApp::draw(){
         reportStr
 
 
-        << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
-        << "BOX born after: " << boxMakingTime - (curTime - lastTime) << endl
-        << "Num boxes " << boxes.size() << endl
-        << "killSwitch: " << killSwitch << endl
-        // << "\n\n\n\n" << endl
-        << boxes.size() << " | " << "KillSwitch " << (bool)killSwitch << endl
-        << "FPS: " << ofGetFrameRate() << endl;
+        << "\n\n\n\n" << endl
+        // << "Running Time: " << curTime/60 << " min, " << curTime%60 << " sec" << endl
+        // << "BOX born after: " << boxMakingTime - (curTime - lastTime) << endl
+        // << "Num boxes " << boxes.size() << endl
+        // << "killSwitch: " << killSwitch << endl
+        // << "FPS: " << ofGetFrameRate() << endl
+        << boxes.size() << " | " << "KillSwitch " << (bool)killSwitch << endl;
         ofDrawBitmapString(reportStr.str(), 30, 40);
         ofPopStyle();
     }
@@ -722,10 +722,10 @@ void testApp::draw(){
     // }
  
     //AUDIO - visualize
-    ofSetColor(245, 58, 135);
-    ofFill();       
-    // ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
-    ofCircle(ofGetWidth() - 200, 200, scaledVol * 300.0f);
+    // ofSetColor(245, 58, 135);
+    // ofFill();       
+    // // ofCircle(ofGetWidth() - 200, 200, fftSmoothed * 300.0f);
+    // ofCircle(ofGetWidth() - 200, 200, scaledVol * 300.0f);
 
 
     //WINDOW SLIDE
@@ -811,8 +811,8 @@ void testApp::slideScreen(bool showRight)
 
         //slide to show RIGHT side
         oscSendI("/slideScreen", 1);
-        // ofSetWindowPosition(1440 - ofGetWidth()/2, 0); //for realtime
-        ofSetWindowPosition(1440 - ofGetWidth(), 0);
+        ofSetWindowPosition(1440 - ofGetWidth()/2, 0); //for realtime
+        // ofSetWindowPosition(1440 - ofGetWidth(), 0);
         isLeft = false;
         makeBox = false;
 
@@ -820,8 +820,8 @@ void testApp::slideScreen(bool showRight)
 
         //slide to show LEFT side
         oscSendI("/slideScreen", 0);
-        // ofSetWindowPosition(1440, 0); //for realtime
-        ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
+        ofSetWindowPosition(1440, 0); //for realtime
+        // ofSetWindowPosition(1440 - ofGetWidth()/2, 0);
         isLeft = true;
         makeBox = true;
         //Reset Time interval

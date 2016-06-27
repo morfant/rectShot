@@ -299,8 +299,8 @@ Box::renderAtBodyPosition()
         }
         if (toBlue){
             if (isNextTarget){
-                cout << "next target box" << endl;
-                ofSetColor(255, 5, 5, 255);
+                // cout << "next target box" << endl;
+                ofSetColor(255, 5, 5, 100);
                 ofRect(0, 0, size+4, size+4);
             }
 

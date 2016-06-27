@@ -149,7 +149,7 @@ oscfn[3] = OSCFunc({|msg, time, addr, recvPort|
 	// msg.postln;
 	idx = msg[1] - 1; //1 ~ 4 to 0 ~ 3
 
-	gunSyn[idx] = Synth(\gunShot, [\bufnum, ~gunBuf[idx].bufnum, \amp, 0.4]);
+	gunSyn[idx] = Synth(\gunShot, [\bufnum, ~gunBuf[idx].bufnum, \amp, 0.1]);
 
 }, '/gunShot');
 
@@ -205,7 +205,7 @@ oscfn[7] = OSCFunc({|msg, time, addr, recvPort|
 	//msg[1] = 1
 
 
-	endingSyn = Synth(\bufRead, [\bufnum, ~endingMixBuf.bufnum, \rate, 1, \trig, 1, \loop, 0]);
+	endingSyn = Synth(\bufRead, [\bufnum, ~endingMixBuf.bufnum, \rate, 1, \trig, 1, \loop, 0, \amp, 0.5]);
 	inEnding = 1;
 
 	mainMixSyn.free;
